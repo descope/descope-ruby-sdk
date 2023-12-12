@@ -3,7 +3,7 @@ $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 require 'descope/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'auth0'
+  s.name        = 'descope'
   s.version     = Descope::VERSION
   s.authors     = ['Descope']
   s.email       = ['support@descope.com']
