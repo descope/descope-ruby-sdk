@@ -11,9 +11,9 @@ require 'descope/api/v1'
 module Descope
   # Collecting dependencies here
   module Mixins
+    include Descope::Mixins::Common
     include Descope::Mixins::Headers
     include Descope::Mixins::HTTP
     include Descope::Mixins::Initializer
-    include Descope::Mixins::Common
   end
 end
