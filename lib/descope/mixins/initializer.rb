@@ -53,7 +53,7 @@ module Descope
 
       def initialize_v1(_options)
         extend Descope::Api::V1
-        extend Descope::Api::V1::Mgmt
+        extend Descope::Api::V1::Management
       end
     end
   end

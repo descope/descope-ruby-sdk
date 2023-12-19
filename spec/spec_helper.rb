@@ -2,6 +2,7 @@ require 'rack/test'
 require 'faker'
 require 'json'
 require 'descope'
+require_relative '../lib/descope/api/v1/management/common'
 
 if RUBY_VERSION >= '2.7.2'
   # NOTE: https://bugs.ruby-lang.org/issues/17000
@@ -54,6 +55,8 @@ RSpec.configure do |config|
     c.max_formatted_output_length = 1000000
   end
 end
+
+include Descope::Api::V1::Management::Common
 
 def wait(time, increment = 5, elapsed_time = 0, &block)
   yield
