@@ -5,9 +5,9 @@ module Descope
         # Management API calls
         module User
           # Load an existing user
-          def load(login_id = nil, user_id = nil)
-            if login_id.nil? && user_id.nil?
-              raise Descope::Exception::MissingLoginId if login_id.to_s.empty?
+          def load_user(login_id: nil, user_id: nil)
+            if (login_id.nil? || login_id.empty?) && (user_id.nil? || user_id.empty?)
+              raise Descope::MissingLoginOrUserId, 'Login ID is required to load a user'
             end
 
             path = '/v1/mgmt/user'

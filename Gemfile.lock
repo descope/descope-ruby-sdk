@@ -39,6 +39,7 @@ GEM
     diff-lcs (1.5.0)
     docile (1.4.0)
     domain_name (0.6.20231109)
+    dotenv (2.8.1)
     drb (2.2.0)
       ruby2_keywords
     faker (2.23.0)
@@ -78,6 +79,8 @@ GEM
     public_suffix (5.0.4)
     racc (1.7.3)
     rack (3.0.8)
+    rack-test (2.1.0)
+      rack (>= 1.3)
     rainbow (3.1.1)
     rake (13.1.0)
     rdoc (6.6.1)
@@ -161,10 +164,12 @@ DEPENDENCIES
   bundler
   coveralls
   descope!
+  dotenv
   faker (~> 2.0)
   fuubar (~> 2.0)
   irb
   pp
+  rack-test
   rake (~> 13.0)
   rspec (~> 3.11)
   rubocop

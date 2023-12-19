@@ -15,4 +15,6 @@ group :test do
   gem 'simplecov-cobertura'
   gem 'timecop', require: false
   gem 'pp'
+  gem 'rack-test', require: false
+  gem 'dotenv', require: false
 end
