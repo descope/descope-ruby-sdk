@@ -16,10 +16,11 @@ module Descope
       MIN_REQUEST_RETRY_DELAY = 250
       BASE_DELAY = 100
 
-      %i[get post patch delete delete_with_body].each do |method|
+      %i[get post post_file post_form put patch delete delete_with_body].each do |method|
         define_method(method) do |uri, body = {}, extra_headers|
           body = body.delete_if { |_, v| v.nil? }
           # authorization_header(token) unless token.nil?
+          puts "http call: method: #{method}, uri: #{uri}, timeout: #{timeout}, headers: #{headers}, body: #{body}"
           request_with_retry(method, uri, body, extra_headers)
         end
       end
@@ -94,7 +95,8 @@ module Descope
                  else
                    call(method, encode_uri(uri), timeout, headers, body.to_json)
                  end
-
+        puts "result #{result.inspect}"
+        puts "http code: #{result.code}"
         case result.code
         when 200...226 then safe_parse_json(result.body)
         when 400       then raise Descope::BadRequest.new(result.body, code: result.code, headers: result.headers)

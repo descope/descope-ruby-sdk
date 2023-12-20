@@ -28,10 +28,7 @@ module Descope
 
   # exception for unset user_id, this might cause removal of
   # all users, or other unexpected behaviour
-  class MissingLoginId < Descope::Exception; end
-  class MissingUserId < Descope::Exception; end
-
-  class MissingProjectID < Descope::Exception; end
+  class ArgumentException < Descope::Exception; end
 
   # exception for invalid token when its empty
   class InvalidToken < Descope::Exception; end

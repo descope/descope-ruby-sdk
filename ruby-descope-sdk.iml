@@ -18,6 +18,7 @@
     <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.5.0, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="docile (v1.4.0, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="domain_name (v0.6.20231109, rbenv: 3.2.2 bin) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="dotenv (v2.8.1, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="drb (v2.2.0, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="faker (v2.23.0, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="fuubar (v2.5.1, rbenv: 3.2.2 bin) [gem]" level="application" />
@@ -44,6 +45,7 @@
     <orderEntry type="library" scope="PROVIDED" name="public_suffix (v5.0.4, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="racc (v1.7.3, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rack (v3.0.8, rbenv: 3.2.2 bin) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rack-test (v2.1.0, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rainbow (v3.1.1, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rake (v13.1.0, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rdoc (v6.6.1, rbenv: 3.2.2 bin) [gem]" level="application" />
@@ -77,5 +79,49 @@
     <orderEntry type="library" scope="PROVIDED" name="vcr (v6.2.0, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="webmock (v3.19.1, rbenv: 3.2.2 bin) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="zache (v0.13.1, rbenv: 3.2.2 bin) [gem]" level="application" />
+  </component>
+  <component name="RakeTasksCache">
+    <option name="myRootTask">
+      <RakeTaskImpl id="rake">
+        <subtasks>
+          <RakeTaskImpl description="Run All Suites" fullCommand="all" id="all" />
+          <RakeTaskImpl description="Build descope-0.0.1.gem into the pkg directory" fullCommand="build" id="build" />
+          <RakeTaskImpl id="build">
+            <subtasks>
+              <RakeTaskImpl description="Generate SHA512 checksum if descope-0.0.1.gem into the checksums directory" fullCommand="build:checksum" id="checksum" />
+            </subtasks>
+          </RakeTaskImpl>
+          <RakeTaskImpl description="Remove any temporary products" fullCommand="clean" id="clean" />
+          <RakeTaskImpl description="Remove any generated files" fullCommand="clobber" id="clobber" />
+          <RakeTaskImpl description="Build and install descope-0.0.1.gem into system gems" fullCommand="install" id="install" />
+          <RakeTaskImpl id="install">
+            <subtasks>
+              <RakeTaskImpl description="Build and install descope-0.0.1.gem into system gems without network access" fullCommand="install:local" id="local" />
+            </subtasks>
+          </RakeTaskImpl>
+          <RakeTaskImpl description="Run Integration Tests" fullCommand="integration" id="integration" />
+          <RakeTaskImpl description="Create tag v0.0.1 and build and push descope-0.0.1.gem to rubygems.org" fullCommand="release[remote]" id="release[remote]" />
+          <RakeTaskImpl description="Run Rubocop" fullCommand="rubocop" id="rubocop" />
+          <RakeTaskImpl id="rubocop">
+            <subtasks>
+              <RakeTaskImpl description="Autocorrect RuboCop offenses (only when it's safe)" fullCommand="rubocop:autocorrect" id="autocorrect" />
+              <RakeTaskImpl description="Autocorrect RuboCop offenses (safe and unsafe)" fullCommand="rubocop:autocorrect_all" id="autocorrect_all" />
+              <RakeTaskImpl description="" fullCommand="rubocop:auto_correct" id="auto_correct" />
+            </subtasks>
+          </RakeTaskImpl>
+          <RakeTaskImpl description="Run Unit Tests" fullCommand="spec" id="spec" />
+          <RakeTaskImpl description="Run unit and integration tests" fullCommand="test" id="test" />
+          <RakeTaskImpl description="" fullCommand="default" id="default" />
+          <RakeTaskImpl description="" fullCommand="release" id="release" />
+          <RakeTaskImpl id="release">
+            <subtasks>
+              <RakeTaskImpl description="" fullCommand="release:guard_clean" id="guard_clean" />
+              <RakeTaskImpl description="" fullCommand="release:rubygem_push" id="rubygem_push" />
+              <RakeTaskImpl description="" fullCommand="release:source_control_push" id="source_control_push" />
+            </subtasks>
+          </RakeTaskImpl>
+        </subtasks>
+      </RakeTaskImpl>
+    </option>
   </component>
 </module>

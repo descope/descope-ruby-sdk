@@ -18,12 +18,12 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:get).with(
         USER_LOAD_PATH, params: { loginId: 'someone' }
       )
-      expect { @instance.load_user(login_id: 'someone') }.not_to raise_error(Descope::MissingLoginId)
+      expect { @instance.load_user(login_id: 'someone') }.not_to raise_error(Descope::ArgumentException)
     end
 
     it "is expected to raise error on #{USER_LOAD_PATH} without login_id" do
       allow(@instance).to receive(:get).with(USER_LOAD_PATH, nil)
-      expect { @instance.load_user }.to raise_error(Descope::MissingLoginId)
+      expect { @instance.load_user }.to raise_error(Descope::ArgumentException)
     end
   end
 
@@ -32,12 +32,12 @@ describe Descope::Api::V1::Management::User do
       allow(@instance).to receive(:get).with(
         USER_LOAD_PATH, { user_id: 'ABCD' }
       )
-      expect { @instance.load_by_user_id(user_id: 'ABCD') }.not_to raise_error(Descope::MissingUserId)
+      expect { @instance.load_by_user_id(user_id: 'ABCD') }.not_to raise_error(Descope::ArgumentException)
     end
 
     it "is expected to raise error on #{USER_LOAD_PATH} without user_id" do
       allow(@instance).to receive(:get).with(USER_LOAD_PATH, nil)
-      expect { @instance.load_by_user_id }.to raise_error(Descope::MissingUserId)
+      expect { @instance.load_by_user_id }.to raise_error(Descope::ArgumentException)
     end
   end
 

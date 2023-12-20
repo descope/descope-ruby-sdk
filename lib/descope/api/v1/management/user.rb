@@ -9,24 +9,24 @@ module Descope
           def load_user(login_id: nil)
             # Retrieve user information based on the provided Login ID
             if login_id.nil? || login_id.empty?
-              raise Descope::MissingLoginId, "Failed loading user by login_id #{login_id}"
+              raise Descope::ArgumentException, "Failed loading user by login_id #{login_id}"
             end
 
             path = Common::USER_LOAD_PATH
             request_params = {}
             request_params[:loginId] = login_id unless login_id.nil?
-            get(path, params: request_params)
+            get(path, request_params)
           end
 
           def load_by_user_id(user_id: nil)
             # Retrieve user information based on the provided user ID
             # The user ID can be found on the user's JWT.
-            raise Descope::MissingUserId, "Failed loading user by user_id #{user_id}" if user_id.nil? || user_id.empty?
+            raise Descope::ArgumentException, "Failed loading user by user_id #{user_id}" if user_id.nil? || user_id.empty?
 
             path = Common::USER_LOAD_PATH
             request_params = {}
             request_params[:userId] = user_id unless user_id.nil?
-            get(path, params: request_params)
+            get(path, request_params)
           end
 
           # Create a new test user.
@@ -50,8 +50,12 @@ module Descope
             additional_login_ids: nil
           )
             if login_id.nil? || login_id.empty?
-              raise Descope::MissingLoginId, 'login_id is required to create a user'
+              raise Descope::ArgumentException, 'login_id is required to create a user'
             end
+
+            # if email.nil? || phone.nil?
+            #   raise Descope::ArgumentException, 'email or phone is required to create a user'
+            # end
 
             role_names ||= []
             user_tenants ||= []
@@ -77,7 +81,7 @@ module Descope
               send_sms: nil,
               additional_login_ids: additional_login_ids,
             )
-            post(path, params: request_params)
+            post(path, request_params)
           end
 
 
