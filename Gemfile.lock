@@ -24,6 +24,7 @@ GEM
     addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
+    attr_extras (7.1.0)
     base64 (0.2.0)
     bigdecimal (3.1.4)
     concurrent-ruby (1.2.2)
@@ -67,10 +68,13 @@ GEM
     multi_json (1.15.0)
     mutex_m (0.2.0)
     netrc (0.11.0)
+    optimist (3.1.0)
     parallel (1.23.0)
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
+    patience_diff (1.2.0)
+      optimist (~> 3.0)
     pp (0.5.0)
       prettyprint
     prettyprint (0.2.0)
@@ -138,6 +142,10 @@ GEM
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
     stringio (3.1.0)
+    super_diff (0.10.0)
+      attr_extras (>= 6.2.4)
+      diff-lcs
+      patience_diff
     sync (0.5.0)
     term-ansicolor (1.7.1)
       tins (~> 1.0)
@@ -176,6 +184,7 @@ DEPENDENCIES
   rubocop-rails
   simplecov (~> 0.9)
   simplecov-cobertura
+  super_diff
   terminal-notifier-guard
   timecop
   vcr

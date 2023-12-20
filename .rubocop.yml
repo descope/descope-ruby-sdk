@@ -1,0 +1,10 @@
+inherit_from: .rubocop_todo.yml
+require:
+  - rubocop-rails
+Rails:
+  Enabled: true
+AllCops:
+ Exclude:
+   - bin/**/*
+   - vendor/**/*
+   - auth0.gemspec

@@ -2,6 +2,8 @@ require 'rack/test'
 require 'faker'
 require 'json'
 require 'descope'
+require 'super_diff/rspec'
+
 require_relative '../lib/descope/api/v1/management/common'
 
 if RUBY_VERSION >= '2.7.2'

@@ -17,4 +17,5 @@ group :test do
   gem 'pp'
   gem 'rack-test', require: false
   gem 'dotenv', require: false
+  gem "super_diff", require: false
 end

@@ -28,5 +28,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '~> 3.11'
   s.add_development_dependency 'simplecov', '~> 0.9'
   s.add_development_dependency 'faker', '~> 2.0'
+  s.add_development_dependency "super_diff", "~> 1.0"
   s.license = 'MIT'
 end

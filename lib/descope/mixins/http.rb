@@ -16,7 +16,7 @@ module Descope
       MIN_REQUEST_RETRY_DELAY = 250
       BASE_DELAY = 100
 
-      %i[get].each do |method|
+      %i[get post patch delete delete_with_body].each do |method|
         define_method(method) do |uri, body = {}, extra_headers|
           body = body.delete_if { |_, v| v.nil? }
           # authorization_header(token) unless token.nil?
