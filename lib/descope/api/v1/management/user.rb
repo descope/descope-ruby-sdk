@@ -21,11 +21,11 @@ module Descope
           def load_by_user_id(user_id: nil)
             # Retrieve user information based on the provided user ID
             # The user ID can be found on the user's JWT.
-            raise Descope::ArgumentException, "Failed loading user by user_id #{user_id}" if user_id.nil? || user_id.empty?
+            raise Descope::ArgumentException, "Missing user id" if user_id.nil? || user_id.empty?
 
             path = Common::USER_LOAD_PATH
             request_params = {}
-            request_params[:userId] = user_id unless user_id.nil?
+            request_params[:userId] = user_id
             get(path, request_params)
           end
 

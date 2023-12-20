@@ -16,7 +16,7 @@ describe Descope::Api::V1::Management::User do
 
     it "is expected to get #{USER_LOAD_PATH} with login_id" do
       expect(@instance).to receive(:get).with(
-        USER_LOAD_PATH, params: { loginId: 'someone' }
+        USER_LOAD_PATH, { loginId: 'someone' }
       )
       expect { @instance.load_user(login_id: 'someone') }.not_to raise_error(Descope::ArgumentException)
     end
@@ -62,8 +62,7 @@ describe Descope::Api::V1::Management::User do
       }
 
       expect(@instance).to receive(:post).with(
-        USER_CREATE_PATH,
-        params: {
+        USER_CREATE_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           phone: nil,

@@ -20,7 +20,7 @@ module Descope
         define_method(method) do |uri, body = {}, extra_headers|
           body = body.delete_if { |_, v| v.nil? }
           # authorization_header(token) unless token.nil?
-          puts "http call: method: #{method}, uri: #{uri}, timeout: #{timeout}, headers: #{headers}, body: #{body}"
+          puts "http call: method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}"
           request_with_retry(method, uri, body, extra_headers)
         end
       end
