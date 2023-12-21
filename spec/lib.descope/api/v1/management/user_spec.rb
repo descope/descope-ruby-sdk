@@ -47,28 +47,25 @@ describe Descope::Api::V1::Management::User do
     end
 
     it "is expected to post #{USER_CREATE_PATH} with user data" do
-      tenant1 = Descope::Api::V1::Management::Common::AssociatedTenant.new(tenant_id: 'tenant1')
-      user_tenant1 = {
-        "tenantId": tenant1.tenant_id
-      }
-
-      tenant2 = Descope::Api::V1::Management::Common::AssociatedTenant.new(
-        tenant_id: 'tenant2',
-        role_names: %w[role1 role2]
-      )
-      user_tenant2 = {
-        "tenantId": tenant2.tenant_id,
-        "roleNames": tenant2.role_names
-      }
-
+      user_tenants_args = [
+        {
+          tenant_id: 'tenant1'
+        },
+        {
+          tenant_id: 'tenant2',
+          role_names: %w[role1 role2]
+        }
+      ]
       expect(@instance).to receive(:post).with(
         USER_CREATE_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
-          phone: nil,
+          phone: '+1-212-669-2542',
           displayName: 'name',
+          givenName: 'name',
+          familyName: 'Ruby SDK',
           roleNames: [],
-          userTenants: [user_tenant1, user_tenant2],
+          userTenants: associated_tenants_to_hash(user_tenants_args),
           test: false,
           picture: 'https://www.example.com/picture.png',
           customAttributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
@@ -81,15 +78,16 @@ describe Descope::Api::V1::Management::User do
         @instance.create_user(
           login_id: 'name@mail.com',
           email: 'name@mail.com',
+          phone: '+1-212-669-2542',
           display_name: 'name',
-          user_tenants: [user_tenant1, user_tenant2],
+          given_name: 'name',
+          family_name: 'Ruby SDK',
+          user_tenants: user_tenants_args,
           picture: 'https://www.example.com/picture.png',
           custom_attributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
           additional_login_ids: %w[id-1 id-2]
         )
       end.not_to raise_error
-
-
     end
   end
 end

@@ -6,29 +6,26 @@ module Descope
       module Management
         # Management API calls
         module User
-          def load_user(options = {})
+          def load_user(login_id: nil)
             # Retrieve user information based on the provided Login ID
+            raise Descope::ArgumentException, 'Missing login id' if login_id.nil? || login_id.empty?
+
             request_params = {
-              loginId: options.fetch(:login_id, nil),
+              loginId: login_id
             }
-
-            # if request_params["login_id"].nil? || request_params["login_id"].empty?
-            #   raise Descope::ArgumentException, "Failed loading user by login_id with id of: #{request_params["login_id"]}"
-            # end
-
             path = Common::USER_LOAD_PATH
-
             get(path, request_params)
           end
 
           def load_by_user_id(user_id: nil)
             # Retrieve user information based on the provided user ID
             # The user ID can be found on the user's JWT.
-            raise Descope::ArgumentException, "Missing user id" if user_id.nil? || user_id.empty?
+            raise Descope::ArgumentException, 'Missing user id' if user_id.nil? || user_id.empty?
 
             path = Common::USER_LOAD_PATH
-            request_params = {}
-            request_params[:userId] = user_id
+            request_params = {
+              userId: user_id
+            }
             get(path, request_params)
           end
 
@@ -52,13 +49,8 @@ module Descope
             invite_url: nil,
             additional_login_ids: nil
           )
-            if login_id.nil? || login_id.empty?
-              raise Descope::ArgumentException, 'login_id is required to create a user'
-            end
-
-            if email.nil? || phone.nil?
-              raise Descope::ArgumentException, 'email or phone is required to create a user'
-            end
+            raise Descope::ArgumentException, 'login_id is required to create a user' if login_id.nil? || login_id.empty?
+            raise Descope::ArgumentException, 'email or phone is required to create a user' if email.nil? || phone.nil?
 
             role_names ||= []
             user_tenants ||= []
@@ -110,7 +102,6 @@ module Descope
             send_sms: nil,
             additional_login_ids: nil
           )
-            puts "called create user with login_id: #{login_id}"
             body = _compose_update_body(
               login_id: login_id,
               email: email,
@@ -170,19 +161,6 @@ module Descope
             res[:familyName] = family_name unless family_name.nil?
             res[:verifiedPhone] = verified_phone unless verified_phone.nil?
             res
-          end
-
-          def associated_tenants_to_hash(associated_tenants)
-            associated_tenant_list = []
-            associated_tenants.each do |tenant|
-              associated_tenant_list.append(
-                {
-                  "tenantId": tenant[:tenant_id],
-                  "roleNames": tenant[:role_names]
-                }
-              )
-            end
-            associated_tenant_list
           end
         end
       end

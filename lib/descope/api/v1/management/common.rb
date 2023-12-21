@@ -111,25 +111,17 @@ module Descope
           # Represents a tenant association for a User or Access Key. The tenant_id is required to denote
           # which tenant the user or access key belongs to. The role_names array is an optional list of
           # roles for the user or access key in this specific tenant.
-          class AssociatedTenant
-            attr_reader :tenant_id, :role_names
-
-            def initialize(tenant_id: "", role_names: [])
-              @tenant_id = tenant_id
-              @role_names = role_names
+          def associated_tenants_to_hash(associated_tenants)
+            associated_tenant_list = []
+            associated_tenants.each do |tenant|
+              associated_tenant_list.append(
+                {
+                  "tenantId": tenant[:tenant_id],
+                  "roleNames": tenant[:role_names]
+                }
+              )
             end
-
-            def associated_tenants_to_hash(associated_tenants: [])
-              associated_tenant_list = []
-              associated_tenants.each do |tenant|
-                associated_tenant_list.append(
-                  {
-                    "tenantId": tenant.tenant_id,
-                    "roleNames": tenant.role_names,
-                  }
-                )
-              end
-            end
+            associated_tenant_list
           end
         end
       end
