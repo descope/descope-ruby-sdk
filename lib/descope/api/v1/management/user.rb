@@ -32,7 +32,22 @@ module Descope
           # Create a new test user.
           # The login_id is required and will determine what the user will use to sign in.
           # Make sure the login id is unique for test. All other fields are optional.
-          def create_user(
+          def create_user(**args)
+            _create(**args)
+          end
+
+          def create_test_user(**args)
+            args[:test] = true
+            _create(**args)
+          end
+
+          def invite(**args)
+            args[:invite] = true
+            _create(**args)
+          end
+
+          private
+          def _create(
             login_id: nil,
             email: nil,
             phone: nil,
@@ -47,6 +62,8 @@ module Descope
             verified_email: nil,
             verified_phone: nil,
             invite_url: nil,
+            test: false,
+            invite: false,
             additional_login_ids: nil
           )
             raise Descope::ArgumentException, 'login_id is required to create a user' if login_id.nil? || login_id.empty?
@@ -65,8 +82,8 @@ module Descope
               family_name: family_name,
               role_names: role_names,
               user_tenants: user_tenants,
-              invite: false,
-              test: false,
+              invite: invite,
+              test: test,
               picture: picture,
               custom_attributes: custom_attributes,
               verified_email: verified_email,
@@ -75,12 +92,10 @@ module Descope
               send_mail: nil,
               send_sms: nil,
               additional_login_ids: additional_login_ids,
-            )
+              )
             post(path, request_params)
           end
 
-
-          private
           def _compose_create_body(
             login_id: nil,
             email: nil,
@@ -113,6 +128,7 @@ module Descope
               role_names: role_names,
               user_tenants: user_tenants,
               test: test,
+              invite: invite,
               picture: picture,
               custom_attributes: custom_attributes,
               additional_login_ids: additional_login_ids
@@ -137,6 +153,7 @@ module Descope
             role_names: nil,
             user_tenants: nil,
             test: false,
+            invite: false,
             picture: nil,
             custom_attributes: nil,
             verified_email: nil,
@@ -151,6 +168,7 @@ module Descope
               roleNames: role_names,
               userTenants: associated_tenants_to_hash(user_tenants),
               test: test,
+              invite: invite,
               picture: picture,
               customAttributes: custom_attributes,
               additionalLoginIds: additional_login_ids
