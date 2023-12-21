@@ -3,7 +3,6 @@ require 'descope'
 dev_project_id = 'P2ZoKhzAdvZV9HzRZ0SE8pIdNq8P'
 client = Descope::Client.new(
   {
-    descope_api_url: "api.descope.dev",
     project_id: dev_project_id,
     management_key: ENV['MGMT_KEY']
   }
@@ -36,10 +35,10 @@ def create_user(client)
   puts "user_create_res: #{user_create_res}"
 end
 
-def load_user(client)
-  user_load_res = client.load_user(login_id: "stam@nowhere.com")
+def load_u(client)
+  user_load_res = client.load_user({login_id: "stam@nowhere.com"})
   # user_load_res = client.load_by_user_id(user_id: "U2ZpARjKAJJmq0fzU2lXNNCGnF4j")
   puts "user_load_res: #{user_load_res}"
 end
 
-load_user(client)
+load_u(client)

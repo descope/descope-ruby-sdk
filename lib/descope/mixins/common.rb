@@ -4,7 +4,7 @@ module Descope
   module Mixins
     # Common values and methods
     module Common
-      DEFAULT_BASE_URL = "https://api.descope.com".freeze  # pragma: no cover
+      DEFAULT_BASE_URL = "https://api.descope.dev".freeze  # pragma: no cover
       DEFAULT_TIMEOUT_SECONDS = 60
 
       # PHONE_REGEX = r"""^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\/]?){0,})(?:[\-\.\ \\/]?(?:#|ext\.?|extension|x)[\-\.\ \\/]?(\d+))?$"""

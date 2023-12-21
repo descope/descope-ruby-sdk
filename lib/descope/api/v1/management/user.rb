@@ -6,15 +6,18 @@ module Descope
       module Management
         # Management API calls
         module User
-          def load_user(login_id: nil)
+          def load_user(options = {})
             # Retrieve user information based on the provided Login ID
-            if login_id.nil? || login_id.empty?
-              raise Descope::ArgumentException, "Failed loading user by login_id #{login_id}"
-            end
+            request_params = {
+              loginId: options.fetch(:login_id, nil),
+            }
+
+            # if request_params["login_id"].nil? || request_params["login_id"].empty?
+            #   raise Descope::ArgumentException, "Failed loading user by login_id with id of: #{request_params["login_id"]}"
+            # end
 
             path = Common::USER_LOAD_PATH
-            request_params = {}
-            request_params[:loginId] = login_id unless login_id.nil?
+
             get(path, request_params)
           end
 
