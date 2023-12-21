@@ -56,9 +56,9 @@ module Descope
               raise Descope::ArgumentException, 'login_id is required to create a user'
             end
 
-            # if email.nil? || phone.nil?
-            #   raise Descope::ArgumentException, 'email or phone is required to create a user'
-            # end
+            if email.nil? || phone.nil?
+              raise Descope::ArgumentException, 'email or phone is required to create a user'
+            end
 
             role_names ||= []
             user_tenants ||= []
@@ -110,6 +110,7 @@ module Descope
             send_sms: nil,
             additional_login_ids: nil
           )
+            puts "called create user with login_id: #{login_id}"
             body = _compose_update_body(
               login_id: login_id,
               email: email,
@@ -176,11 +177,12 @@ module Descope
             associated_tenants.each do |tenant|
               associated_tenant_list.append(
                 {
-                  "tenantId": tenant['tenant_id'],
-                  "roleNames": tenant['roles']
+                  "tenantId": tenant[:tenant_id],
+                  "roleNames": tenant[:role_names]
                 }
               )
             end
+            associated_tenant_list
           end
         end
       end

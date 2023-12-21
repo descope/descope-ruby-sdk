@@ -8,28 +8,26 @@ client = Descope::Client.new(
   }
 )
 
-puts "client: #{client.inspect}"
-
 # Create user
 def create_user(client)
   user_create_res = client.create_user(
     login_id: "ami_ruby_sdk+ami@descope.com",
-    # email: "ami_ruby_sdk+ami@descope.com",
-    # phone: "3474500361",
-    # display_name: "Ami Ruby SDK",
-    # user_tenants: [
-    #   {
-    #     tenant_id: "T2ZoKhzAdvZV9HzRZ0SE8pIdNq8P",
-    #     role_names: ["RubySdkAdmin"]
-    #   }
-    # ],
-    # picture: 'https://static-00.iconduck.com/assets.00/ruby-gems-icon-447x512-6feckqly.png',
-    # family_name: "Ruby",
-    # given_name: "SDK",
-    # custom_attributes: {
-    #   "custom_attribute_1" => "custom_value_1",
-    #   "custom_attribute_2" => "custom_value_2"
-    # },
+    email: "ami_ruby_sdk+ami@descope.com",
+    phone: "+1-347-450-0361",
+    display_name: "Ami Ruby SDK",
+    user_tenants: [
+      {
+        tenant_id: "T2Zp93ZrKlLl1SQDxzO0LTU8i4qU",
+        role_names: ["RubySdkAdmin"]
+      }
+    ],
+    picture: 'https://static-00.iconduck.com/assets.00/ruby-gems-icon-447x512-6feckqly.png',
+    family_name: "Ruby",
+    given_name: "SDK",
+    custom_attributes: {
+      "custom_attribute_1" => "custom_value_1",
+      "custom_attribute_2" => "custom_value_2"
+    },
     )
 
   puts "user_create_res: #{user_create_res}"
@@ -41,4 +39,5 @@ def load_u(client)
   puts "user_load_res: #{user_load_res}"
 end
 
-load_u(client)
+# load_u(client)
+create_user(client)

@@ -2,6 +2,7 @@
 require "addressable/uri"
 require 'retryable'
 require_relative '../exception'
+require 'pp'
 
 module Descope
   module Mixins
@@ -17,9 +18,7 @@ module Descope
       BASE_DELAY = 100
 
       %i(get post post_file post_form put patch delete delete_with_body).each do |method|
-        define_method(method) do |uri, body = {}, extra_headers|
-          puts "http call: method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}"
-
+        define_method(method) do |uri, body = {}, extra_headers = {}|
           body = body.delete_if { |_, v| v.nil? }
           # authorization_header(token) unless token.nil?
           request_with_retry(method, uri, body, extra_headers)
@@ -97,7 +96,7 @@ module Descope
                    call(method, encode_uri(uri), timeout, headers, body.to_json)
                  end
 
-        puts "http code: #{result.code}"
+        puts "http status code: #{result.code}"
         case result.code
         when 200...226 then safe_parse_json(result.body)
         when 400       then raise Descope::BadRequest.new(result.body, code: result.code, headers: result.headers)
@@ -112,7 +111,7 @@ module Descope
       end
 
       def call(method, url, timeout, headers, body = nil)
-        # puts "call: method: #{method}, url: #{url}, timeout: #{timeout}, headers: #{headers}, body: #{body}"
+        puts "call: method: #{method}, url: #{url}, timeout: #{timeout}, headers: #{headers}, body: #{pp body}"
         RestClient::Request.execute(
           method: method,
           url: url,
