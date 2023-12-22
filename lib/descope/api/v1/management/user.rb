@@ -92,9 +92,238 @@ module Descope
             post(path, request_params)
           end
 
-          def delete_all_test_users()
+          def delete_all_test_users
             path = Common::USER_DELETE_ALL_TEST_USERS_PATH
             delete(path)
+          end
+
+          def logout_user(login_id: nil)
+            path = Common::USER_LOGOUT_PATH
+            request_params = {
+              loginId: login_id
+            }
+            post(path, request_params)
+          end
+
+          def logout_user_by_id(user_id: nil)
+            path = Common::USER_LOGOUT_PATH
+            request_params = {
+              userId: user_id
+            }
+            post(path, request_params)
+          end
+
+          def search_all(
+            tenant_ids: [],
+            role_names: [],
+            limit: 0,
+            page: 0,
+            test_users_only: false,
+            with_test_user: false,
+            custom_attributes: {},
+            statuses: [],
+            emails: [],
+            phones: []
+          )
+            body = {
+              tenantIds: tenant_ids,
+              roleNames: role_names,
+              limit: limit,
+              page: page,
+              testUsersOnly: test_users_only,
+              withTestUser: with_test_user,
+            }
+            body[:statuses] = statuses unless statuses.empty?
+            body[:emails] = emails unless emails.empty?
+            body[:phones] = phones unless phones.empty?
+            body[:customAttributes] = custom_attributes unless custom_attributes.empty?
+
+            post(Common::USERS_SEARCH_PATH, body)
+          end
+
+          def get_provider_token(login_id: nil, provider: nil)
+            path = Common::USER_GET_PROVIDER_TOKEN
+            request_params = {
+              loginId: login_id,
+              provider: provider
+            }
+            get(path, request_params)
+          end
+
+          def activate(login_id: nil)
+            path = Common::USER_UPDATE_STATUS_PATH
+            request_params = {
+              loginId: login_id,
+              status: 'enabled'
+            }
+            post(path, request_params)
+          end
+
+          def deactivate(login_id: nil)
+            path = Common::USER_UPDATE_STATUS_PATH
+            request_params = {
+              loginId: login_id,
+              status: 'disabled'
+            }
+            post(path, request_params)
+          end
+
+          def update_login_id(login_id: nil, new_login_id: nil)
+            path = Common::USER_UPDATE_LOGIN_ID_PATH
+            request_params = {
+              loginId: login_id,
+              newLoginId: new_login_id
+            }
+            post(path, request_params)
+          end
+
+          def update_email(login_id: nil, new_email: nil)
+            path = Common::USER_UPDATE_EMAIL_PATH
+            request_params = {
+              loginId: login_id,
+              newEmail: new_email
+            }
+            post(path, request_params)
+          end
+
+          def update_phone(login_id: nil, phone: nil, verified: nil)
+            path = Common::USER_UPDATE_PHONE_PATH
+            request_params = {
+              loginId: login_id,
+              phone: phone,
+              verified: verified
+            }
+            post(path, request_params)
+          end
+
+          def update_display_name(
+            login_id: nil,
+            display_name: nil,
+            given_name: nil,
+            middle_name: nil,
+            family_name: nil
+          )
+            body = { loginId: login_id }
+            body[:displayName] = display_name unless display_name.nil?
+            body[:givenName] = given_name unless given_name.nil?
+            body[:middleName] = middle_name unless middle_name.nil?
+            body[:familyName] = family_name unless family_name.nil?
+            post(Common::USER_UPDATE_NAME_PATH, body)
+          end
+
+          def update_picture(login_id: nil, picture: nil)
+            body = {
+              loginId: login_id,
+              picture: picture
+            }
+            post(Common::USER_UPDATE_PICTURE_PATH, body)
+          end
+
+          def update_custom_attribute(login_id: nil, attribute_key: nil, attribute_val: nil)
+            body = {
+              loginId: login_id,
+              attributeKey: attribute_key,
+              attributeVal: attribute_val
+            }
+            post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
+          end
+
+          def add_roles(login_id: nil, role_names: [])
+            body = {
+              loginId: login_id,
+              roleNames: role_names
+            }
+            post(Common::USER_ADD_ROLE_PATH, body)
+          end
+
+          def remove_roles(login_id: nil, role_names: [])
+            body = {
+              loginId: login_id,
+              roleNames: role_names
+            }
+            post(Common::USER_REMOVE_ROLE_PATH, body)
+          end
+
+          def add_tenant(login_id: nil, tenant_id: nil)
+            body = {
+              loginId: login_id,
+              tenantId: tenant_id
+            }
+            post(Common::USER_ADD_TENANT_PATH, body)
+          end
+
+          def remove_tenant(login_id: nil, tenant_id: nil)
+            body = {
+              loginId: login_id,
+              tenantId: tenant_id
+            }
+            post(Common::USER_REMOVE_TENANT_PATH, body)
+          end
+
+          def add_tenant_role(login_id: nil, tenant_id: nil, role_names: [])
+            body = {
+              loginId: login_id,
+              tenantId: tenant_id,
+              roleNames: role_names
+            }
+            post(Common::USER_ADD_TENANT_PATH, body)
+          end
+
+          def remove_tenant_role(login_id: nil, tenant_id: nil, role_names: [])
+            body = {
+              loginId: login_id,
+              tenantId: tenant_id,
+              roleNames: role_names
+            }
+            post(Common::USER_REMOVE_TENANT_PATH, body)
+          end
+
+          def set_password(login_id: nil, password: nil)
+            body = {
+              loginId: login_id,
+              password: password
+            }
+            post(Common::USER_SET_PASSWORD_PATH, body)
+          end
+
+          def expire_password(login_id: nil)
+            body = {
+              loginId: login_id
+            }
+            post(Common::USER_EXPIRE_PASSWORD_PATH, body)
+          end
+
+          def generate_otp_for_test(method: nil, login_id: nil)
+            body = {
+              loginId: login_id,
+              deliveryMethod: get_method_string(method),
+            }
+            post(Common::USER_GENERATE_OTP_FOR_TEST_PATH, body)
+          end
+
+          def generate_magic_link_for_test(method: nil, login_id: nil, uri: nil)
+            body = {
+              loginId: login_id,
+              deliveryMethod: get_method_string(method),
+              URI: uri
+            }
+            post(Common::USER_GENERATE_MAGIC_LINK_FOR_TEST_PATH, body)
+          end
+
+          def generate_enchanted_link_for_test(login_id: nil, uri: nil)
+            body = {
+              loginId: login_id,
+              URI: uri
+            }
+            post(Common::USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, body)
+          end
+
+          def generate_embedded_link(login_id: nil, custom_claims: nil)
+            body = {
+              loginId: login_id,
+              customClaims: custom_claims
+            }
+            post(Common::USER_GENERATE_EMBEDDED_LINK_PATH, body)
           end
 
           private
@@ -143,7 +372,7 @@ module Descope
               send_mail: nil,
               send_sms: nil,
               additional_login_ids: additional_login_ids,
-              )
+            )
             post(path, request_params)
           end
 

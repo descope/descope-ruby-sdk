@@ -123,6 +123,19 @@ module Descope
             end
             associated_tenant_list
           end
+
+          def get_method_string(method: nil)
+            names = {
+              DeliveryMethod::EMAIL => 'email',
+              DeliveryMethod::SMS => 'sms',
+              DeliveryMethod::WHATSAPP => 'whatsapp'
+            }
+
+            names.fetch(method) do
+              raise AuthException, 'Unknown delivery method: {method}' unless name
+            end
+          end
+
         end
       end
     end
