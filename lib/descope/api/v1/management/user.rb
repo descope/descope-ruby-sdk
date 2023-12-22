@@ -46,6 +46,57 @@ module Descope
             _create(**args)
           end
 
+          def update_user(
+            login_id: nil,
+            email: nil,
+            phone: nil,
+            display_name: nil,
+            given_name: nil,
+            middle_name: nil,
+            family_name: nil,
+            role_names: [],
+            user_tenants: [],
+            picture: nil,
+            custom_attributes: nil,
+            verified_email: nil,
+            verified_phone: nil,
+            additional_login_ids: nil
+          )
+            role_names ||= []
+            user_tenants ||= []
+            path = Common::USER_UPDATE_PATH
+            request_params = _compose_update_body(
+              login_id: login_id,
+              email: email,
+              phone: phone,
+              display_name: display_name,
+              given_name: given_name,
+              middle_name: middle_name,
+              family_name: family_name,
+              role_names: role_names,
+              user_tenants: user_tenants,
+              picture: picture,
+              custom_attributes: custom_attributes,
+              verified_email: verified_email,
+              verified_phone: verified_phone,
+              additional_login_ids: additional_login_ids,
+            )
+            post(path, request_params)
+          end
+
+          def delete_user(login_id: nil)
+            path = Common::USER_DELETE_PATH
+            request_params = {
+              loginId: login_id
+            }
+            post(path, request_params)
+          end
+
+          def delete_all_test_users()
+            path = Common::USER_DELETE_ALL_TEST_USERS_PATH
+            delete(path)
+          end
+
           private
           def _create(
             login_id: nil,
