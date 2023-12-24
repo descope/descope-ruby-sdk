@@ -16,6 +16,7 @@ module Descope
 
           # user
           USER_CREATE_PATH = '/v1/mgmt/user/create'
+          USER_CREATE_BATCH_PATH = '/v1/mgmt/user/create/batch'
           USER_UPDATE_PATH = '/v1/mgmt/user/update'
           USER_DELETE_PATH = '/v1/mgmt/user/delete'
           USER_LOGOUT_PATH = '/v1/mgmt/user/logout'

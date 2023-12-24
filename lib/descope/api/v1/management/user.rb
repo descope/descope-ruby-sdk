@@ -6,46 +6,50 @@ module Descope
       module Management
         # Management API calls
         module User
-          def load_user(login_id: nil)
-            # Retrieve user information based on the provided Login ID
-            raise Descope::ArgumentException, 'Missing login id' if login_id.nil? || login_id.empty?
-
-            request_params = {
-              loginId: login_id
-            }
-            path = Common::USER_LOAD_PATH
-            get(path, request_params)
+          # Create a new user, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
+          # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.
+          def create_user(**args)
+            _create(**args)
           end
 
-          def load_by_user_id(user_id: nil)
-            # Retrieve user information based on the provided user ID
-            # The user ID can be found on the user's JWT.
-            raise Descope::ArgumentException, 'Missing user id' if user_id.nil? || user_id.empty?
-
-            path = Common::USER_LOAD_PATH
+          # Batch Create Users, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUsers/
+          def create_batch_users(users: [])
+            users_params = []
+            users.each do |user|
+              users_params.append(_create(**user.merge(skip_create: true)))
+            end
+            path = Common::USER_CREATE_BATCH_PATH
             request_params = {
-              userId: user_id
+              users: users_params
             }
-            get(path, request_params)
+            post(path, request_params)
           end
 
           # Create a new test user.
           # The login_id is required and will determine what the user will use to sign in.
           # Make sure the login id is unique for test. All other fields are optional.
-          def create_user(**args)
-            _create(**args)
-          end
-
+          # @see https://docs.descope.com/api/testusermanagement/
+          # Test User Management:
+          # 1. Create test Users
+          # 2. Generate OTP (sms/email) for test users
+          # 3. Generate Magic Link (sms/email) for test users
+          # 4. Generate Enchanted Link (email) for test users
+          # 5. Delete Test Users
           def create_test_user(**args)
             args[:test] = true
             _create(**args)
           end
 
-          def invite(**args)
+          # Invite a new user.
+          def invite_user(**args)
             args[:invite] = true
             _create(**args)
           end
 
+          # Updates a user's details, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUser/
           def update_user(
             login_id: nil,
             email: nil,
@@ -84,6 +88,8 @@ module Descope
             post(path, request_params)
           end
 
+          # Delete a user, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/DeleteUser/
           def delete_user(login_id: nil)
             path = Common::USER_DELETE_PATH
             request_params = {
@@ -97,6 +103,35 @@ module Descope
             delete(path)
           end
 
+          # Load a user's data, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/LoadUser/
+          def load_user(login_id: nil)
+            # Retrieve user information based on the provided Login ID
+            raise Descope::ArgumentException, 'Missing login id' if login_id.nil? || login_id.empty?
+
+            request_params = {
+              loginId: login_id
+            }
+            path = Common::USER_LOAD_PATH
+            get(path, request_params)
+          end
+
+          # Load a user's data, using a valid management key by user id.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/LoadUser/
+          def load_by_user_id(user_id: nil)
+            # Retrieve user information based on the provided user ID
+            # The user ID can be found on the user's JWT.
+            raise Descope::ArgumentException, 'Missing user id' if user_id.nil? || user_id.empty?
+
+            path = Common::USER_LOAD_PATH
+            request_params = {
+              userId: user_id
+            }
+            get(path, request_params)
+          end
+
+          # Log a user out of all sessions, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/LogoutAllUserDevices/
           def logout_user(login_id: nil)
             path = Common::USER_LOGOUT_PATH
             request_params = {
@@ -113,6 +148,8 @@ module Descope
             post(path, request_params)
           end
 
+          # Search for users, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/SearchUsers/
           def search_all(
             tenant_ids: [],
             role_names: [],
@@ -141,6 +178,8 @@ module Descope
             post(Common::USERS_SEARCH_PATH, body)
           end
 
+          # Get an existing user's provider token, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/GetUserProviderToken/
           def get_provider_token(login_id: nil, provider: nil)
             path = Common::USER_GET_PROVIDER_TOKEN
             request_params = {
@@ -150,6 +189,8 @@ module Descope
             get(path, request_params)
           end
 
+          # Updates an existing user's status, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserStatus/
           def activate(login_id: nil)
             path = Common::USER_UPDATE_STATUS_PATH
             request_params = {
@@ -168,6 +209,8 @@ module Descope
             post(path, request_params)
           end
 
+          # Updates an existing user's login ID, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserLoginID/
           def update_login_id(login_id: nil, new_login_id: nil)
             path = Common::USER_UPDATE_LOGIN_ID_PATH
             request_params = {
@@ -177,6 +220,8 @@ module Descope
             post(path, request_params)
           end
 
+          # Updates an existing user's email, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserEmail/
           def update_email(login_id: nil, new_email: nil)
             path = Common::USER_UPDATE_EMAIL_PATH
             request_params = {
@@ -186,6 +231,8 @@ module Descope
             post(path, request_params)
           end
 
+          # Updates an existing user's phone number, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserPhone/
           def update_phone(login_id: nil, phone: nil, verified: nil)
             path = Common::USER_UPDATE_PHONE_PATH
             request_params = {
@@ -196,6 +243,8 @@ module Descope
             post(path, request_params)
           end
 
+          # Updates an existing user's display name, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserDisplayName/
           def update_display_name(
             login_id: nil,
             display_name: nil,
@@ -211,6 +260,8 @@ module Descope
             post(Common::USER_UPDATE_NAME_PATH, body)
           end
 
+          # Update an existing user's profile picture, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserPicture/
           def update_picture(login_id: nil, picture: nil)
             body = {
               loginId: login_id,
@@ -219,6 +270,8 @@ module Descope
             post(Common::USER_UPDATE_PICTURE_PATH, body)
           end
 
+          # Update an existing user's custom attributes, using a valid management key.
+          # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserCustomAttribute/
           def update_custom_attribute(login_id: nil, attribute_key: nil, attribute_val: nil)
             body = {
               loginId: login_id,
@@ -228,6 +281,7 @@ module Descope
             post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
           end
 
+          #
           def add_roles(login_id: nil, role_names: [])
             body = {
               loginId: login_id,
@@ -344,7 +398,8 @@ module Descope
             invite_url: nil,
             test: false,
             invite: false,
-            additional_login_ids: nil
+            additional_login_ids: nil,
+            skip_create: false
           )
             raise Descope::ArgumentException, 'login_id is required to create a user' if login_id.nil? || login_id.empty?
             raise Descope::ArgumentException, 'email or phone is required to create a user' if email.nil? || phone.nil?
@@ -373,6 +428,8 @@ module Descope
               send_sms: nil,
               additional_login_ids: additional_login_ids,
             )
+            return request_params if skip_create
+
             post(path, request_params)
           end
 
