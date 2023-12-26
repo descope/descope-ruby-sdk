@@ -1,8 +1,8 @@
 Metrics/MethodLength:
   Max: 15
-
+Metrics/BlockLength:
+  Enabled: false
 Metrics/LineLength:
   Max: 121
-
 Metrics/ParameterLists:
   Enabled: false
