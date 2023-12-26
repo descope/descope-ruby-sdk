@@ -3,6 +3,7 @@ require 'uri'
 require 'descope/mixins/headers'
 require 'descope/mixins/http'
 require 'descope/mixins/initializer'
+require 'descope/mixins/validation'
 require 'descope/mixins/common'
 require 'descope/api/v1'
 
