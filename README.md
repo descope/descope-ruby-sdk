@@ -1,14 +1,14 @@
-Descope SDK for Python
+Descope SDK for Ruby
 
 
 The Descope SDK for Ruby provides convenient access to the Descope user management and authentication API for a backend written in Ruby. You can read more on the Descope Website.
 
 
 
-# Descope SDK for Python
+# Descope SDK for Ruby
 
-The Descope SDK for python provides convenient access to the Descope user management and authentication API
-for a backend written in python. You can read more on the [Descope Website](https://descope.com).
+The Descope SDK for Ruby provides convenient access to the Descope user management and authentication API
+for a backend written in Ruby. You can read more on the [Descope Website](https://descope.com).
 
 ## Requirements
 
