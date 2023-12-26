@@ -88,12 +88,6 @@ module Descope
         PUBLIC_KEY_PATH = "/v2/keys"
       end
 
-      module DeliveryMethod
-        WHATSAPP = 1
-        SMS = 2
-        EMAIL = 3
-      end
-
       module LoginOptions
         attr_accessor :stepup, :mfa, :custom_claims
         def initialize
