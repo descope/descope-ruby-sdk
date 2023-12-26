@@ -1,6 +1,6 @@
 module Descope
   # Default exception in namespace of Descope
-  # if you want to catch all exceptions, then you should use this one.
+  # If you want to catch all exceptions, then you should use this one.
   # Network exceptions are not included
   class Exception < StandardError
     attr_reader :error_data
