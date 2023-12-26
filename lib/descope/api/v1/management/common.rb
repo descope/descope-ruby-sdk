@@ -14,7 +14,7 @@ module Descope
           TENANT_LOAD_ALL_PATH = '/v1/mgmt/tenant/all'
           TENANT_SEARCH_ALL_PATH = '/v1/mgmt/tenant/search'
 
-          # user
+          # userUSER_CREATE_PATH
           USER_CREATE_PATH = '/v1/mgmt/user/create'
           USER_CREATE_BATCH_PATH = '/v1/mgmt/user/create/batch'
           USER_UPDATE_PATH = '/v1/mgmt/user/update'
@@ -126,17 +126,22 @@ module Descope
           end
 
           def get_method_string(method: nil)
-            names = {
-              DeliveryMethod::EMAIL => 'email',
+            name = {
+              DeliveryMethod::WHATSAPP => 'whatsapp',
               DeliveryMethod::SMS => 'sms',
-              DeliveryMethod::WHATSAPP => 'whatsapp'
-            }
+              DeliveryMethod::EMAIL => 'email'
+            }.key(method)
 
-            names.fetch(method) do
-              raise AuthException, 'Unknown delivery method: {method}' unless name
-            end
+            raise ArgumentException, "Unknown delivery method: #{method}" unless name
+
+            name
           end
 
+          module DeliveryMethod
+            WHATSAPP = 1
+            SMS = 2
+            EMAIL = 3
+          end
         end
       end
     end

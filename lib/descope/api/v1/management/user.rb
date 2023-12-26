@@ -42,7 +42,15 @@ module Descope
             _create(**args)
           end
 
-          # Invite a new user.
+          # Create a new user and invite them via an email message.
+          #
+          #         Functions exactly the same as the `create` function with the additional invitation
+          #             behavior. See the documentation above for the general creation behavior.
+          #
+          #         IMPORTANT: Since the invitation is sent by email, make sure either
+          #             the email is explicitly set, or the login_id itself is an email address.
+          #             You must configure the invitation URL in the Descope console prior to
+          #             calling the method.
           def invite_user(**args)
             args[:invite] = true
             _create(**args)
@@ -350,7 +358,7 @@ module Descope
           def generate_otp_for_test(method: nil, login_id: nil)
             body = {
               loginId: login_id,
-              deliveryMethod: get_method_string(method),
+              deliveryMethod: get_method_string(method: method)
             }
             post(Common::USER_GENERATE_OTP_FOR_TEST_PATH, body)
           end
@@ -401,9 +409,6 @@ module Descope
             additional_login_ids: nil,
             skip_create: false
           )
-            raise Descope::ArgumentException, 'login_id is required to create a user' if login_id.nil? || login_id.empty?
-            raise Descope::ArgumentException, 'email or phone is required to create a user' if email.nil? || phone.nil?
-
             role_names ||= []
             user_tenants ||= []
             path = Common::USER_CREATE_PATH
