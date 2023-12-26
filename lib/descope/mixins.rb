@@ -1,11 +1,9 @@
 require 'rest-client'
 require 'uri'
-
 require 'descope/mixins/headers'
 require 'descope/mixins/http'
 require 'descope/mixins/initializer'
 require 'descope/mixins/common'
-
 require 'descope/api/v1'
 
 module Descope
