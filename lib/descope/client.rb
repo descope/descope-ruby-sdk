@@ -1,5 +1,5 @@
 module Descope
-  # Main class
+  # Main class for descope client
   class Client
     include Descope::Mixins
   end
