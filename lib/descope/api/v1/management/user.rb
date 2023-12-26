@@ -289,6 +289,14 @@ module Descope
             post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
           end
 
+          def update_jwt(jwt: nil, custom_claims: nil)
+            body = {
+              jwt: jwt,
+              customClaims: custom_claims,
+            }
+            post(Common::UPDATE_JWT_PATH, body)
+          end
+
           #
           def add_roles(login_id: nil, role_names: [])
             body = {
@@ -378,14 +386,6 @@ module Descope
               URI: uri
             }
             post(Common::USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, body)
-          end
-
-          def generate_embedded_link(login_id: nil, custom_claims: nil)
-            body = {
-              loginId: login_id,
-              customClaims: custom_claims
-            }
-            post(Common::USER_GENERATE_EMBEDDED_LINK_PATH, body)
           end
 
           private

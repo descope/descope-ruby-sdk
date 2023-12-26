@@ -608,4 +608,44 @@ describe Descope::Api::V1::Management::User do
       end.not_to raise_error
     end
   end
+
+  context '.generate_enchanted_link_for_test' do
+    it 'is expected to respond to a generate_enchanted_link_for_test method' do
+      expect(@instance).to respond_to(:generate_enchanted_link_for_test)
+
+      expect(@instance).to receive(:post).with(
+        USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, {
+          loginId: 'someone@example.com',
+          URI: 'https://www.example.com'
+        }
+      )
+
+      expect do
+        @instance.generate_enchanted_link_for_test(
+          login_id: 'someone@example.com',
+          uri: 'https://www.example.com'
+        )
+      end.not_to raise_error
+    end
+  end
+
+  context '.update_jwt' do
+    it 'is expected to respond to a update_jwt method' do
+      expect(@instance).to respond_to(:update_jwt)
+
+      expect(@instance).to receive(:post).with(
+        UPDATE_JWT_PATH, {
+          jwt: 'eyJ3abcde12345',
+          customClaims: { 'claim1' => 'value1', 'claim2' => 'value2' }
+        }
+      )
+
+      expect do
+        @instance.update_jwt(
+          jwt: 'eyJ3abcde12345',
+          custom_claims: { 'claim1' => 'value1', 'claim2' => 'value2' }
+        )
+      end.not_to raise_error
+    end
+  end
 end
