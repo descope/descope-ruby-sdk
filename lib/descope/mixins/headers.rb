@@ -1,6 +1,7 @@
 module Descope
   module Mixins
     module Headers
+      # Descope default headers
       def client_headers
         {
           'Content-Type' => 'application/json',
