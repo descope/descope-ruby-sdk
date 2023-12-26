@@ -14,7 +14,7 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to respond_to(:create_user)
     end
 
-    it "is expected to post #{} with user data" do
+    it 'is expected to create a user with user data' do
       user_tenants_args = [
         {
           tenant_id: 'tenant1'
