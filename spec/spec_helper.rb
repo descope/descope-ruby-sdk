@@ -11,7 +11,10 @@ if RUBY_VERSION >= '2.7.2'
 end
 
 require 'simplecov'
+require 'simplecov-html'
+
 SimpleCov.start
+SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
 
 if ENV['CI'] == 'true'
   require 'simplecov-cobertura'
