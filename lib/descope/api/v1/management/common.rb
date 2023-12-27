@@ -106,8 +106,11 @@ module Descope
           AUTHZ_RE_TARGET_ALL = '/v1/mgmt/authz/re/targetall'
 
           # Project
-          PROJECT_UPDATE_NAME = '/v1/mgmt/project/update/name'
+          PROJECT_UPDATE_NAME = '/v1/mgmt/project/eupdate/name'
           PROJECT_CLONE = '/v1/mgmt/project/clone'
+          PROJECT_EXPORT_PATH = '/v1/mgmt/project/export'
+          PROJECT_IMPORT_PATH = '/v1/mgmt/project/import'
+          PROJECT_DELETE_PATH = '/v1/mgmt/project/delete'
 
           # Represents a tenant association for a User or Access Key. The tenant_id is required to denote
           # which tenant the user or access key belongs to. The role_names array is an optional list of
