@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class DummyClass
   include Descope::Mixins::Headers
   include Descope::Api::V1::Management::Common
@@ -17,7 +18,7 @@ class DummyClass
   end
 
   %i[get post put patch delete delete_with_body].each do |method|
-    define_method(method) do |_path, _body = {}|
+    define_method(method) do |uri, body = {}, extra_headers = {}|
       true
     end
   end
