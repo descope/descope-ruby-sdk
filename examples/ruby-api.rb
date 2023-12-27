@@ -61,7 +61,7 @@ end
 tenanat_id = 'T2Zp93ZrKlLl1SQDxzO0LTU8i4qU'
 role_names = ['RubySdkAdmin']
 # created_user = create_test_user(client, tenanat_id, role_names)
-load_user(client, 'ami_ruby_sdk+6ami@descope.com')
+load_user(client, 'stam@nowhere.com')
 # update_user_res = update_user(client, 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_user(login_id: 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_all_test_users()
