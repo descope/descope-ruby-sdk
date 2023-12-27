@@ -9,6 +9,10 @@ describe Descope::Client do
     it { should be_a Descope::Api::V1::Management::AccessKey }
     it { should be_a Descope::Api::V1::Management::Tenant }
     it { should be_a Descope::Api::V1::Management::Permission }
+    it { should be_a Descope::Api::V1::Management::Role }
+    it { should be_a Descope::Api::V1::Management::Project }
+    it { should be_a Descope::Api::V1::Management::Authz }
+    it { should be_a Descope::Api::V1::Management::Audit }
   end
 
   let(:project_id) { 'P2AbcZVJYEUBGhX8LNjItawh5nAp' }
