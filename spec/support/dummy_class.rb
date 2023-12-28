@@ -1,10 +1,13 @@
 # frozen_string_literal: true
+
 class DummyClass
   include Descope::Mixins::Headers
+  include Descope::Mixins::Common
+  include Descope::Mixins::Common::EndpointsV1
   include Descope::Api::V1::Management::Common
-  include Descope::Api::V1::Management::User
 
   attr_reader :base_uri, :headers
+
   def initialize
     @base_uri = 'test.descope.com'
     @headers = {

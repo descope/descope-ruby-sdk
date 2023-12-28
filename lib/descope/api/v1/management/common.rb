@@ -3,8 +3,8 @@
 module Descope
   module Api
     module V1
-      # Common Management constants
       module Management
+        # Common Management constants
         module Common
           # tenant
           TENANT_CREATE_PATH = '/v1/mgmt/tenant/create'

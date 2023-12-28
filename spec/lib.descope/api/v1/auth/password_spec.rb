@@ -1,0 +1,26 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+describe Descope::Api::V1::Session do
+  before(:all) do
+    dummy_instance = DummyClass.new
+    dummy_instance.extend(Descope::Api::V1::Session)
+    dummy_instance.extend(Descope::Api::V1::Auth::Password)
+    @instance = dummy_instance
+  end
+
+  context '.sign_up'  do
+    it 'is expected to respond to sign up' do
+      expect(@instance).to respond_to(:sign_up)
+    end
+
+    it 'is expected to sign up with password' do
+      expect(@instance).to receive(:post).with(
+        SIGN_UP_PASSWORD_PATH, { loginId: 'test', password: 's3cr3t', user: 'admin' }
+      )
+
+      expect { @instance.sign_up(login_id: 'test', password: 's3cr3t', user: 'admin') }.not_to raise_error
+    end
+  end
+end

@@ -18,6 +18,15 @@ module Descope
           raise ArgumentError, "Missing tenant_id key in tenant: #{tenant}" unless tenant_symbolized.key?(:tenant_id)
         end
       end
+
+      def validate_login_id(login_id)
+        raise AuthException, 'login_id cannot be empty' unless login_id.is_a?(String) && !login_id.empty?
+      end
+
+      def validate_password(password)
+        raise AuthException, 'password cannot be empty' unless password.is_a?(String) && !password.empty?
+      end
+
     end
   end
 end
