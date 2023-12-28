@@ -23,4 +23,18 @@ describe Descope::Api::V1::Session do
       expect { @instance.sign_up(login_id: 'test', password: 's3cr3t', user: 'admin') }.not_to raise_error
     end
   end
+
+  context '.sign_in'  do
+    it 'is expected to respond to sign in' do
+      expect(@instance).to respond_to(:sign_in)
+    end
+
+    it 'is expected to sign in with password' do
+      expect(@instance).to receive(:post).with(
+        SIGN_IN_PASSWORD_PATH, { loginId: 'test', password: 's3cr3t' }
+      )
+
+      expect { @instance.sign_in(login_id: 'test', password: 's3cr3t') }.not_to raise_error
+    end
+  end
 end

@@ -65,5 +65,6 @@ role_names = ['RubySdkAdmin']
 # update_user_res = update_user(client, 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_user(login_id: 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_all_test_users()
-res = client.token_validation_v1(project_id: 'P2ZoKhzAdvZV9HzRZ0SE8pIdNq8P')
-puts "res: #{res}"
+
+res = client.sign_in(login_id: 'ami+1@descope.com', password: 'Fl@ffybunny123')
+puts "exmple response: #{res}"

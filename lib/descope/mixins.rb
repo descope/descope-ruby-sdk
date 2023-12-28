@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'uri'
+require 'jwt'
 require 'descope/mixins/headers'
 require 'descope/mixins/http'
 require 'descope/mixins/initializer'

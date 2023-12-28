@@ -44,6 +44,7 @@ module Descope
       end
 
       def safe_parse_json(body)
+        puts "response => #{JSON.parse(body.to_s)}"
         JSON.parse(body.to_s)
       rescue JSON::ParserError
         body
