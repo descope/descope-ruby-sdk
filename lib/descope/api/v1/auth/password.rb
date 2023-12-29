@@ -35,7 +35,7 @@ module Descope
 
           private
 
-          def _compose_signup_body(login_id, password, user)
+          def compose_signup_body(login_id, password, user)
             body = {
               loginId: login_id,
               password: password

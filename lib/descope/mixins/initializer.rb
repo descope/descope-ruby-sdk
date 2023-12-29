@@ -18,7 +18,7 @@ module Descope
         if @public_key.nil?
           @public_keys = {}
         else
-          kid, pub_key, alg = _validate_and_load_public_key(@public_key)
+          kid, pub_key, alg = validate_and_load_public_key(@public_key)
           @public_keys = { kid => [pub_key, alg] }
         end
 
@@ -72,7 +72,7 @@ module Descope
       private
 
       # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity
-      def _validate_and_load_public_key(public_key)
+      def validate_and_load_public_key(public_key)
         unless public_key.is_a?(String) || public_key.is_a?(Hash)
           raise AuthException.new(
             'Unable to load public key. Invalid public key error: (unknown type)',

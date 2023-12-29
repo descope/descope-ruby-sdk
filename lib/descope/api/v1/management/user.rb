@@ -10,7 +10,7 @@ module Descope
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
           # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.
           def create_user(**args)
-            _create(**args)
+            create(**args)
           end
 
           # Batch Create Users, using a valid management key.
@@ -18,7 +18,7 @@ module Descope
           def create_batch_users(users: [])
             users_params = []
             users.each do |user|
-              users_params.append(_create(**user.merge(skip_create: true)))
+              users_params.append(create(**user.merge(skip_create: true)))
             end
             path = Common::USER_CREATE_BATCH_PATH
             request_params = {
@@ -39,7 +39,7 @@ module Descope
           # 5. Delete Test Users
           def create_test_user(**args)
             args[:test] = true
-            _create(**args)
+            create(**args)
           end
 
           # Create a new user and invite them via an email message.
@@ -53,7 +53,7 @@ module Descope
           #             calling the method.
           def invite_user(**args)
             args[:invite] = true
-            _create(**args)
+            create(**args)
           end
 
           # Updates a user's details, using a valid management key.
@@ -77,7 +77,7 @@ module Descope
             role_names ||= []
             user_tenants ||= []
             path = Common::USER_UPDATE_PATH
-            request_params = _compose_update_body(
+            request_params = compose_update_body(
               login_id: login_id,
               email: email,
               phone: phone,
@@ -129,7 +129,7 @@ module Descope
           def load_by_user_id(user_id: nil)
             # Retrieve user information based on the provided user ID
             # The user ID can be found on the user's JWT.
-            raise Descope::ArgumentException, 'Missing user id' if user_id.nil? || user_id.empty?
+            raise Descope::ArgumentException, 'Missing user id' if user_id.nil? || user_id.to_s.empty?
 
             path = Common::USER_LOAD_PATH
             request_params = {
@@ -389,7 +389,7 @@ module Descope
           end
 
           private
-          def _create(
+          def create(
             login_id: nil,
             email: nil,
             phone: nil,
@@ -412,7 +412,7 @@ module Descope
             role_names ||= []
             user_tenants ||= []
             path = Common::USER_CREATE_PATH
-            request_params = _compose_create_body(
+            request_params = compose_create_body(
               login_id: login_id,
               email: email,
               phone: phone,
@@ -438,7 +438,7 @@ module Descope
             post(path, request_params)
           end
 
-          def _compose_create_body(
+          def compose_create_body(
             login_id: nil,
             email: nil,
             phone: nil,
@@ -459,7 +459,7 @@ module Descope
             send_sms: nil,
             additional_login_ids: nil
           )
-            body = _compose_update_body(
+            body = compose_update_body(
               login_id: login_id,
               email: email,
               phone: phone,
@@ -484,7 +484,7 @@ module Descope
             body
           end
 
-          def _compose_update_body(
+          def compose_update_body(
             login_id: nil,
             email: nil,
             phone: nil,

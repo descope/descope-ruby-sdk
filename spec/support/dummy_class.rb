@@ -5,6 +5,7 @@ class DummyClass
   include Descope::Mixins::Common
   include Descope::Mixins::Common::EndpointsV1
   include Descope::Api::V1::Management::Common
+  include Descope::Api::V1::Auth
 
   attr_reader :base_uri, :headers
 
