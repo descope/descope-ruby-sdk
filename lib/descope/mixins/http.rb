@@ -112,7 +112,6 @@ module Descope
       end
 
       def call(method, url, timeout, headers, body = nil)
-        puts "call: method: #{method}, url: #{url}, timeout: #{timeout}, headers: #{headers}, body: #{pp body}"
         RestClient::Request.execute(
           method: method,
           url: url,

@@ -18,7 +18,6 @@ module Descope
 
         def generate_jwt_response(response_body, refresh_cookie = nil, audience = nil)
           jwt_response = generate_auth_info(response_body, refresh_cookie, true, audience)
-          puts "debug: jwt response: #{jwt_response}"
           jwt_response['user'] = response_body.key?('user') ? response_body['user'] : {}
           jwt_response['firstSeen'] = response_body.key?('firstSeen') ? response_body['firstSeen'] : true
 
@@ -75,8 +74,7 @@ module Descope
             (jwt_response[SESSION_TOKEN_NAME] ? jwt_response[SESSION_TOKEN_NAME]['iss'] : nil) ||
             (jwt_response[REFRESH_SESSION_TOKEN_NAME] ? jwt_response[REFRESH_SESSION_TOKEN_NAME]['iss'] : nil) ||
             jwt_response['iss'] || ''
-
-          puts "debug: issuer: #{issuer}"
+          
           jwt_response['projectId'] = issuer.split('/').last # support both url issuer and project ID issuer
 
           sub =
@@ -112,21 +110,16 @@ module Descope
             fetch_public_keys
           end
 
-          puts "debug: @public_keys AFTER FETCH: #{@public_keys}"
-          puts "debug: kid: #{kid}"
           found_key = @public_keys[kid] || nil
-          if found_key.nil?
-            raise AuthException.new('Unable to validate public key. Public key not found.', code: 500)
-          end
+          raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
 
           # save reference to the founded key
           # (as another thread can change the self.public_keys hash)
           copy_key = found_key
-          puts "debug: copy_key: #{copy_key}"
           alg_from_key = copy_key[1]
           if alg_header != alg_from_key
             raise AuthException.new(
-              'Algorithm signature in JWT header does not match the algorithm signature in the public key',
+              'Algorithm signature in JWT header does not match the algorithm signature in the Public key.',
               code: 500
             )
           end
@@ -141,8 +134,7 @@ module Descope
           rescue JWT::ExpiredSignature => e
             raise AuthException.new("Received Invalid token times error due to time glitch (between machines) during jwt validation, try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default: #{e.message}", code: 500)
           end
-          puts "debug: claims: #{claims}"
-          puts "debug: token: #{token}"
+
           claims['jwt'] = token
           claims
         end
@@ -156,31 +148,25 @@ module Descope
 
           # The JWT.decode method returns an array where
           # the first element is the payload and the second element is the header.
-          puts "debug: JWT decode_response: #{decode_response}"
           decode_response[1]
         end
 
         def fetch_public_keys
           response = token_validation_v2(@project_id)
-          puts "debug fetch_public_keys token_validation_v2 res: #{response}"
-
           unless response.is_a?(Hash) && response.key?('keys')
             raise AuthException.new("Unable to fetch public keys. #{response}", code: 500)
           end
 
           jwkeys_wrapper = response
           jwkeys = jwkeys_wrapper['keys']
-
           @public_keys = {}
+
           jwkeys.each do |key|
-            puts "debug: validate_and_load_public_key with key #{key}"
             loaded_kid, pub_key, alg = validate_and_load_public_key(key)
             @public_keys[loaded_kid] = [pub_key, alg]
-            puts "debug: @public_keys: #{@public_keys}"
           rescue AuthException
             nil
           end
-          puts "debug fetch_public_keys @public_keys: #{@public_keys}"
         end
 
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity
