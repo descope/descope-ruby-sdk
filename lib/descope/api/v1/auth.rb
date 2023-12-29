@@ -30,11 +30,16 @@ module Descope
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         def generate_auth_info(response_body, refresh_token, user_jwt, audience = nil)
           jwt_response = {}
+
+          # validate the session token if sessionJwt is not empty
           st_jwt = response_body['sessionJwt'] || ''
           validate_token(st_jwt) if st_jwt != ''
+
+          # validate refresh token if refresh_token was passed or if refreshJwt is not empty
           rt_jwt = response_body['refreshJwt'] || ''
           jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience) if refresh_token
           jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, user_jwt) if rt_jwt != ''
+
           jwt_response = adjust_properties(jwt_response, user_jwt)
 
           if user_jwt
@@ -103,9 +108,12 @@ module Descope
           raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
 
           if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
+            # fetch keys from /v2/keys and set them in @public_keys
             fetch_public_keys
           end
 
+          puts "debug: @public_keys AFTER FETCH: #{@public_keys}"
+          puts "debug: kid: #{kid}"
           found_key = @public_keys[kid] || nil
           if found_key.nil?
             raise AuthException.new('Unable to validate public key. Public key not found.', code: 500)
@@ -148,12 +156,14 @@ module Descope
 
           # The JWT.decode method returns an array where
           # the first element is the payload and the second element is the header.
+          puts "debug: JWT decode_response: #{decode_response}"
           decode_response[1]
         end
 
         def fetch_public_keys
           response = token_validation_v2(@project_id)
           puts "debug fetch_public_keys token_validation_v2 res: #{response}"
+
           unless response.is_a?(Hash) && response.key?('keys')
             raise AuthException.new("Unable to fetch public keys. #{response}", code: 500)
           end
@@ -163,13 +173,14 @@ module Descope
 
           @public_keys = {}
           jwkeys.each do |key|
+            puts "debug: validate_and_load_public_key with key #{key}"
             loaded_kid, pub_key, alg = validate_and_load_public_key(key)
             @public_keys[loaded_kid] = [pub_key, alg]
+            puts "debug: @public_keys: #{@public_keys}"
           rescue AuthException
             nil
           end
           puts "debug fetch_public_keys @public_keys: #{@public_keys}"
-          @public_keys
         end
 
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -186,7 +197,7 @@ module Descope
               public_key = JSON.parse(public_key)
             rescue JSON::ParserError => e
               raise AuthException.new(
-                "Unable to load public key. error: #{e.message}",
+                "Unable to parse public key json, error: #{e.message}",
                 code: 500
               )
             end

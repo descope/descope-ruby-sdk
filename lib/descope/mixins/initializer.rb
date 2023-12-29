@@ -12,7 +12,7 @@ module Descope
         options = Hash[config.map { |(k, v)| [k.to_sym, v] }]
         @base_uri = base_url(options)
         @headers = client_headers
-        @project_id = options[:project_id] || ENV['DESCOPE_PROJECT_ID']
+        @project_id = options[:project_id] || ENV['DESCOPE_PROJECT_ID'] || ''
         @public_key = options[:public_key] || ENV['DESCOPE_PUBLIC_KEY']
 
         if @public_key.nil?
@@ -26,7 +26,7 @@ module Descope
         @secure = !@skip_verify
         @management_key = options[:management_key] || ENV['DESCOPE_MANAGEMENT_KEY']
         @timeout_seconds = options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
-        @jwt_validation_leeway = options[:jwt_validation_leeway]
+        @jwt_validation_leeway = options[:jwt_validation_leeway] || Common::DEFAULT_JWT_VALIDATION_LEEWAY
 
         if @project_id.to_s.empty?
           raise AuthException.new(
@@ -59,7 +59,7 @@ module Descope
         if options.fetch(:management_key, nil)
           authorization_header(options[:management_key])
         else
-          Rails.logger.debug 'no management key'
+          puts 'no management key'
         end
       end
 

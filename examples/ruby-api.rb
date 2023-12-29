@@ -14,8 +14,8 @@ client = Descope::Client.new(
 def create_test_user(client, tenant_id, role_names)
   user_create_res = client.create_test_user(
     login_id: 'ami_ruby_sdk+6ami@descope.com',
-    email: 'ami_ruby_sdk+5ami@descope.com',
-    phone: '+1-347-450-0361',
+    #email: 'ami_ruby_sdk+5ami@descope.com',
+    #phone: '+1-347-450-0361',
     display_name: 'Ami Ruby SDK',
     user_tenants: [
       {
@@ -60,7 +60,7 @@ end
 
 tenanat_id = 'T2Zp93ZrKlLl1SQDxzO0LTU8i4qU'
 role_names = ['RubySdkAdmin']
-# created_user = create_test_user(client, tenanat_id, role_names)
+# res = create_test_user(client, tenanat_id, role_names)
 #load_user(client, 'stam@nowhere.com')
 # update_user_res = update_user(client, 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_user(login_id: 'ami_ruby_sdk+6ami@descope.com')
