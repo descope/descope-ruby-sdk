@@ -18,7 +18,7 @@ module Descope
 
         def generate_jwt_response(response_body, refresh_cookie = nil, audience = nil)
           jwt_response = generate_auth_info(response_body, refresh_cookie, true, audience)
-
+          puts "debug: jwt response: #{jwt_response}"
           jwt_response['user'] = response_body.key?('user') ? response_body['user'] : {}
           jwt_response['firstSeen'] = response_body.key?('firstSeen') ? response_body['firstSeen'] : true
 
@@ -71,8 +71,8 @@ module Descope
             (jwt_response[REFRESH_SESSION_TOKEN_NAME] ? jwt_response[REFRESH_SESSION_TOKEN_NAME]['iss'] : nil) ||
             jwt_response['iss'] || ''
 
-
-          jwt_response['projectID'] = issuer.split('/').last # support both url issuer and project ID issuer
+          puts "debug: issuer: #{issuer}"
+          jwt_response['projectId'] = issuer.split('/').last # support both url issuer and project ID issuer
 
           sub =
             (jwt_response[SESSION_TOKEN_NAME] ? jwt_response[SESSION_TOKEN_NAME]['sub'] : nil) ||
@@ -102,7 +102,41 @@ module Descope
           kid = unverified_header['kid']
           raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
 
-          fetch_public_keys if @public_keys == {} || @public_keys[kid].nil?
+          if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
+            fetch_public_keys
+          end
+
+          found_key = @public_keys[kid] || nil
+          if found_key.nil?
+            raise AuthException.new('Unable to validate public key. Public key not found.', code: 500)
+          end
+
+          # save reference to the founded key
+          # (as another thread can change the self.public_keys hash)
+          copy_key = found_key
+          puts "debug: copy_key: #{copy_key}"
+          alg_from_key = copy_key[1]
+          if alg_header != alg_from_key
+            raise AuthException.new(
+              'Algorithm signature in JWT header does not match the algorithm signature in the public key',
+              code: 500
+            )
+          end
+
+          begin
+            claims = JWT.decode(
+              token,
+              copy_key[0].public_key,
+              true,
+              { algorithm: alg_header, exp_leeway: @jwt_validation_leeway }
+            )[0] # the payload is the first index in the decoded array
+          rescue JWT::ExpiredSignature => e
+            raise AuthException.new("Received Invalid token times error due to time glitch (between machines) during jwt validation, try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default: #{e.message}", code: 500)
+          end
+          puts "debug: claims: #{claims}"
+          puts "debug: token: #{token}"
+          claims['jwt'] = token
+          claims
         end
 
         def jwt_get_unverified_header(token)
@@ -119,8 +153,9 @@ module Descope
 
         def fetch_public_keys
           response = token_validation_v2(@project_id)
+          puts "debug fetch_public_keys token_validation_v2 res: #{response}"
           unless response.is_a?(Hash) && response.key?('keys')
-            raise AuthException.new("Unable to fetch public keys. #{response.body}", code: response.code)
+            raise AuthException.new("Unable to fetch public keys. #{response}", code: 500)
           end
 
           jwkeys_wrapper = response
@@ -132,6 +167,55 @@ module Descope
             @public_keys[loaded_kid] = [pub_key, alg]
           rescue AuthException
             nil
+          end
+          puts "debug fetch_public_keys @public_keys: #{@public_keys}"
+          @public_keys
+        end
+
+        # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity
+        def validate_and_load_public_key(public_key)
+          unless public_key.is_a?(String) || public_key.is_a?(Hash)
+            raise AuthException.new(
+              'Unable to load public key. Invalid public key error: (unknown type)',
+              code: 500
+            )
+          end
+
+          if public_key.is_a? String
+            begin
+              public_key = JSON.parse(public_key)
+            rescue JSON::ParserError => e
+              raise AuthException.new(
+                "Unable to load public key. error: #{e.message}",
+                code: 500
+              )
+            end
+          end
+
+          alg = public_key[ALGORITHM_KEY]
+          if alg.nil?
+            raise AuthException.new(
+              'Unable to load public key. Missing property: alg',
+              code: 500
+            )
+          end
+
+          kid = public_key['kid']
+          if kid.nil?
+            raise AuthException.new(
+              'Unable to load public key. Missing property: kid',
+              code: 500
+            )
+          end
+
+          begin
+            # Load and validate public key
+            [kid, JWT::JWK.new(public_key), alg]
+          rescue JWT::JWKError => e
+            raise AuthException.new(
+              "Unable to load public key #{e.message}",
+              code: 500
+            )
           end
         end
       end

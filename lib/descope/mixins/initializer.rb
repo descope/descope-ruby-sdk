@@ -68,55 +68,6 @@ module Descope
         extend Descope::Api::V1::Management
         extend Descope::Api::V1::Auth
       end
-
-      private
-
-      # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity
-      def validate_and_load_public_key(public_key)
-        unless public_key.is_a?(String) || public_key.is_a?(Hash)
-          raise AuthException.new(
-            'Unable to load public key. Invalid public key error: (unknown type)',
-            code: 500
-          )
-        end
-
-        if public_key.is_a? String
-          begin
-            public_key = JSON.parse(public_key)
-          rescue JSON::ParserError => e
-            raise AuthException.new(
-              "Unable to load public key. error: #{e.message}",
-              code: 500
-            )
-          end
-        end
-
-        alg = public_key[Descope::Api::V1::Auth::ALGORITHM_KEY]
-        if alg.nil?
-          raise AuthException.new(
-            'Unable to load public key. Missing property: alg',
-            code: 500
-          )
-        end
-
-        kid = public_key['kid']
-        if kid.nil?
-          raise AuthException.new(
-            'Unable to load public key. Missing property: kid',
-            code: 500
-          )
-        end
-
-        begin
-          # Load and validate public key
-          [kid, JWT::JWK.new(public_key), alg]
-        rescue JWT::JWKError => e
-          raise AuthException.new(
-            "Unable to load public key #{e.message}",
-            code: 500
-          )
-        end
-      end
     end
   end
 end

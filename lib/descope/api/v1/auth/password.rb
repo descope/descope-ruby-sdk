@@ -30,6 +30,7 @@ module Descope
               ssoAppId: sso_app_id
             }
             res = post(SIGN_IN_PASSWORD_PATH, request_params)
+            puts "debug: sign in response: #{res}"
             generate_jwt_response(res)
           end
 

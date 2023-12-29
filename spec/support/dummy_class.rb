@@ -17,7 +17,7 @@ class DummyClass
       'x-descope-sdk-ruby-version': RUBY_VERSION,
       'x-descope-sdk-version': Descope::SDK_VERSION
     }
-    @project_id = 'project_id'
+    @project_id = 'P2abcde12345'
     @management_key = 'management_key'
   end
 

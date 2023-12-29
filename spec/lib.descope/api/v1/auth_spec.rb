@@ -6,6 +6,7 @@ describe Descope::Api::V1::Auth do
   before(:all) do
     dummy_instance = DummyClass.new
     dummy_instance.extend(Descope::Api::V1::Auth)
+    dummy_instance.extend(Descope::Api::V1::Session)
     dummy_instance.extend(Descope::Mixins::Common::EndpointsV1)
     @instance = dummy_instance
   end
@@ -24,6 +25,20 @@ describe Descope::Api::V1::Auth do
     end
 
     it 'is expected to generate jwt response' do
+      allow(@instance).to receive(:token_validation_v2).and_return(
+        {
+          'keys' => [
+            {
+              'alg' => 'RS256',
+              'e' => 'AQAB',
+              'kid' => 'SK2ZoKi2Q4I5U8SjammTyOXRWvKl0',
+              'kty' => 'RSA',
+              'n' => 'shNRO_U_ ',
+              'use' => 'sig'
+            }
+          ]
+        }
+      )
       expect do
         @instance.generate_jwt_response(response_body)
       end.not_to raise_error
