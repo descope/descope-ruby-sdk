@@ -149,5 +149,51 @@ describe Descope::Api::V1::Auth do
         /Algorithm signature in JWT header does not match the algorithm signature in the Public key./
       )
     end
+
+    it 'is expected to decode the token successfully' do
+      rsa_private = OpenSSL::PKey::RSA.generate 2048
+      rsa_public = rsa_private.public_key
+
+      allow_any_instance_of(Descope::Api::V1::Auth).to receive(:jwt_get_unverified_header).and_return(
+        {
+          'alg' => 'RS256',
+          'kid' => 'some_kid'
+        }
+      )
+      # bypassing fetch_public_keys since all we need is the set of public_keys attribute on the client class
+      allow_any_instance_of(Descope::Api::V1::Auth).to receive(:fetch_public_keys).and_return(nil)
+      expect(
+        @instance.instance_variable_set(
+          :@public_keys, { 'some_kid' => [JWT::JWK.new(rsa_public), public_key['alg']] }
+        )
+      )
+
+      LEEWAY = 10
+      CLOCK = Time.now.to_i
+      ALGORITHM = 'RS256'.freeze
+
+      CONTEXT = { algorithm: ALGORITHM, leeway: LEEWAY, audience: 'tokens-test-123', issuer: 'https://tokens-test.descope.com/', clock: CLOCK }.freeze
+
+
+      payload = { data: 'test' }
+      default_payload = { iss: CONTEXT[:issuer], sub: 'user123', aud: CONTEXT[:audience], exp: CLOCK + LEEWAY, iat: CLOCK }
+      token = JWT.encode(default_payload.merge(payload), rsa_private, ALGORITHM)
+
+      expect do
+        sleep(20)
+        @instance.send(:validate_token, token)
+      end.to raise_error(
+        Descope::AuthException, /Signature has expired/
+      )
+
+      expect(
+        @instance.instance_variable_set(
+          :@jwt_validation_leeway, 120
+        )
+      )
+      expect do
+        @instance.send(:validate_token, token)
+      end.to_not raise_error
+    end
   end
 end
