@@ -19,6 +19,8 @@ class DummyClass
     }
     @project_id = 'P2abcde12345'
     @management_key = 'management_key'
+    @public_keys = {}
+    @mlock = Mutex.new
   end
 
   %i[get post put patch delete delete_with_body].each do |method|

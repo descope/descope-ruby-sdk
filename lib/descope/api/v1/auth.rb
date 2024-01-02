@@ -105,18 +105,20 @@ module Descope
           kid = unverified_header['kid']
           raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
 
-          if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
-            # fetch keys from /v2/keys and set them in @public_keys
-            fetch_public_keys
+          found_key = nil
+          @mlock.synchronize do
+            if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
+              # fetch keys from /v2/keys and set them in @public_keys
+              fetch_public_keys
+            end
+            found_key = @public_keys[kid]
+            raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
           end
 
-          found_key = @public_keys[kid] || nil
-          raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
 
-          # save reference to the founded key
+          # save reference to the found key
           # (as another thread can change the self.public_keys hash)
-          copy_key = found_key
-          alg_from_key = copy_key[1]
+          alg_from_key = found_key[1]
           if alg_header != alg_from_key
             raise AuthException.new(
               'Algorithm signature in JWT header does not match the algorithm signature in the Public key.',
@@ -127,7 +129,7 @@ module Descope
           begin
             claims = JWT.decode(
               token,
-              copy_key[0].public_key,
+              found_key[0].public_key,
               true,
               { algorithm: alg_header, exp_leeway: @jwt_validation_leeway }
             )[0] # the payload is the first index in the decoded array
@@ -152,7 +154,7 @@ module Descope
         end
 
         def fetch_public_keys
-          response = token_validation_v2(@project_id)
+          response = token_validation_key(@project_id)
           unless response.is_a?(Hash) && response.key?('keys')
             raise AuthException.new("Unable to fetch public keys. #{response}", code: 500)
           end

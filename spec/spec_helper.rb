@@ -1,6 +1,9 @@
 require 'rack/test'
 require 'faker'
 require 'json'
+require 'concurrent'
+require 'openssl'
+require 'base64'
 require 'descope'
 require 'super_diff/rspec'
 

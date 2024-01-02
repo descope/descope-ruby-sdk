@@ -170,6 +170,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
+  concurrent-ruby (~> 1.1)
   coveralls
   descope!
   dotenv

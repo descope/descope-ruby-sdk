@@ -11,6 +11,11 @@ describe Descope::Api::V1::Auth do
     @instance = dummy_instance
   end
 
+  LEEWAY = 10
+  CLOCK = Time.now.to_i
+  ALGORITHM = 'RS256'.freeze
+  CONTEXT = { algorithm: ALGORITHM, leeway: LEEWAY, audience: 'tokens-test-123', issuer: 'https://tokens-test.descope.com/', clock: CLOCK }.freeze
+
   let(:public_key) do
     {
       'alg' => 'RS256',
@@ -168,13 +173,6 @@ describe Descope::Api::V1::Auth do
         )
       )
 
-      LEEWAY = 10
-      CLOCK = Time.now.to_i
-      ALGORITHM = 'RS256'.freeze
-
-      CONTEXT = { algorithm: ALGORITHM, leeway: LEEWAY, audience: 'tokens-test-123', issuer: 'https://tokens-test.descope.com/', clock: CLOCK }.freeze
-
-
       payload = { data: 'test' }
       default_payload = { iss: CONTEXT[:issuer], sub: 'user123', aud: CONTEXT[:audience], exp: CLOCK + LEEWAY, iat: CLOCK }
       token = JWT.encode(default_payload.merge(payload), rsa_private, ALGORITHM)
@@ -194,6 +192,50 @@ describe Descope::Api::V1::Auth do
       expect do
         @instance.send(:validate_token, token)
       end.to_not raise_error
+    end
+
+    it 'is expected to use @public_keys in a thread safe manner' do
+      optional_parameters = { kid: 'some-kid', use: 'sig', alg: ALGORITHM }
+      jwk = JWT::JWK.new(OpenSSL::PKey::RSA.new(2048), optional_parameters)
+      payload = { data: 'data' }
+      token = JWT.encode(payload, jwk.signing_key, jwk[:alg], kid: jwk[:kid])
+
+      # JSON Web Key Set for advertising your signing keys
+      jwks_hash = JWT::JWK::Set.new(jwk).export
+      jwks_hash.transform_keys!(&:to_s)['keys'][0].transform_keys!(&:to_s)
+
+      counter = 0
+      # stub the fetch_keys API call to get keys (/v2/keys/{project_id}) with the public key created above
+      allow(@instance).to receive(:token_validation_key) do |*args|
+        counter += 1
+        jwks_hash
+      end
+
+      # Create an array to hold threads
+      threads = []
+
+      # Make sure public_keys is only empty once
+
+      # Declare errors array with thread safety
+      errors = Concurrent::Array.new
+
+      10.times do
+        threads << Thread.new do
+          begin
+            @instance.send(:validate_token, token)
+          rescue StandardError => e
+            puts "Error: #{e}"
+            errors << e
+          end
+        end
+      end
+
+      # Wait for all threads to finish
+      threads.each(&:join)
+
+      # Expect no errors
+      expect(errors).to have_attributes(length: 0)
+      expect(counter).to eq(1)
     end
   end
 end

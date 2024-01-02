@@ -6,7 +6,7 @@ module Descope
   module Mixins
     # Helper class for initializing the Descope API
     module Initializer
-      attr_accessor :public_keys
+      attr_accessor :public_keys, :mlock
 
       def initialize(config)
         options = Hash[config.map { |(k, v)| [k.to_sym, v] }]
@@ -14,6 +14,7 @@ module Descope
         @headers = client_headers
         @project_id = options[:project_id] || ENV['DESCOPE_PROJECT_ID'] || ''
         @public_key = options[:public_key] || ENV['DESCOPE_PUBLIC_KEY']
+        @mlock = Mutex.new
 
         if @public_key.nil?
           @public_keys = {}

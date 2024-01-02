@@ -4,11 +4,7 @@ module Descope
     module V1
       # Holds all session methods
       module Session
-        def token_validation_v1(project_id)
-          get("#{Descope::Mixins::Common::EndpointsV1::PUBLIC_KEY_PATH}/#{project_id}")
-        end
-
-        def token_validation_v2(project_id)
+        def token_validation_key(project_id)
           get("#{Descope::Mixins::Common::EndpointsV2::PUBLIC_KEY_PATH}/#{project_id}")
         end
 
