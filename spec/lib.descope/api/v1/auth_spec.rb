@@ -70,7 +70,7 @@ describe Descope::Api::V1::Auth do
 
   context 'fetch_public_keys' do
     it 'is expected to fetch public keys' do
-      allow(@instance).to receive(:token_validation_v2).and_return({ 'keys' => [public_key] })
+      allow(@instance).to receive(:token_validation_key).and_return({ 'keys' => [public_key] })
       expect { @instance.send(:fetch_public_keys) }.not_to raise_error
       expect(@instance.instance_variable_get(:@public_keys)).not_to be_nil
       expect(@instance.instance_variable_get(:@public_keys)).to eq(

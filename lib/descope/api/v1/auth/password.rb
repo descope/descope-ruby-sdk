@@ -14,7 +14,13 @@ module Descope
             # (optional) Include additional user metadata that you wish to save.
             validate_login_id(login_id)
             validate_password(password)
-            post(SIGN_UP_PASSWORD_PATH, _compose_signup_body(login_id, password, user))
+            request_params = {
+              loginId: login_id,
+              password: password
+            }
+            request_params[:user] = user unless user.nil?
+
+            post(SIGN_UP_PASSWORD_PATH, request_params)
           end
 
           def sign_in(login_id: nil, password: nil, sso_app_id: nil)
@@ -31,18 +37,6 @@ module Descope
             }
             res = post(SIGN_IN_PASSWORD_PATH, request_params)
             generate_jwt_response(res)
-          end
-
-          private
-
-          def compose_signup_body(login_id, password, user)
-            body = {
-              loginId: login_id,
-              password: password
-            }
-
-            body[:user] = user unless user.nil?
-            body
           end
         end
       end

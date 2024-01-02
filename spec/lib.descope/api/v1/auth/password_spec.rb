@@ -33,7 +33,8 @@ describe Descope::Api::V1::Session do
       expect(@instance).to receive(:post).with(
         SIGN_IN_PASSWORD_PATH, { loginId: 'test', password: 's3cr3t', ssoAppId: nil }
       )
-
+      # stub the jwt_get_unverified_header method to return the kid of the public key created above
+      allow(@instance).to receive(:generate_jwt_response).and_return({})
       expect { @instance.sign_in(login_id: 'test', password: 's3cr3t') }.not_to raise_error
     end
   end

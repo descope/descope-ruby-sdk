@@ -10,24 +10,9 @@ describe Descope::Api::V1::Session do
     @instance = dummy_instance
   end
 
-  context '.token_validation_v1'  do
-    it 'is expected to respond to token validation v1' do
-      expect(@instance).to respond_to(:token_validation_v1)
-    end
-
-    it 'is expected to get v1 public key' do
-      project_id = 'project123'
-      expect(@instance).to receive(:get).with(
-        "#{Descope::Mixins::Common::EndpointsV1::PUBLIC_KEY_PATH}/#{project_id}"
-      )
-
-      expect { @instance.token_validation_v1('project123') }.not_to raise_error
-    end
-  end
-
-  context '.token_validation_v2'  do
-    it 'is expected to respond to token validation v2' do
-      expect(@instance).to respond_to(:token_validation_v2)
+  context '.token_validation_key' do
+    it 'is expected to respond to token validation key' do
+      expect(@instance).to respond_to(:token_validation_key)
     end
 
     it 'is expected to get v2 public key' do
@@ -36,7 +21,7 @@ describe Descope::Api::V1::Session do
         "#{Descope::Mixins::Common::EndpointsV2::PUBLIC_KEY_PATH}/#{project_id}"
       )
 
-      expect { @instance.token_validation_v2('project123') }.not_to raise_error
+      expect { @instance.token_validation_key('project123') }.not_to raise_error
     end
   end
 

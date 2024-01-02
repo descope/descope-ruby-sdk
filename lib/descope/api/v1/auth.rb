@@ -17,6 +17,10 @@ module Descope
         ALGORITHM_KEY = 'alg'
 
         def generate_jwt_response(response_body, refresh_cookie = nil, audience = nil)
+          if response_body.nil? || response_body.empty?
+            raise AuthException.new('Unable to generate jwt response. Response body is empty', code: 500)
+          end
+
           jwt_response = generate_auth_info(response_body, refresh_cookie, true, audience)
           jwt_response['user'] = response_body.key?('user') ? response_body['user'] : {}
           jwt_response['firstSeen'] = response_body.key?('firstSeen') ? response_body['firstSeen'] : true

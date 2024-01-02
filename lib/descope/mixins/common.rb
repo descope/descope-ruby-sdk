@@ -86,7 +86,6 @@ module Descope
         UPDATE_PASSWORD_PATH = '/v1/auth/password/update'
         REPLACE_PASSWORD_PATH = '/v1/auth/password/replace'
         PASSWORD_POLICY_PATH = '/v1/auth/password/policy'
-        PUBLIC_KEY_PATH = '/v1/keys'
       end
 
       module EndpointsV2
