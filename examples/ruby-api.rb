@@ -58,6 +58,12 @@ def load_user_by_id(client, user_id)
   user_load_res
 end
 
+def enchanted(client, login_id)
+  user_load_res = client.enchanted_link_sign_in(login_id: login_id)
+  puts "user_load_res: #{user_load_res}"
+  user_load_res
+end
+
 tenanat_id = 'T2Zp93ZrKlLl1SQDxzO0LTU8i4qU'
 role_names = ['RubySdkAdmin']
 # res = create_test_user(client, tenanat_id, role_names)

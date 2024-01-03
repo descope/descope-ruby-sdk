@@ -9,8 +9,7 @@ module Descope
       DEFAULT_BASE_URL = 'https://api.descope.dev' # pragma: no cover
       DEFAULT_TIMEOUT_SECONDS = 60
       DEFAULT_JWT_VALIDATION_LEEWAY = 5
-
-      # PHONE_REGEX = r"""^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\/]?){0,})(?:[\-\.\ \\/]?(?:#|ext\.?|extension|x)[\-\.\ \\/]?(\d+))?$"""
+      PHONE_REGEX = %r{^(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[-./ \\]?(?:(?:\(?\d{1,}\)?[-./ \\]?){0,})(?:[-./ \\]?(?:#|ext\.?|extension|x)[-./ \\]?(\d+))?$}.freeze
 
       SESSION_COOKIE_NAME = 'DS'
       REFRESH_SESSION_COOKIE_NAME = 'DSR'
@@ -20,6 +19,24 @@ module Descope
       COOKIE_DATA_NAME = 'cookieData'
 
       REDIRECT_LOCATION_COOKIE_NAME = 'Location'
+
+      module DeliveryMethod
+        WHATSAPP = 1
+        SMS = 2
+        EMAIL = 3
+      end
+
+      def get_method_string(method)
+        name = {
+          DeliveryMethod::WHATSAPP => 'whatsapp',
+          DeliveryMethod::SMS => 'sms',
+          DeliveryMethod::EMAIL => 'email'
+        }[method]
+
+        raise ArgumentException, "Unknown delivery method: #{method}" if name.nil?
+
+        name
+      end
 
       module EndpointsV1
         REFRESH_TOKEN_PATH = '/v1/auth/refresh'

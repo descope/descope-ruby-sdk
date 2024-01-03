@@ -127,24 +127,6 @@ module Descope
             end
             associated_tenant_list
           end
-
-          def get_method_string(method: nil)
-            name = {
-              DeliveryMethod::WHATSAPP => 'whatsapp',
-              DeliveryMethod::SMS => 'sms',
-              DeliveryMethod::EMAIL => 'email'
-            }.key(method)
-
-            raise ArgumentException, "Unknown delivery method: #{method}" unless name
-
-            name
-          end
-
-          module DeliveryMethod
-            WHATSAPP = 1
-            SMS = 2
-            EMAIL = 3
-          end
         end
       end
     end

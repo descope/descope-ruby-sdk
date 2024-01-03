@@ -9,7 +9,7 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def sign_up(login_id: nil, password: nil, user: nil)
+          def password_sign_up(login_id: nil, password: nil, user: nil)
             # Sign up (create) a new user using a login ID and password.
             # (optional) Include additional user metadata that you wish to save.
             validate_login_id(login_id)
@@ -23,7 +23,7 @@ module Descope
             post(SIGN_UP_PASSWORD_PATH, request_params)
           end
 
-          def sign_in(login_id: nil, password: nil, sso_app_id: nil)
+          def password_sign_in(login_id: nil, password: nil, sso_app_id: nil)
             # Sign-In an existing user utilizing password authentication. This endpoint will return the user's JWT..
             # Return dict in the format
             #  {"jwts": [], "user": "", "firstSeen": "", "error": ""}

@@ -366,7 +366,7 @@ module Descope
           def generate_otp_for_test(method: nil, login_id: nil)
             body = {
               loginId: login_id,
-              deliveryMethod: get_method_string(method: method)
+              deliveryMethod: get_method_string(method)
             }
             post(Common::USER_GENERATE_OTP_FOR_TEST_PATH, body)
           end

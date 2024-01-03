@@ -24,7 +24,9 @@ class DummyClass
   end
 
   %i[get post put patch delete delete_with_body].each do |method|
-    define_method(method) do |uri, body = {}, extra_headers = {}|
+    define_method(method) do |uri, token, body = {}, extra_headers = {}|
+      body = body.delete_if { |_, v| v.nil? }
+      authorization_header(token) unless token.nil?
       true
     end
   end
