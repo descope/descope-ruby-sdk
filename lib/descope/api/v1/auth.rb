@@ -225,15 +225,15 @@ module Descope
         end
 
         def validate_refresh_token_provided(login_options: nil, refresh_token: nil)
-          refresh_required = !login_options.nil? && (login_options['mfa'] || login_options['stepup'])
-          refresh_missing = refresh_token.nil? or refresh_token.to_s.empty?
+          refresh_required = !login_options.nil? && (login_options[:mfa] || login_options[:stepup])
+          refresh_missing = refresh_token.nil? || refresh_token.to_s.empty?
 
-          if refresh_required && refresh_missing
-            raise AuthException.new(
-              'Missing refresh token for stepup/mfa',
-              code: 400
-            )
-          end
+          return unless refresh_required && refresh_missing
+
+          raise AuthException.new(
+            'Missing refresh token for stepup/mfa',
+            code: 400
+          )
         end
 
         def compose_url(base, method)
@@ -247,6 +247,18 @@ module Descope
           "#{base}/#{suffix}"
         end
 
+        def get_login_id_by_method(method: nil, user: {})
+          login_id = {
+            DeliveryMethod::WHATSAPP => ['whatsapp', user.fetch(:phone, '')],
+            DeliveryMethod::SMS => ['phone', user.fetch(:phone, '')],
+            DeliveryMethod::EMAIL => ['email', user.fetch(:email, '')]
+          }[method]
+
+          raise AuthException.new("Unknown delivery method: #{method}", code: 400) if login_id.nil?
+
+          login_id
+        end
+
         def adjust_and_verify_delivery_method(method, login_id, user)
           return false if login_id.nil?
 
@@ -254,24 +266,24 @@ module Descope
 
           case method
           when DeliveryMethod::EMAIL
-            user['email'] ||= login_id
+            user[:email] ||= login_id
             begin
-              EmailValidator.validate_email(user['email'], check_deliverability: false)
+              validate_email(user[:email])
               return true
-            rescue EmailNotValidError
+            rescue AuthException
               return false
             end
           when DeliveryMethod::SMS
-            user['phone'] ||= login_id
+            user[:phone] ||= login_id
             return false unless /^#{PHONE_REGEX}$/.match(user['phone'])
           when DeliveryMethod::WHATSAPP
-            user['phone'] ||= login_id
+            user[:phone] ||= login_id
             return false unless /^#{PHONE_REGEX}$/.match(user['phone'])
           else
             return false
           end
 
-          return true
+          true
         end
       end
     end

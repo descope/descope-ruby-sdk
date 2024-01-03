@@ -26,6 +26,10 @@ module Descope
       def validate_password(password)
         raise AuthException, 'password cannot be empty' unless password.is_a?(String) && !password.empty?
       end
+
+      def validate_email(email)
+        raise AuthException.new('email cannot be empty', code: 400) unless email.is_a?(String) && !email.empty?
+      end
     end
   end
 end

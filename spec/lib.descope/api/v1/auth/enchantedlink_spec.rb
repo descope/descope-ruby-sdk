@@ -37,5 +37,49 @@ describe Descope::Api::V1::EnhancedLink do
         )
       end.not_to raise_error
     end
+
+    it 'is expected to validate refresh token and not raise an error with refresh token and valid login options' do
+      expect do
+        @instance.send(:validate_refresh_token_provided,
+                       login_options: { mfa: true, stepup: true },
+                       refresh_token: 'some-token')
+      end.not_to raise_error
+    end
+
+    it 'is expected to validate refresh token and raise an error with refresh token and invalid login options' do
+      expect do
+        @instance.send(:validate_refresh_token_provided,
+                       login_options: { 'mfa': true, 'stepup': true },
+                       refresh_token: '')
+      end.to raise_error(Descope::AuthException, 'Missing refresh token for stepup/mfa')
+    end
+  end
+
+  context '.sign_up' do
+    it 'is expected to respond to sign up' do
+      expect(@instance).to respond_to(:enchanted_link_sign_up)
+    end
+
+    it 'is expected to sign up with enchanted link' do
+      request_params = {
+        loginId: 'test',
+        URI: 'https://some-uri/email',
+        user: { username: 'user1', email: 'dummy@dummy.com' },
+        email: 'dummy@dummy.com'
+      }
+
+      expect(@instance).to receive(:post).with(
+        compose_signup_uri,
+        request_params
+      )
+
+      expect do
+        @instance.enchanted_link_sign_up(
+          login_id: 'test',
+          uri: 'https://some-uri/email',
+          user: { username: 'user1', email: 'dummy@dummy.com' }
+        )
+      end.not_to raise_error
+    end
   end
 end

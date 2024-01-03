@@ -58,7 +58,7 @@ def load_user_by_id(client, user_id)
   user_load_res
 end
 
-def enchanted(client, login_id)
+def enchanted_sign_in(client, login_id)
   user_load_res = client.enchanted_link_sign_in(login_id: login_id)
   puts "user_load_res: #{user_load_res}"
   user_load_res
@@ -72,5 +72,5 @@ role_names = ['RubySdkAdmin']
 # client.delete_user(login_id: 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_all_test_users()
 
-res = client.sign_in(login_id: 'ami+1@descope.com', password: 'Fl@ffybunny123')
+res = enchanted_sign_in(client, login_id: 'ami+1@descope.com')
 puts "exmple response: #{res}"
