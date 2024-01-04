@@ -37,6 +37,7 @@ module Descope
   # exception for not found resource, you query for an
   # non-existent resource, or wrong path
   class NotFound < Descope::HTTPError; end
+  class MethodNotAllowed < Descope::HTTPError; end
   # exception for unknown error
   class Unsupported < Descope::HTTPError; end
   # exception for server error

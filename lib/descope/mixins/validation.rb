@@ -30,6 +30,10 @@ module Descope
       def validate_email(email)
         raise AuthException.new('email cannot be empty', code: 400) unless email.is_a?(String) && !email.empty?
       end
+
+      def validate_token_not_empty(token)
+        raise AuthException.new('token cannot be empty', code: 400) unless token.is_a?(String) && !token.empty?
+      end
     end
   end
 end

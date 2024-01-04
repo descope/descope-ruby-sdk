@@ -16,6 +16,7 @@ module Descope
         @public_key = options[:public_key] || ENV['DESCOPE_PUBLIC_KEY']
         @mlock = Mutex.new
 
+        puts "base_uri: #{@base_uri}"
         if @public_key.nil?
           @public_keys = {}
         else
@@ -45,7 +46,11 @@ module Descope
       end
 
       def base_url(options)
-        options[:descope_api_url] || ENV['DESCOPE_API_URL'] || Common::DEFAULT_BASE_URL
+        url = options[:descope_api_url] || ENV['DESCOPE_API_URL'] || Common::DEFAULT_BASE_URL
+        return url if url.start_with? 'http'
+
+        raise AuthException.new('base url must start with http or https', code: 400)
+
       end
 
       def authorization_header(pswd)

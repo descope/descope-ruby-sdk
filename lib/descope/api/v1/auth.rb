@@ -18,7 +18,7 @@ module Descope
 
         ALGORITHM_KEY = 'alg'
 
-        def generate_jwt_response(response_body, refresh_cookie = nil, audience = nil)
+        def generate_jwt_response(response_body: nil, refresh_cookie: nil, audience: nil)
           if response_body.nil? || response_body.empty?
             raise AuthException.new('Unable to generate jwt response. Response body is empty', code: 500)
           end

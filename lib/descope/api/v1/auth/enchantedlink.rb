@@ -16,7 +16,7 @@ module Descope
             validate_refresh_token_provided(login_options: login_options, refresh_token: refresh_token)
 
             body = compose_signin_body(login_id, uri, login_options)
-            uri = compose_signin_uri
+            uri = compose_signin_url
             post(uri, body, nil, refresh_token)
           end
 
@@ -24,7 +24,7 @@ module Descope
             # Sign-up new end user by sending an enchanted link via email
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpEnchantedLink/
 
-            unless adjust_and_verify_delivery_method(DeliveryMethod::EMAIL, login_id, user)
+            unless adjust_and_verify_delivery_method(Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id, user)
               raise Descope::ArgumentException.new(
                 'Invalid delivery method',
                 code: 400
@@ -32,13 +32,33 @@ module Descope
             end
 
             body = compose_signup_body(login_id, uri, user)
-            uri = compose_signup_uri
+            uri = compose_signup_url
             post(uri, body)
+          end
+
+          def enchanted_link_sign_up_or_in(login_id: nil, uri: nil)
+            # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpOrInEnchantedLinkEmail/
+            body = compose_signin_body(login_id, uri)
+            uri = compose_sign_up_or_in_url
+            puts "uri: #{uri}"
+            post(uri, body)
+          end
+
+          def enchanted_link_verify_token(token: nil)
+            validate_token_not_empty(token)
+            post(GET_SESSION_ENCHANTEDLINK_AUTH_PATH, { token: token })
+          end
+
+          def enchanted_link_get_session(pending_ref: nil)
+            # @see https://docs.descope.com/api/openapi/enchantedlink/operation/GetEnchantedLinkSession/
+            res = post( GET_SESSION_ENCHANTEDLINK_AUTH_PATH, { pendingRef: pending_ref })
+            generate_jwt_response(response_body: res, refresh_cookie: res['refreshJwt'])
           end
 
           private
 
-          def compose_signin_body(login_id, uri, login_options = {})
+          def compose_signin_body(login_id, uri, login_options = nil)
+            login_options ||= {}
             unless login_options.is_a?(Hash)
               raise Descope::ArgumentException.new(
                 'Unable to read login_option, not a Hash',
@@ -48,37 +68,36 @@ module Descope
 
             {
               loginId: login_id,
-              URI: uri,
+              redirectUrl: uri,
               loginOptions: login_options.to_h
             }
           end
 
-          def compose_signin_uri
-            compose_url(SIGN_IN_AUTH_ENCHANTEDLINK_PATH, DeliveryMethod::EMAIL)
+          def compose_signin_url
+            compose_url(SIGN_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          end
+
+          def compose_signup_url
+            compose_url(SIGN_UP_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          end
+
+          def compose_sign_up_or_in_url
+            compose_url(SIGN_UP_OR_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
           end
 
           def compose_signup_body(login_id, uri, user)
             body = {
               loginId: login_id,
-              URI: uri
+              redirectUrl: uri
             }
 
             unless user.nil? || user.empty?
               body[:user] = user
-              method_str, val = get_login_id_by_method(method: DeliveryMethod::EMAIL, user: user)
-              puts "method_str: #{method_str}, val: #{val}"
+              method_str, val = get_login_id_by_method(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, user: user)
               body[method_str.to_sym] = val
             end
 
             body
-          end
-
-          def compose_signup_uri
-            compose_url(SIGN_UP_AUTH_ENCHANTEDLINK_PATH, DeliveryMethod::EMAIL)
-          end
-
-          def compose_get_session_body(pending_ref)
-            {"pendingRef": pending_ref}
           end
         end
       end

@@ -18,11 +18,11 @@ describe Descope::Api::V1::EnhancedLink do
     it 'is expected to sign in with enchanted link' do
       request_params = {
         loginId: 'test',
-        URI: 'https://some-uri/email',
+        redirectUrl: 'https://some-uri/email',
         loginOptions: { 'abc': '123' }
       }
       expect(@instance).to receive(:post).with(
-        compose_signin_uri,
+        compose_signin_url,
         request_params,
         nil,
         'refresh_token'
@@ -63,13 +63,13 @@ describe Descope::Api::V1::EnhancedLink do
     it 'is expected to sign up with enchanted link' do
       request_params = {
         loginId: 'test',
-        URI: 'https://some-uri/email',
+        redirectUrl: 'https://some-uri/email',
         user: { username: 'user1', email: 'dummy@dummy.com' },
         email: 'dummy@dummy.com'
       }
 
       expect(@instance).to receive(:post).with(
-        compose_signup_uri,
+        compose_signup_url,
         request_params
       )
 
@@ -79,6 +79,68 @@ describe Descope::Api::V1::EnhancedLink do
           uri: 'https://some-uri/email',
           user: { username: 'user1', email: 'dummy@dummy.com' }
         )
+      end.not_to raise_error
+    end
+  end
+
+  context '.sign_up_or_in' do
+    it 'is expected to respond to sign up' do
+      expect(@instance).to respond_to(:enchanted_link_sign_up_or_in)
+    end
+
+    it 'is expected to sign up with enchanted link' do
+      request_params = {
+        loginId: 'test',
+        redirectUrl: 'https://some-uri/email',
+        loginOptions: {}
+      }
+
+      expect(@instance).to receive(:post).with(
+        compose_sign_up_or_in_url,
+        request_params
+      )
+
+      expect do
+        @instance.enchanted_link_sign_up_or_in(
+          login_id: 'test',
+          uri: 'https://some-uri/email'
+        )
+      end.not_to raise_error
+    end
+  end
+
+  context '.enchanted_link_verify_token' do
+    it 'is expected to respond to enchanted_link_verify_token' do
+      expect(@instance).to respond_to(:enchanted_link_verify_token)
+    end
+
+    it 'is expected to verify token with enchanted link' do
+      expect(@instance).to receive(:post).with(
+        GET_SESSION_ENCHANTEDLINK_AUTH_PATH,
+        { token: 'token' }
+      )
+
+      expect { @instance.enchanted_link_verify_token(token: 'token') }.not_to raise_error
+    end
+  end
+
+  context '.get_session' do
+    it 'is expected to respond to get_session' do
+      expect(@instance).to respond_to(:enchanted_link_get_session)
+    end
+
+    it 'is expected to get session by pending ref with enchanted link' do
+      request_params = {
+        pendingRef: 'pendingRef'
+      }
+
+      expect(@instance).to receive(:post).twice.with(
+        GET_SESSION_ENCHANTEDLINK_AUTH_PATH,
+        request_params
+      ).and_return('cookies' => { REFRESH_SESSION_COOKIE_NAME => 'refresh_token' })
+
+      expect do
+        @instance.enchanted_link_get_session(pending_ref: 'pendingRef')
       end.not_to raise_error
     end
   end

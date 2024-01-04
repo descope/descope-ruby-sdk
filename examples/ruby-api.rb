@@ -3,10 +3,12 @@
 require 'descope'
 
 dev_project_id = 'P2ZoKhzAdvZV9HzRZ0SE8pIdNq8P'
+prod_project_id = 'P2WJXSonKgqhynwfVIPIDR8U7a5J'
 client = Descope::Client.new(
   {
-    project_id: dev_project_id,
-    management_key: ENV['MGMT_KEY']
+    project_id: prod_project_id,
+    management_key: ENV['MGMT_KEY'],
+    descope_api_url: 'app.descope.com'
   }
 )
 
@@ -58,8 +60,8 @@ def load_user_by_id(client, user_id)
   user_load_res
 end
 
-def enchanted_sign_in(client, login_id)
-  user_load_res = client.enchanted_link_sign_in(login_id: login_id)
+def enchanted_sign_in(client, login_id, uri)
+  user_load_res = client.enchanted_link_sign_in(login_id: login_id, uri: uri)
   puts "user_load_res: #{user_load_res}"
   user_load_res
 end
@@ -72,5 +74,5 @@ role_names = ['RubySdkAdmin']
 # client.delete_user(login_id: 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_all_test_users()
 
-res = enchanted_sign_in(client, login_id: 'ami+1@descope.com')
+res = enchanted_sign_in(client, 'ami+1@descope.com', uri: 'https://app.descope.com')
 puts "exmple response: #{res}"
