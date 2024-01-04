@@ -6,7 +6,7 @@ module Descope
   module Mixins
     # Common values and methods
     module Common
-      DEFAULT_BASE_URL = 'https://api.descope.org' # pragma: no cover
+      DEFAULT_BASE_URL = 'https://api.descope.com' # pragma: no cover
       DEFAULT_TIMEOUT_SECONDS = 60
       DEFAULT_JWT_VALIDATION_LEEWAY = 5
       PHONE_REGEX = %r{^(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[-./ \\]?(?:(?:\(?\d{1,}\)?[-./ \\]?){0,})(?:[-./ \\]?(?:#|ext\.?|extension|x)[-./ \\]?(\d+))?$}.freeze
@@ -65,7 +65,6 @@ module Descope
         GET_SESSION_MAGICLINK_AUTH_PATH = '/v1/auth/magiclink/pending-session'
         UPDATE_USER_EMAIL_MAGICLINK_PATH = '/v1/auth/magiclink/update/email'
         UPDATE_USER_PHONE_MAGICLINK_PATH = '/v1/auth/magiclink/update/phone'
-
         # enchantedlink
         SIGN_UP_AUTH_ENCHANTEDLINK_PATH = '/v1/auth/enchantedlink/signup'
         SIGN_IN_AUTH_ENCHANTEDLINK_PATH = '/v1/auth/enchantedlink/signin'
