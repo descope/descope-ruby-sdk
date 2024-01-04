@@ -19,13 +19,17 @@ module Descope
           #  [amr, drn, exp, iss, rexp, sub, jwt] in the top level of the response dict, please use
           #  them from the sessionToken key instead, as these claims will soon be deprecated from the top level
           #  of the response dict.
-          raise AuthException.new('Refresh token is required to refresh a session', code: 400) if refresh_token.nil? || refresh_token.empty?
-          # validate_token(refresh_token, audience: audience)
+
+          if refresh_token.nil? || refresh_token.empty?
+            raise AuthException.new('Refresh token is required to refresh a session', code: 400)
+          end
+
+          validate_token(refresh_token, audience)
           post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
         end
 
-        def me
-          get(ME_PATH)
+        def me(refresh_token)
+          get(ME_PATH, {}, {}, refresh_token)
         end
 
         def sign_out(refresh_token = nil)
@@ -36,8 +40,8 @@ module Descope
           post(LOGOUT_ALL_PATH, {}, {}, refresh_token)
         end
 
-        def validate_session
-          post(VALIDATE_SESSION_PATH)
+        def validate_session(refresh_token = nil)
+          post(VALIDATE_SESSION_PATH, {}, {}, refresh_token)
         end
       end
     end

@@ -4,7 +4,6 @@ require 'descope/mixins/common'
 require 'descope/api/v1/auth/password'
 require 'descope/api/v1/auth/enchantedlink'
 
-
 module Descope
   module Api
     module V1
@@ -88,7 +87,6 @@ module Descope
             (jwt_response[REFRESH_SESSION_TOKEN_NAME] ? jwt_response[REFRESH_SESSION_TOKEN_NAME]['sub'] : nil) ||
             jwt_response['sub'] || ''
 
-
           if user_jwt
             jwt_response['userId'] = sub # Save the userID also in the dict top level
           else
@@ -121,7 +119,6 @@ module Descope
             raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
           end
 
-
           # save reference to the found key
           # (as another thread can change the self.public_keys hash)
           alg_from_key = found_key[1]
@@ -140,7 +137,9 @@ module Descope
               { algorithm: alg_header, exp_leeway: @jwt_validation_leeway }
             )[0] # the payload is the first index in the decoded array
           rescue JWT::ExpiredSignature => e
-            raise AuthException.new("Received Invalid token times error due to time glitch (between machines) during jwt validation, try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default: #{e.message}", code: 500)
+            raise AuthException.new(
+              "Received Invalid token times error due to time glitch (between machines) during jwt validation, try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default: #{e.message}", code: 500
+            )
           end
 
           claims['jwt'] = token
