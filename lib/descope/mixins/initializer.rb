@@ -53,7 +53,7 @@ module Descope
 
       end
 
-      def authorization_header(pswd: nil)
+      def authorization_header(pswd = nil)
         bearer = !pswd.nil? && !pswd.empty? ? "#{@project_id}:#{pswd}" : @project_id
         add_headers('Authorization' => "Bearer #{bearer}")
       end
@@ -71,6 +71,7 @@ module Descope
         extend Descope::Api::V1
         extend Descope::Api::V1::Management
         extend Descope::Api::V1::Auth
+        extend Descope::Api::V1::Session
       end
     end
   end

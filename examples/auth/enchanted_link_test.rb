@@ -7,11 +7,12 @@ require_relative 'server.rb'
 # DESCOPE_PROJECT_ID = 'P2aVGmQvQzSLJwP3ttcxO12tmQXk'
 
 # sandbox
-DESCOPE_PROJECT_ID = 'P2P3hlbsUIyy5H65B56jEE9oXZXD'
+DESCOPE_PROJECT_ID = 'P2aVMzUiPwXNXQ8HSJOvZN76fOUW'
 
 descope_client = Descope::Client.new(
   {
-    project_id: DESCOPE_PROJECT_ID
+    project_id: DESCOPE_PROJECT_ID,
+    descope_base_uri: 'https://api.descope.org'
   }
 )
 
@@ -61,8 +62,8 @@ def poll_for_session(descope_client, pending_ref)
 
       puts "refresh_token: #{refresh_token}"
       puts :"Done logging out!"
-      descope_client.logout(refresh_token:)
-      puts "User logged out"
+      descope_client.sign_out(refresh_token)
+      puts 'User logged out'
       done = true
     end
   end
