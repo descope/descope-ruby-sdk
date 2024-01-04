@@ -18,9 +18,9 @@ module Descope
       BASE_DELAY = 100
 
       %i[get post post_file post_form put patch delete delete_with_body].each do |method|
-        define_method(method) do |uri, body = {}, extra_headers = {}, token = nil|
+        define_method(method) do |uri, body = {}, extra_headers = {}, pswd = nil|
           body = body.delete_if { |_, v| v.nil? }
-          authorization_header(token) unless token.nil?
+          authorization_header(pswd) unless pswd.nil?
           puts "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
           request_with_retry(method, uri, body, extra_headers)
         end

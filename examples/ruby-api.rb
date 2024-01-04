@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 require 'descope'
-
-dev_project_id = 'P2ZoKhzAdvZV9HzRZ0SE8pIdNq8P'
-prod_project_id = 'P2WJXSonKgqhynwfVIPIDR8U7a5J'
+# sdx mgmt key suffix => K2aTAgKcLXTi04pnug58FMhmVw6x
+sdx_project_id = 'P2P3hlbsUIyy5H65B56jEE9oXZXD'
 client = Descope::Client.new(
   {
-    project_id: prod_project_id,
-    management_key: ENV['MGMT_KEY'],
-    descope_api_url: 'app.descope.com'
+    project_id: sdx_project_id,
+    management_key: ENV['MGMT_KEY']
   }
 )
 
@@ -69,10 +67,10 @@ end
 tenanat_id = 'T2Zp93ZrKlLl1SQDxzO0LTU8i4qU'
 role_names = ['RubySdkAdmin']
 # res = create_test_user(client, tenanat_id, role_names)
-#load_user(client, 'stam@nowhere.com')
+load_user_by_id(client, 'U2aT6ln7ripvMm6dKfCEehGEcex1')
 # update_user_res = update_user(client, 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_user(login_id: 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_all_test_users()
 
-res = enchanted_sign_in(client, 'ami+1@descope.com', uri: 'https://app.descope.com')
-puts "exmple response: #{res}"
+#res = enchanted_sign_in(client, 'ami+1@descope.com', uri: 'https://app.descope.com')
+#puts "exmple response: #{res}"
