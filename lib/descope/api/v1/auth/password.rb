@@ -51,6 +51,32 @@ module Descope
             }
             post(REPLACE_PASSWORD_PATH, request_params)
           end
+
+          def password_update(login_id: nil, new_password: nil, refresh_token: nil)
+            # Update an existing user's password with a new password.
+            validate_login_id(login_id)
+            validate_password(new_password)
+            validate_refresh_token_not_nil(refresh_token)
+            request_params = {
+              loginId: login_id,
+              newPassword: new_password
+            }
+            post(UPDATE_PASSWORD_PATH, request_params, {}, refresh_token)
+          end
+
+          def get_password_policy(refresh_token = nil)
+            # Get the configured password policy for the project.
+            get(PASSWORD_POLICY_PATH, {}, {}, refresh_token)
+          end
+
+          def password_reset(login_id: nil, redirect_url: nil, provider_id: nil, template_id: nil)
+            #  Sends a password reset prompt to the user with the given
+            #  login_id according to the password settings defined in the Descope console.
+            # NOTE: The user must be verified according to the configured password reset method.
+            validate_login_id(login_id)
+            post(SEND_RESET_PASSWORD_PATH,
+                 loginId: login_id, redirectUrl: redirect_url, providerId: provider_id, templateId: template_id)
+          end
         end
       end
     end

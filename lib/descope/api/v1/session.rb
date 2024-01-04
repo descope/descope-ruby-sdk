@@ -21,10 +21,7 @@ module Descope
           #  them from the sessionToken key instead, as these claims will soon be deprecated from the top level
           #  of the response dict.
 
-          if refresh_token.nil? || refresh_token.empty?
-            raise AuthException.new('Refresh token is required to refresh a session', code: 400)
-          end
-
+          validate_refresh_token_not_nil(refresh_token)
           validate_token(refresh_token, audience)
           post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
         end

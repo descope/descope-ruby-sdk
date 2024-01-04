@@ -34,6 +34,12 @@ module Descope
       def validate_token_not_empty(token)
         raise AuthException.new('token cannot be empty', code: 400) unless token.is_a?(String) && !token.empty?
       end
+
+      def validate_refresh_token_not_nil(refresh_token)
+        return unless refresh_token.nil? || refresh_token.empty?
+
+        raise AuthException.new('Refresh token is required to refresh a session', code: 400)
+      end
     end
   end
 end
