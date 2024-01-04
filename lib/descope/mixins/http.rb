@@ -20,7 +20,6 @@ module Descope
       %i[get post post_file post_form put patch delete delete_with_body].each do |method|
         define_method(method) do |uri, body = {}, extra_headers = {}, pswd = nil|
           body = body.delete_if { |_, v| v.nil? }
-          authorization_header(pswd) unless pswd.nil?
           puts "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
           request_with_retry(method, uri, body, extra_headers)
         end
@@ -69,10 +68,14 @@ module Descope
         @headers.merge!(h.to_hash)
       end
 
-      def request_with_retry(method, uri, body = {}, extra_headers = {})
+      def request_with_retry(method, uri, body = {}, extra_headers = {}, pswd = nil)
         Retryable.retryable(retry_options) do
           request(method, uri, body, extra_headers)
         end
+      end
+
+      def default_authorization_header
+        { 'Authorization' => "Bearer #{@project_id}" }
       end
 
       def request(method, uri, body = {}, extra_headers = {})
@@ -97,7 +100,9 @@ module Descope
                    form_post_headers = headers.except('Content-Type') unless headers.nil?
                    call(:post, encode_uri(uri), timeout, form_post_headers, body.compact)
                  else
-                   call(method, encode_uri(uri), timeout, headers, body.to_json)
+                   auth_header = headers.merge(default_authorization_header)
+                   
+                   call(method, encode_uri(uri), timeout, auth_header, body.to_json)
                  end
 
         puts "http status code: #{result.code}"

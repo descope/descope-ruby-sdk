@@ -2,16 +2,16 @@
 
 require 'descope'
 # sdx mgmt key suffix => K2aTAgKcLXTi04pnug58FMhmVw6x
-sdx_project_id = 'P2P3hlbsUIyy5H65B56jEE9oXZXD'
+sdx_project_id = 'P2OkfVnJi5Ht7mpCqHjx17nV5epH'
+sdx_management_key = 'K2aTm0tKOrwsgQfkO2a1w5SQkHUGMl6mPVv5bA7FWxWuxNFPTfVfF6WsqXGlLYykMAUxtt1'
 descope_client = Descope::Client.new(
   {
-    project_id: sdx_project_id,
-    management_key: ENV['MGMT_KEY']
+    project_id: sdx_project_id
   }
 )
-descope_client.load_by_user_id(user_id: 'U2aT6ln7ripvMm6dKfCEehGEcex1')
+# descope_client.load_by_user_id(user_id: 'U2Zs5oaPIAtUumVXIlwPjTlVmGlI')
 
-res = descope_client.enchanted_link_sign_up(login_id: 'ami+2@descope.com')
+res = descope_client.enchanted_link_sign_up_or_in(login_id: 'kevin+2@descope.com', uri: 'http://localhost:3001/verify')
 link_identifier = res['linkId'] # Show the user which link they should press in their email
 pending_ref = res['pendingRef'] # Used to poll for a valid session
 masked_email = res['maskedEmail']
@@ -29,6 +29,7 @@ while !done && i < max_tries
   begin
     i += 1
     puts 'waiting 4 seconds for session to be created...'
+    puts "link_identifier: #{link_identifier}"
     sleep(4)
     jwt_response = descope_client.enchanted_link_get_session(pending_ref: pending_ref)
   rescue Descope::AuthException, Descope::Unauthorized => e
