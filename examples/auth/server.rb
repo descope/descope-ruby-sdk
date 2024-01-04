@@ -2,34 +2,47 @@ require 'sinatra'
 require 'net/http'
 require 'uri'
 require 'json'
+require 'descope'
 
 
-get '/verify' do
-  token = params['t']
+# Server for token verification
+class DescopeServer < Sinatra::Base
+  attr_accessor :client
 
-  if token.nil?
-    status 400
-    return 'Token is required'
+  def initialize(client: nil, project_id: nil)
+    super
+    raise Descope::AuthException, 'client and project id are required' if client.nil? && project_id.nil?
+
+    @project_id = project_id
+    @client = client || Descope::Client.new({ project_id: @project_id })
   end
 
-  uri = URI.parse('https://api.descope.org/v1/auth/enchantedlink/verify')
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = true
-  request = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{P2P3hlbsUIyy5H65B56jEE9oXZXD}" })
-  request.body = { token: token }.to_json
+  get '/verify' do
+    token = params['t']
 
+    if token.nil?
+      status 400
+      return 'Token is required'
+    end
 
-  begin
-    response = http.request(request)
-    puts response.body
-    status 200
-    puts 'User clicked the link and token was verified!'
-    return 'Token Verified!'
-  rescue => e
-    puts "Verification failed: #{e.message}"
-    status 500
-    return 'Verification failed'
+    begin
+      response = @client.enchanted_link_verify_token(token: token)
+      puts response
+
+      # valid response is {}
+      if response == {}
+        status 200
+        puts 'User clicked the link and token was verified!'
+        return 'Token Verified!'
+      else
+        status 500
+        puts 'Verification failed unexpected response'
+        return 'Verification failed'
+      end
+    rescue => e
+      puts "Could not verify token: #{e.message}"
+      status 500
+      return 'Verification failed'
+    end
   end
 end
-
-set :port, 3001

@@ -46,26 +46,24 @@ module Descope
       end
 
       def base_url(options)
-        url = options[:descope_api_url] || ENV['DESCOPE_API_URL'] || Common::DEFAULT_BASE_URL
+        url = options[:descope_base_uri] || ENV['DESCOPE_BASE_URI'] || Common::DEFAULT_BASE_URL
         return url if url.start_with? 'http'
 
         raise AuthException.new('base url must start with http or https', code: 400)
 
       end
 
-      def authorization_header(pswd)
-        return unless pswd
-
-        bearer = "#{@project_id}:#{pswd}"
+      def authorization_header(pswd: nil)
+        bearer = !pswd.nil? && !pswd.empty? ? "#{@project_id}:#{pswd}" : @project_id
         add_headers('Authorization' => "Bearer #{bearer}")
       end
 
       def initialize_api(options)
         initialize_v1(options)
         if options.fetch(:management_key, nil)
-          authorization_header(options[:management_key])
+          authorization_header(pswd: options[:management_key])
         else
-          puts 'no management key'
+          authorization_header
         end
       end
 

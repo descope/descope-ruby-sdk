@@ -74,35 +74,19 @@ module Descope
         end
       end
 
-      def default_authorization_header
-        { 'Authorization' => "Bearer #{@project_id}" }
-      end
-
       def request(method, uri, body = {}, extra_headers = {})
+        # @headers is getting the authorization header merged in initializer.rb
+        puts "DEBUG:: base url: #{@base_uri}"
+        puts "DEBUG:: request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{@headers}"
         result = case method
                  when :get
-                   @headers ||= {}
                    get_headers = @headers.merge({ params: body }).merge(extra_headers)
                    call(:get, encode_uri(uri), timeout, get_headers)
                  when :delete
-                   @headers ||= {}
                    delete_headers = @headers.merge({ params: body })
                    call(:delete, encode_uri(uri), timeout, delete_headers)
-                 when :delete_with_body
-                   call(:delete, encode_uri(uri), timeout, headers, body.to_json)
-                 when :post_file
-                   body.merge!(multipart: true)
-                   # Ignore the default Content-Type headers and let the HTTP client define them
-                   post_file_headers = headers.except('Content-Type') unless headers.nil?
-                   # Actual call with the altered headers
-                   call(:post, encode_uri(uri), timeout, post_file_headers, body)
-                 when :post_form
-                   form_post_headers = headers.except('Content-Type') unless headers.nil?
-                   call(:post, encode_uri(uri), timeout, form_post_headers, body.compact)
                  else
-                   auth_header = headers.merge(default_authorization_header)
-                   
-                   call(method, encode_uri(uri), timeout, auth_header, body.to_json)
+                   call(method, encode_uri(uri), timeout, @headers, body.to_json)
                  end
 
         puts "http status code: #{result.code}"

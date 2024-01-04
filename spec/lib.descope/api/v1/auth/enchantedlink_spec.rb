@@ -116,7 +116,7 @@ describe Descope::Api::V1::EnhancedLink do
 
     it 'is expected to verify token with enchanted link' do
       expect(@instance).to receive(:post).with(
-        GET_SESSION_ENCHANTEDLINK_AUTH_PATH,
+        VERIFY_ENCHANTEDLINK_AUTH_PATH,
         { token: 'token' }
       )
 
