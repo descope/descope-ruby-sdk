@@ -53,12 +53,12 @@ module Descope
             res = post(AUDIT_SEARCH, request_params)
             raise Descope::AuthException, "could not get audits: #{res}" if res['audits'].nil?
 
-            { 'audits' => res['audits'].map { |audit| _convert_audit_record(audit) } }
+            { 'audits' => res['audits'].map { |audit| convert_audit_record(audit) } }
           end
 
           private
 
-          def _convert_audit_record(audit)
+          def convert_audit_record(audit)
             {
               'projectId' => audit['projectId'] || '',
               'userId' => audit['userId'] || '',

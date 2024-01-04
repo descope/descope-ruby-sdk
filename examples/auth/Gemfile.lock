@@ -1,0 +1,35 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    dotenv (2.8.1)
+    jwt (2.7.1)
+    mustermann (2.0.2)
+      ruby2_keywords (~> 0.0.1)
+    nio4r (2.7.0)
+    puma (6.4.1)
+      nio4r (~> 2.0)
+    rack (2.2.8)
+    rack-protection (2.2.4)
+      rack
+    ruby2_keywords (0.0.5)
+    sinatra (2.2.4)
+      mustermann (~> 2.0)
+      rack (~> 2.2)
+      rack-protection (= 2.2.4)
+      tilt (~> 2.0)
+    tilt (2.3.0)
+    webrick (1.8.1)
+
+PLATFORMS
+  arm64-darwin-23
+  ruby
+
+DEPENDENCIES
+  dotenv
+  jwt (~> 2.5)
+  puma
+  sinatra (~> 2.2)
+  webrick
+
+BUNDLED WITH
+   2.5.3

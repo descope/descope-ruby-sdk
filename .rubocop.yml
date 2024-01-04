@@ -2,7 +2,7 @@ inherit_from: .rubocop_todo.yml
 require:
   - rubocop-rails
 Rails:
-  Enabled: true
+  Enabled: False
 AllCops:
  Exclude:
    - bin/**/*

@@ -13,6 +13,9 @@ describe Descope::Client do
     it { should be_a Descope::Api::V1::Management::Project }
     it { should be_a Descope::Api::V1::Management::Authz }
     it { should be_a Descope::Api::V1::Management::Audit }
+    it { should be_a Descope::Api::V1::Session }
+    it { should be_a Descope::Api::V1::Auth }
+    it { should be_a Descope::Api::V1::Auth::Password }
   end
 
   let(:project_id) { 'P2AbcZVJYEUBGhX8LNjItawh5nAp' }

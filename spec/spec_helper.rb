@@ -1,9 +1,11 @@
 require 'rack/test'
 require 'faker'
 require 'json'
+require 'concurrent'
+require 'openssl'
+require 'base64'
 require 'descope'
 require 'super_diff/rspec'
-require_relative '../lib/descope/api/v1/management/common'
 
 if RUBY_VERSION >= '2.7.2'
   # NOTE: https://bugs.ruby-lang.org/issues/17000
@@ -27,21 +29,6 @@ Dotenv.load
 require 'webmock/rspec'
 WebMock.allow_net_connect!
 
-require 'vcr'
-VCR.configure do |config|
-  # Uncomment the line below to record new VCR cassettes.
-  # When this is commented out, VCR will reject all outbound HTTP calls.
-  config.allow_http_connections_when_no_cassette = true
-  config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
-  config.configure_rspec_metadata!
-  config.hook_into :webmock
-  config.filter_sensitive_data('MANAGEMENT_KEY') { ENV['MANAGEMENT_KEY'] }
-
-
-  ENV['PROJECT_ID'] = 'dummyProjectId'
-  ENV['MANAGEMENT_KEY'] = 'dummyManagementKey'
-end
-
 $LOAD_PATH.unshift File.expand_path('..', __FILE__)
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
@@ -49,6 +36,12 @@ Dir['./lib/*.rb'].each { |f| require f }
 Dir['./lib/api/**/*.rb'].each { |f| require f }
 Dir['./spec/support/**/*.rb'].each { |f| require f }
 Dir['./spec/support/*.rb'].each { |f| require f }
+
+include Descope::Api::V1::Management::Common
+include Descope::Mixins::Common
+include Descope::Mixins::Common::EndpointsV1
+include Descope::Mixins::Common::EndpointsV2
+include Descope::Api::V1::Auth
 
 require 'rspec'
 RSpec.configure do |config|
@@ -60,7 +53,6 @@ RSpec.configure do |config|
   end
 end
 
-include Descope::Api::V1::Management::Common
 
 def wait(time, increment = 5, elapsed_time = 0, &block)
   yield

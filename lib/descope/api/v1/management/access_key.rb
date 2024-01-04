@@ -15,10 +15,10 @@ module Descope
             role_names ||= []
             key_tenants ||= []
             validate_tenants(key_tenants)
-            post(ACCESS_KEY_CREATE_PATH, _compose_create_body(name, expire_time, role_names, key_tenants))
+            post(ACCESS_KEY_CREATE_PATH, compose_create_body(name, expire_time, role_names, key_tenants))
           end
 
-          def _compose_create_body(name, expire_time, role_names, key_tenants)
+          def compose_create_body(name, expire_time, role_names, key_tenants)
             {
               name: name,
               expireTime: expire_time,

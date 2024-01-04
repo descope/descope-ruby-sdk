@@ -15,7 +15,7 @@ module Descope
 
             self_provisioning_domains ||= []
             custom_attributes ||= []
-            post(TENANT_CREATE_PATH, _compose_create_update_body(name, id, self_provisioning_domains, custom_attributes))
+            post(TENANT_CREATE_PATH, compose_create_update_body(name, id, self_provisioning_domains, custom_attributes))
           end
 
           def update_tenant(name: nil, id: nil, self_provisioning_domains: nil, custom_attributes: nil)
@@ -24,7 +24,7 @@ module Descope
             # @see https://docs.descope.com/api/openapi/tenantmanagement/operation/UpdateTenant/
             self_provisioning_domains ||= []
             custom_attributes ||= []
-            post(TENANT_UPDATE_PATH, _compose_create_update_body(name, id, self_provisioning_domains, custom_attributes))
+            post(TENANT_UPDATE_PATH, compose_create_update_body(name, id, self_provisioning_domains, custom_attributes))
           end
 
           def delete_tenant(id: nil)
@@ -55,7 +55,7 @@ module Descope
 
           private
 
-          def _compose_create_update_body(name, id, self_provisioning_domains, custom_attributes)
+          def compose_create_update_body(name, id, self_provisioning_domains, custom_attributes)
             body = {
               name: name,
               id: id,

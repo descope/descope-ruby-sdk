@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'descope'
-
-dev_project_id = 'P2ZoKhzAdvZV9HzRZ0SE8pIdNq8P'
+# sdx mgmt key suffix => K2aTAgKcLXTi04pnug58FMhmVw6x
+sdx_project_id = 'P2P3hlbsUIyy5H65B56jEE9oXZXD'
 client = Descope::Client.new(
   {
-    project_id: dev_project_id,
+    project_id: sdx_project_id,
     management_key: ENV['MGMT_KEY']
   }
 )
@@ -14,8 +14,8 @@ client = Descope::Client.new(
 def create_test_user(client, tenant_id, role_names)
   user_create_res = client.create_test_user(
     login_id: 'ami_ruby_sdk+6ami@descope.com',
-    email: 'ami_ruby_sdk+5ami@descope.com',
-    phone: '+1-347-450-0361',
+    #email: 'ami_ruby_sdk+5ami@descope.com',
+    #phone: '+1-347-450-0361',
     display_name: 'Ami Ruby SDK',
     user_tenants: [
       {
@@ -58,10 +58,19 @@ def load_user_by_id(client, user_id)
   user_load_res
 end
 
+def enchanted_sign_in(client, login_id, uri)
+  user_load_res = client.enchanted_link_sign_in(login_id: login_id, uri: uri)
+  puts "user_load_res: #{user_load_res}"
+  user_load_res
+end
+
 tenanat_id = 'T2Zp93ZrKlLl1SQDxzO0LTU8i4qU'
 role_names = ['RubySdkAdmin']
-# created_user = create_test_user(client, tenanat_id, role_names)
-load_user(client, 'stam@nowhere.com')
+# res = create_test_user(client, tenanat_id, role_names)
+load_user_by_id(client, 'U2aT6ln7ripvMm6dKfCEehGEcex1')
 # update_user_res = update_user(client, 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_user(login_id: 'ami_ruby_sdk+6ami@descope.com')
 # client.delete_all_test_users()
+
+#res = enchanted_sign_in(client, 'ami+1@descope.com', uri: 'https://app.descope.com')
+#puts "exmple response: #{res}"

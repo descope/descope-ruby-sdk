@@ -5,7 +5,7 @@ module Descope
   class Exception < StandardError
     attr_reader :error_data
 
-    def initialize(message,error_data={})
+    def initialize(message, error_data = {})
       super(message)
       @error_data = error_data
     end
@@ -32,10 +32,12 @@ module Descope
 
   # exception for invalid token when its empty
   class InvalidToken < Descope::Exception; end
+  class InvalidParameter < Descope::Exception; end
   class Unauthorized < Descope::HTTPError; end
   # exception for not found resource, you query for an
   # non-existent resource, or wrong path
   class NotFound < Descope::HTTPError; end
+  class MethodNotAllowed < Descope::HTTPError; end
   # exception for unknown error
   class Unsupported < Descope::HTTPError; end
   # exception for server error
