@@ -31,9 +31,9 @@ describe Descope::Api::V1::Session do
     end
 
     it 'is expected to post refresh session' do
-      expect(@instance).to receive(:post).with(REFRESH_TOKEN_PATH)
-
-      expect { @instance.refresh_session }.not_to raise_error
+      expect(@instance).to receive(:post).with(REFRESH_TOKEN_PATH, {}, {}, 'refresh_token')
+      allow(@instance).to receive(:validate_token).with('refresh_token', nil).and_return({})
+      expect { @instance.refresh_session(refresh_token: 'refresh_token') }.not_to raise_error
     end
   end
 
@@ -43,7 +43,7 @@ describe Descope::Api::V1::Session do
     end
 
     it 'is expected to get /me' do
-      expect(@instance).to receive(:get).with(ME_PATH)
+      expect(@instance).to receive(:get).with(ME_PATH, {}, {}, nil)
 
       expect { @instance.me }.not_to raise_error
     end
@@ -55,7 +55,7 @@ describe Descope::Api::V1::Session do
     end
 
     it 'is expected to post sign out' do
-      expect(@instance).to receive(:post).with(LOGOUT_PATH)
+      expect(@instance).to receive(:post).with(LOGOUT_PATH, {}, {}, nil)
 
       expect { @instance.sign_out }.not_to raise_error
     end
@@ -67,7 +67,7 @@ describe Descope::Api::V1::Session do
     end
 
     it 'is expected to post sign out all' do
-      expect(@instance).to receive(:post).with(LOGOUT_ALL_PATH)
+      expect(@instance).to receive(:post).with(LOGOUT_ALL_PATH, {}, {}, nil)
 
       expect { @instance.sign_out_all }.not_to raise_error
     end
@@ -79,7 +79,7 @@ describe Descope::Api::V1::Session do
     end
 
     it 'is expected to post validate session' do
-      expect(@instance).to receive(:post).with(VALIDATE_SESSION_PATH)
+      expect(@instance).to receive(:post).with(VALIDATE_SESSION_PATH, {}, {}, nil)
 
       expect { @instance.validate_session }.not_to raise_error
     end

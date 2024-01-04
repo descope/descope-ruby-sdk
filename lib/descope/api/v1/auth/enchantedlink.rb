@@ -41,7 +41,6 @@ module Descope
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpOrInEnchantedLinkEmail/
             body = compose_signin_body(login_id, uri)
             uri = compose_sign_up_or_in_url
-            puts "uri: #{uri}"
             post(uri, body)
           end
 

@@ -23,11 +23,11 @@ class DummyClass
     @mlock = Mutex.new
   end
 
-  %i[get post put patch delete delete_with_body].each do |method|
-    define_method(method) do |uri, token, body = {}, extra_headers = {}|
+  %i[get post post_file post_form put patch delete delete_with_body].each do |method|
+    define_method(method) do |uri, body = {}, extra_headers = {}, pswd = nil|
       body = body.delete_if { |_, v| v.nil? }
-      authorization_header(token) unless token.nil?
-      true
+      authorization_header(pswd) unless pswd.nil? || pswd.empty?
+      {}
     end
   end
 end

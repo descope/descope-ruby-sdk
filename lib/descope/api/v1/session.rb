@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Descope
   module Api
     module V1
@@ -28,7 +29,7 @@ module Descope
           post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
         end
 
-        def me(refresh_token)
+        def me(refresh_token = nil)
           get(ME_PATH, {}, {}, refresh_token)
         end
 

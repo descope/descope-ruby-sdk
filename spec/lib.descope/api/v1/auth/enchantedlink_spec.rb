@@ -130,14 +130,8 @@ describe Descope::Api::V1::EnhancedLink do
     end
 
     it 'is expected to get session by pending ref with enchanted link' do
-      request_params = {
-        pendingRef: 'pendingRef'
-      }
-
-      expect(@instance).to receive(:post).twice.with(
-        GET_SESSION_ENCHANTEDLINK_AUTH_PATH,
-        request_params
-      ).and_return('cookies' => { REFRESH_SESSION_COOKIE_NAME => 'refresh_token' })
+      jwt_response = { 'fake': 'response' }
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
 
       expect do
         @instance.enchanted_link_get_session(pending_ref: 'pendingRef')

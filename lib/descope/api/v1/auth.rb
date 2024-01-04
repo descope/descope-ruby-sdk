@@ -29,6 +29,10 @@ module Descope
           jwt_response
         end
 
+        def exchange_access_key(refresh_token = nil)
+          post(EXCHANGE_AUTH_ACCESS_KEY_PATH, {}, {}, refresh_token)
+        end
+
         private
 
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

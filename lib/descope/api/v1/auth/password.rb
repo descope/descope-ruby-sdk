@@ -38,6 +38,19 @@ module Descope
             res = post(SIGN_IN_PASSWORD_PATH, request_params)
             generate_jwt_response(response_body: res)
           end
+
+          def password_replace(login_id: nil, old_password: nil, new_password: nil)
+            # Replace an existing user's password with a new password.
+            validate_login_id(login_id)
+            validate_password(old_password)
+            validate_password(new_password)
+            request_params = {
+              loginId: login_id,
+              oldPassword: old_password,
+              newPassword: new_password
+            }
+            post(REPLACE_PASSWORD_PATH, request_params)
+          end
         end
       end
     end

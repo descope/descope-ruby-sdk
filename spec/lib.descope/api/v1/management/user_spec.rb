@@ -596,13 +596,13 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_GENERATE_OTP_FOR_TEST_PATH, {
           loginId: 'someone@example.com',
-          deliveryMethod: DeliveryMethod::EMAIL
+          deliveryMethod: 'email'
         }
       )
 
       expect do
         @instance.generate_otp_for_test(
-          method: 'email',
+          method: DeliveryMethod::EMAIL,
           login_id: 'someone@example.com'
         )
       end.not_to raise_error
