@@ -60,4 +60,55 @@ describe Descope::Api::V1::OAuth do
       expect { @instance.oauth_exchange_token('some-code') }.not_to raise_error
     end
   end
+
+  context '.oauth_create_redirect_url_for_sign_in_request' do
+    it 'is expected to respond to oauth create redirect url for sign in request' do
+      expect(@instance).to respond_to(:oauth_create_redirect_url_for_sign_in_request)
+    end
+
+    it 'is expected to create redirect url for sign in request' do
+      request_params = {
+        stepup: true,
+        customClaims: { 'abc': '123' },
+        mfa: false,
+        ssoAppId: 'sso-id'
+      }
+      expect(@instance).to receive(:post).with(
+        OAUTH_CREATE_REDIRECT_URL_FOR_SIGN_IN_REQUEST_PATH,
+        request_params
+      )
+      expect do
+        @instance.oauth_create_redirect_url_for_sign_in_request(
+          stepup: true,
+          custom_claims: { 'abc': '123' },
+          sso_app_id: 'sso-id'
+        )
+      end.not_to raise_error
+    end
+  end
+
+  context '.oauth_create_redirect_url_for_sign_in_request' do
+    it 'is expected to respond to oauth create redirect url for sign in request' do
+      expect(@instance).to respond_to(:oauth_create_redirect_url_for_sign_in_request)
+    end
+
+    it 'is expected to create redirect url for sign up request' do
+      request_params = {
+        stepup: false,
+        customClaims: { 'abc': '123' },
+        mfa: false,
+        ssoAppId: 'sso-id'
+      }
+      expect(@instance).to receive(:post).with(
+        OAUTH_CREATE_REDIRECT_URL_FOR_SIGN_UP_REQUEST_PATH,
+        request_params
+      )
+      expect do
+        @instance.oauth_create_redirect_url_for_sign_up_request(
+          custom_claims: { 'abc': '123' },
+          sso_app_id: 'sso-id'
+        )
+      end.not_to raise_error
+    end
+  end
 end
