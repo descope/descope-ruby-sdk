@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Descope
   module Api
     module V1
@@ -13,9 +14,7 @@ module Descope
             # Sign-in existing user by sending an enchanted link via email.
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignInEnchantedLinkEmail/
             validate_login_id(login_id)
-
             validate_refresh_token_provided(login_options, refresh_token)
-
             body = enchanted_link_compose_signin_body(login_id, uri, login_options)
             uri = enchanted_link_compose_signin_url
             post(uri, body, nil, refresh_token)
