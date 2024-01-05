@@ -29,7 +29,7 @@ Thread.new do
 end
 
 def sign_up_or_in(descope_client, login_id)
-  res = descope_client.enchanted_link_sign_up_or_in(login_id:, uri: 'http://localhost:3001/verify')
+  res = descope_client.magic_link_email_sign_up_or_in(login_id:, uri: 'http://localhost:3001/verify')
   link_identifier = res['linkId'] # Show the user which link they should press in their email
   pending_ref = res['pendingRef'] # Used to poll for a valid session
   masked_email = res['maskedEmail']

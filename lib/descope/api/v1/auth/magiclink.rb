@@ -10,7 +10,7 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def magic_link_email_sign_up(method: nil, login_id: nil, uri: nil, user: {}, provider_id: nil, template_id: nil)
+          def magiclink_email_sign_up(method: nil, login_id: nil, uri: nil, user: {}, provider_id: nil, template_id: nil)
             # Sign-up new end user by sending a magic link via email
             # @see https://docs.descope.com/api/openapi/magiclink/operation/SignUpMagicLinkEmail/
             validate_login_id(login_id)
@@ -23,7 +23,7 @@ module Descope
             extract_masked_address(res, method)
           end
 
-          def magic_link_email_sign_in(method: nil, login_id: nil, uri: nil, login_options: nil, refresh_token: nil)
+          def magiclink_email_sign_in(method: nil, login_id: nil, uri: nil, login_options: nil, refresh_token: nil)
             validate_login_id(login_id)
             validate_refresh_token_provided(login_options, refresh_token)
             body = magiclink_compose_signin_body(login_id, uri, login_options)
@@ -32,7 +32,7 @@ module Descope
             extract_masked_address(res, method)
           end
 
-          def magic_link_email_sign_up_or_in(method: nil, login_id: nil, uri: nil, login_options: nil)
+          def magiclink_email_sign_up_or_in(method: nil, login_id: nil, uri: nil, login_options: nil)
             body = magiclink_compose_signin_body(login_id, uri, login_options)
             uri = magiclink_compose_sign_up_or_in_url(method)
             res = post(uri, body)

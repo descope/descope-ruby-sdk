@@ -12,7 +12,7 @@ describe Descope::Api::V1::MagicLink do
 
   context '.sign_in' do
     it 'is expected to respond to sign in' do
-      expect(@instance).to respond_to(:magic_link_email_sign_in)
+      expect(@instance).to respond_to(:magiclink_email_sign_in)
     end
 
     it 'is expected to sign in with magic link email' do
@@ -36,7 +36,7 @@ describe Descope::Api::V1::MagicLink do
       allow_any_instance_of(Descope::Api::V1::Auth::MagicLink).to receive(:extract_masked_address).and_return({})
 
       expect do
-        @instance.magic_link_email_sign_in(
+        @instance.magiclink_email_sign_in(
           method: DeliveryMethod::EMAIL,
           login_id: 'test',
           uri: 'https://some-uri/email',
@@ -54,7 +54,7 @@ describe Descope::Api::V1::MagicLink do
 
   context '.sign_up' do
     it 'is expected to respond to magic link email sign up' do
-      expect(@instance).to respond_to(:magic_link_email_sign_up)
+      expect(@instance).to respond_to(:magiclink_email_sign_up)
     end
 
     it 'is expected to sign up with enchanted link' do
@@ -71,7 +71,7 @@ describe Descope::Api::V1::MagicLink do
       ).and_return({ 'maskedEmail' => 'd****@d****.com' })
 
       expect do
-        @instance.magic_link_email_sign_up(
+        @instance.magiclink_email_sign_up(
           login_id: 'test',
           method: DeliveryMethod::EMAIL,
           uri: 'https://some-uri/email',
@@ -83,7 +83,7 @@ describe Descope::Api::V1::MagicLink do
 
   context '.sign_up_or_in' do
     it 'is expected to respond to sign up' do
-      expect(@instance).to respond_to(:magic_link_email_sign_up_or_in)
+      expect(@instance).to respond_to(:magiclink_email_sign_up_or_in)
     end
 
     it 'is expected to sign up or in with magic link' do
@@ -104,7 +104,7 @@ describe Descope::Api::V1::MagicLink do
       ).and_return({ 'maskedEmail' => 'd****@d****.com' })
 
       expect do
-        @instance.magic_link_email_sign_up_or_in(
+        @instance.magiclink_email_sign_up_or_in(
           method: DeliveryMethod::EMAIL,
           login_id: 'test',
           uri: 'https://some-uri/email',
@@ -119,9 +119,9 @@ describe Descope::Api::V1::MagicLink do
     end
   end
   #
-  # context '.magic_link_verify_token' do
-  #   it 'is expected to respond to magic_link_email_verify_token' do
-  #     expect(@instance).to respond_to(:magic_link_email_verify_token)
+  # context '.magiclink_verify_token' do
+  #   it 'is expected to respond to magiclink_email_verify_token' do
+  #     expect(@instance).to respond_to(:magiclink_email_verify_token)
   #   end
   #
   #   it 'is expected to verify token with enchanted link' do
@@ -130,13 +130,13 @@ describe Descope::Api::V1::MagicLink do
   #       { token: 'token' }
   #     )
   #
-  #     expect { @instance.magic_link_email_verify_token(token: 'token') }.not_to raise_error
+  #     expect { @instance.magiclink_email_verify_token(token: 'token') }.not_to raise_error
   #   end
   # end
 
   # context '.get_session' do
   #   it 'is expected to respond to get_session' do
-  #     expect(@instance).to respond_to(:magic_link_email_get_session)
+  #     expect(@instance).to respond_to(:magiclink_email_get_session)
   #   end
   #
   #   it 'is expected to get session by pending ref with enchanted link' do
@@ -144,7 +144,7 @@ describe Descope::Api::V1::MagicLink do
   #     allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
   #
   #     expect do
-  #       @instance.magic_link_email_get_session(pending_ref: 'pendingRef')
+  #       @instance.magiclink_email_get_session(pending_ref: 'pendingRef')
   #     end.not_to raise_error
   #   end
   # end
