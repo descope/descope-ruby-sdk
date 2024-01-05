@@ -26,7 +26,7 @@ get '/verify' do
   end
 
   begin
-    response = @client.magiclink_email_verify_token(token: token)
+    response = @client.magiclink_verify_token(token: token)
     puts response
     puts "token is valid"
     refresh_token = jwt_response.fetch(Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME).fetch("jwt")
@@ -42,7 +42,7 @@ end
 
 
 def sign_up_or_in(descope_client, login_id)
-  res = descope_client.magiclink_email_sign_up_or_in(method: EMAIL, login_id:, uri: 'http://localhost:3001/verify')
+  res = descope_client.magiclink_sign_up_or_in(method: EMAIL, login_id:, uri: 'http://localhost:3001/verify')
   masked_email = res['maskedEmail']
   puts "masked_email: #{masked_email}"
 end
