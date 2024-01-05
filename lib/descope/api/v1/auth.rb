@@ -3,6 +3,7 @@
 require 'descope/mixins/common'
 require 'descope/api/v1/auth/password'
 require 'descope/api/v1/auth/enchantedlink'
+require 'descope/api/v1/auth/magiclink'
 
 module Descope
   module Api
@@ -14,6 +15,7 @@ module Descope
         include Descope::Mixins::Common::EndpointsV2
         include Descope::Api::V1::Auth::Password
         include Descope::Api::V1::Auth::EnhancedLink
+        include Descope::Api::V1::Auth::MagicLink
 
         ALGORITHM_KEY = 'alg'
 
@@ -227,7 +229,7 @@ module Descope
           end
         end
 
-        def validate_refresh_token_provided(login_options: nil, refresh_token: nil)
+        def validate_refresh_token_provided(login_options, refresh_token)
           refresh_required = !login_options.nil? && (login_options[:mfa] || login_options[:stepup])
           refresh_missing = refresh_token.nil? || refresh_token.to_s.empty?
 
@@ -287,6 +289,16 @@ module Descope
           end
 
           true
+        end
+
+        def extract_masked_address(response, method)
+          if [DeliveryMethod::SMS, DeliveryMethod::WHATSAPP].include?(method)
+            response['maskedPhone']
+          elsif method == DeliveryMethod::EMAIL
+            response['maskedEmail']
+          else
+            ''
+          end
         end
       end
     end

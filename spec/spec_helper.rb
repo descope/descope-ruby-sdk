@@ -23,9 +23,6 @@ if ENV['CI'] == 'true'
   SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 end
 
-require 'dotenv'
-Dotenv.load
-
 require 'webmock/rspec'
 WebMock.allow_net_connect!
 

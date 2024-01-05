@@ -16,7 +16,6 @@ module Descope
         @public_key = options[:public_key] || ENV['DESCOPE_PUBLIC_KEY']
         @mlock = Mutex.new
 
-        puts "base_uri: #{@base_uri}"
         if @public_key.nil?
           @public_keys = {}
         else
