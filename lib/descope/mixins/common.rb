@@ -77,6 +77,8 @@ module Descope
         # oauth
         OAUTH_START_PATH = '/v1/auth/oauth/authorize'
         OAUTH_EXCHANGE_TOKEN_PATH = '/v1/auth/oauth/exchange'
+        OAUTH_CREATE_REDIRECT_URL_FOR_SIGN_IN_REQUEST_PATH = 'v1/auth/oauth/authorize/signin'
+        OAUTH_CREATE_REDIRECT_URL_FOR_SIGN_UP_REQUEST_PATH = 'v1/auth/oauth/authorize/signup'
 
         # saml
         AUTH_SAML_START_PATH = '/v1/auth/saml/authorize'

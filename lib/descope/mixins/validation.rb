@@ -48,6 +48,12 @@ module Descope
           DeliveryMethod::WHATSAPP, DeliveryMethod::SMS
         ].include?(method)
       end
+
+      def verify_provider(oauth_provider)
+        return false if oauth_provider.to_s.empty? || oauth_provider.nil?
+
+        true
+      end
     end
   end
 end
