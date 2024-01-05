@@ -1,7 +1,7 @@
 # frozen_string_literal: true
-
+require 'sinatra'
 require 'descope'
-require_relative 'server.rb'
+include Descope::Mixins::Common::DeliveryMethod
 
 # prod
 # DESCOPE_PROJECT_ID = 'P2aVGmQvQzSLJwP3ttcxO12tmQXk'
@@ -17,39 +17,39 @@ descope_client = Descope::Client.new(
 )
 
 # Initialize our Sinatra application
-descope_app = DescopeServer.new(client: descope_client)
+get '/verify' do
+  token = params['t']
 
-Thread.new do
+  if token.nil?
+    status 400
+    return 'Token is required'
+  end
+
   begin
-    Rack::Handler::WEBrick.run descope_app, Port: 3001
-  rescue => Interrupt
-    puts 'Sinatra server shutting down...'
-    nil
+    response = @client.magiclink_email_verify_token(token: token)
+    puts response
+    puts "token is valid"
+    refresh_token = jwt_response.fetch(Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME).fetch("jwt")
+    puts "jwt_response: #{jwt_response}"
+    status 200
+    return 'Token Verified!'
+  rescue => e
+    puts "Could not verify token: #{e.message}"
+    status 500
+    return 'Verification failed'
   end
 end
 
+
 def sign_up_or_in(descope_client, login_id)
-  res = descope_client.magic_link_email_sign_up_or_in(login_id:, uri: 'http://localhost:3001/verify')
-  link_identifier = res['linkId'] # Show the user which link they should press in their email
-  pending_ref = res['pendingRef'] # Used to poll for a valid session
+  res = descope_client.magiclink_email_sign_up_or_in(method: EMAIL, login_id:, uri: 'http://localhost:3001/verify')
   masked_email = res['maskedEmail']
   puts "masked_email: #{masked_email}"
-  puts "link_identifier: #{link_identifier}"
-  puts "pending_ref: #{pending_ref}"
-  pending_ref
 end
 
-def poll_for_session(descope_client, pending_ref)
-  max_tries = 15
-  i = 0
-  done = false
-  while !done && i < max_tries
+def verify_magiclink(descope_client, token)
     begin
-      i += 1
-      puts 'waiting 4 seconds for session to be created...'
-      sleep(4)
-      print '.'
-      jwt_response = descope_client.enchanted_link_get_session(pending_ref:)
+
       done = true
     rescue Descope::AuthException, Descope::Unauthorized => e
       puts "Failed pending session, err: #{e}"
@@ -71,9 +71,11 @@ end
 
 
 
-pending_ref = sign_up_or_in(descope_client, 'ami+3@descope.com')
-poll_for_session(descope_client, pending_ref)
-# After sending the link, you must poll to receive a valid session using the pending_ref from the previous step.
-# A valid session will be returned only after the user clicks the right link
-# this will be intercepted by the sinatra server and the token will be verified
-# once the token is verified, the session will be created and returned as session_token and refresh_token
+masked_email = sign_up_or_in(descope_client, 'ami+3@descope.com')
+puts "We sent an email to #{masked_email}"
+
+token = input(
+  "Please insert the token you received by email (#{masked_email}):\n"
+)
+
+

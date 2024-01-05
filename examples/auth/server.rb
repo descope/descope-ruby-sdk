@@ -1,7 +1,4 @@
 require 'sinatra'
-require 'net/http'
-require 'uri'
-require 'json'
 require 'descope'
 
 
@@ -9,7 +6,7 @@ require 'descope'
 class DescopeServer < Sinatra::Base
   attr_accessor :client
 
-  def initialize(client: nil, project_id: nil)
+  def initialize(client: nil, project_id: nil, magiclink: nil)
     super
     raise Descope::AuthException, 'client and project id are required' if client.nil? && project_id.nil?
 

@@ -118,34 +118,51 @@ describe Descope::Api::V1::MagicLink do
       end.not_to raise_error
     end
   end
-  #
-  # context '.magiclink_verify_token' do
-  #   it 'is expected to respond to magiclink_email_verify_token' do
-  #     expect(@instance).to respond_to(:magiclink_email_verify_token)
-  #   end
-  #
-  #   it 'is expected to verify token with enchanted link' do
-  #     expect(@instance).to receive(:post).with(
-  #       VERIFY_ENCHANTEDLINK_AUTH_PATH,
-  #       { token: 'token' }
-  #     )
-  #
-  #     expect { @instance.magiclink_email_verify_token(token: 'token') }.not_to raise_error
-  #   end
-  # end
 
-  # context '.get_session' do
-  #   it 'is expected to respond to get_session' do
-  #     expect(@instance).to respond_to(:magiclink_email_get_session)
-  #   end
-  #
-  #   it 'is expected to get session by pending ref with enchanted link' do
-  #     jwt_response = { 'fake': 'response' }
-  #     allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
-  #
-  #     expect do
-  #       @instance.magiclink_email_get_session(pending_ref: 'pendingRef')
-  #     end.not_to raise_error
-  #   end
-  # end
+  context '.magiclink_verify_token' do
+    it 'is expected to respond to magiclink_email_verify_token' do
+      expect(@instance).to respond_to(:magiclink_email_verify_token)
+    end
+
+    it 'is expected to verify token with enchanted link' do
+      expect(@instance).to receive(:post).with(
+        VERIFY_MAGICLINK_AUTH_PATH,
+        { token: 'token' }
+      )
+
+      expect { @instance.magiclink_email_verify_token(token: 'token') }.not_to raise_error
+    end
+  end
+
+  context '.magiclink_update_email' do
+    it 'is expected to respond to magiclink_email_update_user_email' do
+      expect(@instance).to respond_to(:magiclink_email_update_user_email)
+    end
+
+    it 'is expected to update email with enchanted link' do
+      request_params = {
+        loginId: 'test',
+        email: 'dummy@dummy.com',
+        addToLoginIDs: true,
+        onMergeUseExisting: true
+      }
+
+      expect(@instance).to receive(:post).with(
+        UPDATE_USER_EMAIL_MAGICLINK_PATH,
+        request_params,
+        {},
+        'token'
+      ).and_return({ 'maskedEmail' => 'd****@d****.com' })
+
+      expect do
+        @instance.magiclink_email_update_user_email(
+          login_id: 'test',
+          email: 'dummy@dummy.com',
+          add_to_login_ids: true,
+          on_merge_use_existing: true,
+          refresh_token: 'token'
+        )
+      end.not_to raise_error
+    end
+  end
 end

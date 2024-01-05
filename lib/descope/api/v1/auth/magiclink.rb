@@ -39,6 +39,22 @@ module Descope
             extract_masked_address(res, method)
           end
 
+          def magiclink_email_verify_token(token: nil)
+            validate_token_not_empty(token)
+            post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
+          end
+
+          def magiclink_email_update_user_email(login_id: nil, email: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, refresh_token: nil)
+            validate_login_id(login_id)
+            validate_token_not_empty(refresh_token)
+            validate_email(email)
+
+            body = magiclink_compose_update_user_email_body(login_id, email, add_to_login_ids, on_merge_use_existing)
+            uri = UPDATE_USER_EMAIL_MAGICLINK_PATH
+            res = post(uri, body, {}, refresh_token)
+            extract_masked_address(res, DeliveryMethod::EMAIL)
+          end
+
           private
 
           def magiclink_compose_signin_url(method = nil)
@@ -71,7 +87,9 @@ module Descope
             body
           end
 
+          # rubocop:disable Metrics/MethodLength
           def magiclink_compose_signin_body(login_id, uri, login_options)
+            login_options ||= {}
             unless login_options.is_a?(Hash)
               raise Descope::ArgumentException.new(
                 'Unable to read login_option, not a Hash',
