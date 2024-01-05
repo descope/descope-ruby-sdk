@@ -19,10 +19,15 @@ describe Descope::Api::V1::EnhancedLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/email',
-        loginOptions: { 'abc': '123' }
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        }
       }
       expect(@instance).to receive(:post).with(
-        compose_signin_url,
+        enchanted_link_compose_signin_url,
         request_params,
         nil,
         'refresh_token'
@@ -32,7 +37,12 @@ describe Descope::Api::V1::EnhancedLink do
         @instance.enchanted_link_sign_in(
           login_id: 'test',
           uri: 'https://some-uri/email',
-          login_options: { 'abc': '123' },
+          login_options: {
+            stepup: false,
+            custom_claims: { 'abc': '123' },
+            mfa: false,
+            sso_app_id: 'sso-id'
+          },
           refresh_token: 'refresh_token'
         )
       end.not_to raise_error
@@ -40,17 +50,13 @@ describe Descope::Api::V1::EnhancedLink do
 
     it 'is expected to validate refresh token and not raise an error with refresh token and valid login options' do
       expect do
-        @instance.send(:validate_refresh_token_provided,
-                       login_options: { mfa: true, stepup: true },
-                       refresh_token: 'some-token')
+        @instance.send(:validate_refresh_token_provided, { mfa: true, stepup: true },  'some-token')
       end.not_to raise_error
     end
 
     it 'is expected to validate refresh token and raise an error with refresh token and invalid login options' do
       expect do
-        @instance.send(:validate_refresh_token_provided,
-                       login_options: { 'mfa': true, 'stepup': true },
-                       refresh_token: '')
+        @instance.send(:validate_refresh_token_provided, { mfa: true, stepup: true }, '')
       end.to raise_error(Descope::AuthException, 'Missing refresh token for stepup/mfa')
     end
   end
@@ -69,7 +75,7 @@ describe Descope::Api::V1::EnhancedLink do
       }
 
       expect(@instance).to receive(:post).with(
-        compose_signup_url,
+        enchanted_link_compose_signup_url,
         request_params
       )
 
@@ -92,18 +98,29 @@ describe Descope::Api::V1::EnhancedLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/email',
-        loginOptions: {}
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        }
       }
 
       expect(@instance).to receive(:post).with(
-        compose_sign_up_or_in_url,
+        enchanted_link_compose_sign_up_or_in_url,
         request_params
       )
 
       expect do
         @instance.enchanted_link_sign_up_or_in(
           login_id: 'test',
-          uri: 'https://some-uri/email'
+          uri: 'https://some-uri/email',
+          login_options: {
+            stepup: false,
+            custom_claims: { 'abc': '123' },
+            mfa: false,
+            sso_app_id: 'sso-id'
+          }
         )
       end.not_to raise_error
     end

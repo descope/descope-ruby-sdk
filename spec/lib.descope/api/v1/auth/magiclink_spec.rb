@@ -19,10 +19,15 @@ describe Descope::Api::V1::MagicLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/email',
-        loginOptions: { 'abc': '123' }
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        }
       }
       expect(@instance).to receive(:post).with(
-        compose_signin_url,
+        magiclink_compose_signin_url,
         request_params,
         {},
         'refresh_token'
@@ -35,7 +40,12 @@ describe Descope::Api::V1::MagicLink do
           method: DeliveryMethod::EMAIL,
           login_id: 'test',
           uri: 'https://some-uri/email',
-          login_options: { 'abc': '123' },
+          login_options: {
+            stepup: false,
+            custom_claims: { 'abc': '123' },
+            mfa: false,
+            sso_app_id: 'sso-id'
+          },
           refresh_token: 'refresh_token'
         )
       end.not_to raise_error
@@ -56,7 +66,7 @@ describe Descope::Api::V1::MagicLink do
       }
 
       expect(@instance).to receive(:post).with(
-        compose_signup_url,
+        magiclink_compose_signup_url,
         request_params
       ).and_return({ 'maskedEmail' => 'd****@d****.com' })
 
@@ -71,31 +81,43 @@ describe Descope::Api::V1::MagicLink do
     end
   end
 
-  # context '.sign_up_or_in' do
-  #   it 'is expected to respond to sign up' do
-  #     expect(@instance).to respond_to(:magic_link_email_sign_up_or_in)
-  #   end
-  #
-  #   it 'is expected to sign up with magic link' do
-  #     request_params = {
-  #       loginId: 'test',
-  #       redirectUrl: 'https://some-uri/email',
-  #       loginOptions: {}
-  #     }
-  #
-  #     expect(@instance).to receive(:post).with(
-  #       compose_sign_up_or_in_url,
-  #       request_params
-  #     )
-  #
-  #     expect do
-  #       @instance.magic_link_email_sign_up_or_in(
-  #         login_id: 'test',
-  #         uri: 'https://some-uri/email'
-  #       )
-  #     end.not_to raise_error
-  #   end
-  # end
+  context '.sign_up_or_in' do
+    it 'is expected to respond to sign up' do
+      expect(@instance).to respond_to(:magic_link_email_sign_up_or_in)
+    end
+
+    it 'is expected to sign up or in with magic link' do
+      request_params = {
+        loginId: 'test',
+        redirectUrl: 'https://some-uri/email',
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        }
+      }
+
+      expect(@instance).to receive(:post).with(
+        magiclink_compose_sign_up_or_in_url,
+        request_params
+      ).and_return({ 'maskedEmail' => 'd****@d****.com' })
+
+      expect do
+        @instance.magic_link_email_sign_up_or_in(
+          method: DeliveryMethod::EMAIL,
+          login_id: 'test',
+          uri: 'https://some-uri/email',
+          login_options: {
+            stepup: false,
+            custom_claims: { 'abc': '123' },
+            mfa: false,
+            sso_app_id: 'sso-id'
+          }
+        )
+      end.not_to raise_error
+    end
+  end
   #
   # context '.magic_link_verify_token' do
   #   it 'is expected to respond to magic_link_email_verify_token' do

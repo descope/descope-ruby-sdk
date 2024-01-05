@@ -14,10 +14,10 @@ module Descope
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignInEnchantedLinkEmail/
             validate_login_id(login_id)
 
-            validate_refresh_token_provided(login_options: login_options, refresh_token: refresh_token)
+            validate_refresh_token_provided(login_options, refresh_token)
 
-            body = compose_signin_body(login_id, uri, login_options)
-            uri = compose_signin_url
+            body = enchanted_link_compose_signin_body(login_id, uri, login_options)
+            uri = enchanted_link_compose_signin_url
             post(uri, body, nil, refresh_token)
           end
 
@@ -32,21 +32,21 @@ module Descope
               )
             end
 
-            body = compose_signup_body(login_id, uri, user)
-            uri = compose_signup_url
+            body = enchanted_link_compose_signup_body(login_id, uri, user)
+            uri = enchanted_link_compose_signup_url
             post(uri, body)
           end
 
-          def enchanted_link_sign_up_or_in(login_id: nil, uri: nil)
+          def enchanted_link_sign_up_or_in(login_id: nil, uri: nil, login_options: nil)
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpOrInEnchantedLinkEmail/
-            body = compose_signin_body(login_id, uri)
-            uri = compose_sign_up_or_in_url
+            body = enchanted_link_compose_signin_body(login_id, uri, login_options)
+            uri = enchanted_link_compose_sign_up_or_in_url
             post(uri, body)
           end
 
           def enchanted_link_verify_token(token: nil)
             validate_token_not_empty(token)
-            post(VERIFY_ENCHANTEDLINK_AUTH_PATH, { token: token })
+            post(VERIFY_ENCHANTEDLINK_AUTH_PATH, { token: })
           end
 
           def enchanted_link_get_session(pending_ref: nil)
@@ -57,8 +57,7 @@ module Descope
 
           private
 
-          def compose_signin_body(login_id, uri, login_options = nil)
-            login_options ||= {}
+          def enchanted_link_compose_signin_body(login_id, uri, login_options)
             unless login_options.is_a?(Hash)
               raise Descope::ArgumentException.new(
                 'Unable to read login_option, not a Hash',
@@ -66,26 +65,33 @@ module Descope
               )
             end
 
-            {
+            body = {
               loginId: login_id,
               redirectUrl: uri,
-              loginOptions: login_options.to_h
+              loginOptions: {}
             }
+
+            body[:loginOptions][:stepup] = login_options.fetch(:stepup, false)
+            body[:loginOptions][:mfa] = login_options.fetch(:mfa, false)
+            body[:loginOptions][:customClaims] = login_options.fetch(:custom_claims, {})
+            body[:loginOptions][:ssoAppId] = login_options.fetch(:sso_app_id, nil)
+
+            body
           end
 
-          def compose_signin_url
+          def enchanted_link_compose_signin_url
             compose_url(SIGN_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
           end
 
-          def compose_signup_url
+          def enchanted_link_compose_signup_url
             compose_url(SIGN_UP_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
           end
 
-          def compose_sign_up_or_in_url
+          def enchanted_link_compose_sign_up_or_in_url
             compose_url(SIGN_UP_OR_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
           end
 
-          def compose_signup_body(login_id, uri, user)
+          def enchanted_link_compose_signup_body(login_id, uri, user)
             body = {
               loginId: login_id,
               redirectUrl: uri
@@ -93,7 +99,7 @@ module Descope
 
             unless user.nil? || user.empty?
               body[:user] = user
-              method_str, val = get_login_id_by_method(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, user: user)
+              method_str, val = get_login_id_by_method(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, user:)
               body[method_str.to_sym] = val
             end
 
