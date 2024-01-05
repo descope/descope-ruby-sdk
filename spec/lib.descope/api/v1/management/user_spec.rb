@@ -648,4 +648,29 @@ describe Descope::Api::V1::Management::User do
       end.not_to raise_error
     end
   end
+
+  context '.generate_embedded_link' do
+    it 'is expected to respond to generate_embedded_link' do
+      expect(@instance).to respond_to(:generate_embedded_link)
+    end
+
+    it 'is expected to generate embedded link' do
+      request_params = {
+        loginId: 'test',
+        customClaims: { 'abc': '123' }
+      }
+
+      expect(@instance).to receive(:post).with(
+        USER_GENERATE_EMBEDDED_LINK_PATH,
+        request_params
+      )
+
+      expect do
+        @instance.generate_embedded_link(
+          login_id: 'test',
+          custom_claims: { 'abc': '123' }
+        )
+      end.not_to raise_error
+    end
+  end
 end

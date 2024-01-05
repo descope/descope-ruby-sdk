@@ -55,6 +55,19 @@ module Descope
             extract_masked_address(res, DeliveryMethod::EMAIL)
           end
 
+          def magiclink_email_update_user_phone(login_id: nil, phone: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, refresh_token: nil, method: nil)
+            validate_login_id(login_id)
+            validate_token_not_empty(refresh_token)
+            validate_phone(method, phone)
+
+            body = magiclink_compose_update_user_phone_body(login_id, phone, add_to_login_ids, on_merge_use_existing)
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
+            uri = UPDATE_USER_PHONE_MAGICLINK_PATH
+            res = post(uri, body, {}, refresh_token)
+            extract_masked_address(res, DeliveryMethod::SMS)
+          end
+
           private
 
           def magiclink_compose_signin_url(method = nil)

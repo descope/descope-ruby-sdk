@@ -165,4 +165,41 @@ describe Descope::Api::V1::MagicLink do
       end.not_to raise_error
     end
   end
+
+  context '.magiclink_update_phone' do
+    it 'is expected to respond to magiclink_email_update_user_phone' do
+      expect(@instance).to respond_to(:magiclink_email_update_user_phone)
+    end
+
+    it 'is expected to update phone with enchanted link' do
+      request_params = {
+        loginId: 'test',
+        phone: '+1234567890',
+        addToLoginIDs: true,
+        onMergeUseExisting: true,
+        providerId: 'provider-id',
+        templateId: 'template-id'
+      }
+
+      expect(@instance).to receive(:post).with(
+        UPDATE_USER_PHONE_MAGICLINK_PATH,
+        request_params,
+        {},
+        'token'
+      ).and_return({ 'maskedPhone' => '+1******890' })
+
+      expect do
+        @instance.magiclink_email_update_user_phone(
+          login_id: 'test',
+          phone: '+1234567890',
+          add_to_login_ids: true,
+          on_merge_use_existing: true,
+          refresh_token: 'token',
+          method: DeliveryMethod::SMS,
+          provider_id: 'provider-id',
+          template_id: 'template-id'
+        )
+      end.not_to raise_error
+    end
+  end
 end

@@ -32,13 +32,21 @@ module Descope
       end
 
       def validate_token_not_empty(token)
-        raise AuthException.new('token cannot be empty', code: 400) unless token.is_a?(String) && !token.empty?
+        raise AuthException.new('Token cannot be empty', code: 400) unless token.is_a?(String) && !token.empty?
       end
 
       def validate_refresh_token_not_nil(refresh_token)
         return unless refresh_token.nil? || refresh_token.empty?
 
         raise AuthException.new('Refresh token is required to refresh a session', code: 400)
+      end
+
+      def validate_phone(method, phone)
+        raise AuthException.new('Phone number cannot be empty', code: 400) unless phone.is_a?(String) && !phone.empty?
+        raise AuthException.new('Invalid phone number', code: 400) unless phone.match?(PHONE_REGEX)
+        raise AuthException.new('Invalid delivery method', code: 400) unless [
+          DeliveryMethod::WHATSAPP, DeliveryMethod::SMS
+        ].include?(method)
       end
     end
   end

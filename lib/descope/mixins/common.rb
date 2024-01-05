@@ -65,6 +65,7 @@ module Descope
         GET_SESSION_MAGICLINK_AUTH_PATH = '/v1/auth/magiclink/pending-session'
         UPDATE_USER_EMAIL_MAGICLINK_PATH = '/v1/auth/magiclink/update/email'
         UPDATE_USER_PHONE_MAGICLINK_PATH = '/v1/auth/magiclink/update/phone'
+
         # enchantedlink
         SIGN_UP_AUTH_ENCHANTEDLINK_PATH = '/v1/auth/enchantedlink/signup'
         SIGN_IN_AUTH_ENCHANTEDLINK_PATH = '/v1/auth/enchantedlink/signin'

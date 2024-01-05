@@ -388,7 +388,25 @@ module Descope
             post(Common::USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, body)
           end
 
+          def generate_embedded_link(login_id: nil, custom_claims: nil)
+            custom_claims ||= {}
+            unless custom_claims.is_a?(Hash)
+              raise Descope::ArgumentException.new(
+                'Unable to read custom_claims, not a Hash',
+                code: 400
+              )
+            end
+
+            validate_login_id(login_id)
+            request_params = {
+              loginId: login_id,
+              customClaims: custom_claims.to_h
+            }
+            post(USER_GENERATE_EMBEDDED_LINK_PATH, request_params)
+          end
+
           private
+
           def create(
             login_id: nil,
             email: nil,
