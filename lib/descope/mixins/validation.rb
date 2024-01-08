@@ -54,6 +54,14 @@ module Descope
 
         true
       end
+
+      def validate_tenant(tenant)
+        raise ArgumentError, 'Tenant cannot be empty' unless tenant.is_a?(String) && !tenant.empty?
+      end
+
+      def validate_redirect_url(return_url)
+        raise ArgumentError, 'Return_url cannot be empty' unless return_url.is_a?(String) && !return_url.empty?
+      end
     end
   end
 end

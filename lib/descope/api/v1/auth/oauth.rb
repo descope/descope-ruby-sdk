@@ -17,7 +17,7 @@ module Descope
           end
 
           def oauth_exchange_token(code = nil)
-            exchange_token(code, OAUTH_EXCHANGE_TOKEN_PATH)
+            exchange_token(OAUTH_EXCHANGE_TOKEN_PATH, code)
           end
 
           def oauth_create_redirect_url_for_sign_in_request(stepup: false, custom_claims: {}, mfa: false, sso_app_id: nil)
