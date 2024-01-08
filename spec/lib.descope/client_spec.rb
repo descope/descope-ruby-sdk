@@ -18,7 +18,7 @@ describe Descope::Client do
     it { should be_a Descope::Api::V1::Auth::Password }
     it { should be_a Descope::Api::V1::Auth::EnhancedLink }
     it { should be_a Descope::Api::V1::Auth::MagicLink }
-    it { should be_a Descope::Api::V1::Auth::Oauth }
+    it { should be_a Descope::Api::V1::Auth::OAuth }
   end
 
   let(:project_id) { 'P2AbcZVJYEUBGhX8LNjItawh5nAp' }
