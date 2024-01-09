@@ -176,9 +176,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.delete_user(
-          login_id: 'name@mail.com'
-        )
+        @instance.delete_user('name@mail.com')
       end.not_to raise_error
     end
   end
@@ -202,7 +200,7 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:get).with(
         USER_LOAD_PATH, { loginId: 'someone' }
       )
-      expect { @instance.load_user(login_id: 'someone') }.not_to raise_error
+      expect { @instance.load_user('someone') }.not_to raise_error
     end
   end
 
@@ -211,7 +209,7 @@ describe Descope::Api::V1::Management::User do
       allow(@instance).to receive(:get).with(
         USER_LOAD_PATH, { userId: 'ABCD' }
       )
-      expect { @instance.load_by_user_id(user_id: 'ABCD') }.not_to raise_error
+      expect { @instance.load_by_user_id('ABCD') }.not_to raise_error
     end
   end
 
@@ -222,7 +220,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.logout_user(login_id: 'name@mail.com')
+        @instance.logout_user('name@mail.com')
       end.not_to raise_error
     end
 
@@ -232,14 +230,14 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.logout_user_by_id(user_id: 'U2ZpARjKAJJmq0fzU2lXNNCGnF4j')
+        @instance.logout_user_by_id('U2ZpARjKAJJmq0fzU2lXNNCGnF4j')
       end.not_to raise_error
     end
   end
 
   context '.search_users' do
     it 'is expected to respond to a search_all method' do
-      expect(@instance).to respond_to(:search_all)
+      expect(@instance).to respond_to(:search_all_users)
 
       expect(@instance).to receive(:post).with(
         USERS_SEARCH_PATH, {
@@ -253,7 +251,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.search_all(
+        @instance.search_all_users(
           tenant_ids: [],
           role_names: [],
           limit: 10,
@@ -297,7 +295,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.activate(login_id: 'someone@example.com')
+        @instance.activate('someone@example.com')
       end.not_to raise_error
     end
   end
@@ -314,7 +312,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.deactivate(login_id: 'someone@example.com')
+        @instance.deactivate('someone@example.com')
       end.not_to raise_error
     end
   end
@@ -533,7 +531,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.remove_tenant_role' do
     it 'is expected to respond to a remove_tenant_role method' do
-      expect(@instance).to respond_to(:remove_tenant_role)
+      expect(@instance).to respond_to(:remove_tenant_roles)
 
       expect(@instance).to receive(:post).with(
         USER_REMOVE_TENANT_PATH, {
@@ -544,7 +542,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.remove_tenant_role(
+        @instance.remove_tenant_roles(
           login_id: 'someone@example.com',
           tenant_id: 'tenant1',
           role_names: %w[role1 role2]
@@ -581,11 +579,7 @@ describe Descope::Api::V1::Management::User do
         USER_EXPIRE_PASSWORD_PATH, { loginId: 'someone@example.com' }
       )
 
-      expect do
-        @instance.expire_password(
-          login_id: 'someone@example.com'
-        )
-      end.not_to raise_error
+      expect { @instance.expire_password('someone@example.com') }.not_to raise_error
     end
   end
 

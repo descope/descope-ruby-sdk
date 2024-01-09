@@ -47,7 +47,7 @@ def update_user(client, login_id)
 end
 
 def load_user(client, login_id)
-  user_load_res = client.load_user(login_id: login_id)
+  user_load_res = client.load_user(login_id)
   puts "user_load_res: #{user_load_res}"
   user_load_res
 end

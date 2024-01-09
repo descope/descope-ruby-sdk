@@ -47,7 +47,7 @@ describe Descope::Api::V1::Management::AccessKey do
       expect(@instance).to receive(:get).with(
         ACCESS_KEY_LOAD_PATH, { id: '123' }
       )
-      expect { @instance.load_access_key(id: '123') }.not_to raise_error
+      expect { @instance.load_access_key('123') }.not_to raise_error
     end
   end
 
@@ -86,7 +86,7 @@ describe Descope::Api::V1::Management::AccessKey do
       expect(@instance).to receive(:post).with(
         ACCESS_KEY_DEACTIVATE_PATH, { id: '123' }
       )
-      expect { @instance.deactivate_access_key(id: '123') }.not_to raise_error
+      expect { @instance.deactivate_access_key('123') }.not_to raise_error
     end
   end
 
@@ -99,7 +99,7 @@ describe Descope::Api::V1::Management::AccessKey do
       expect(@instance).to receive(:post).with(
         ACCESS_KEY_ACTIVATE_PATH, { id: '123' }
       )
-      expect { @instance.activate_access_key(id: '123') }.not_to raise_error
+      expect { @instance.activate_access_key('123') }.not_to raise_error
     end
   end
 
@@ -112,7 +112,7 @@ describe Descope::Api::V1::Management::AccessKey do
       expect(@instance).to receive(:post).with(
         ACCESS_KEY_DELETE_PATH, { id: '123' }
       )
-      expect { @instance.delete_access_key(id: '123') }.not_to raise_error
+      expect { @instance.delete_access_key('123') }.not_to raise_error
     end
   end
 end

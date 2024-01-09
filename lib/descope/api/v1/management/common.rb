@@ -53,8 +53,8 @@ module Descope
 
           # sso
           SSO_SETTINGS_PATH = '/v1/mgmt/sso/settings'
-          SSO_METADATA_PATH = '/v1/mgmt/sso/metadata'
-          SSO_MAPPING_PATH = '/v1/mgmt/sso/mapping'
+          SSO_OIDC_PATH = '/v1/mgmt/sso/oidc' # configure ssp settings via oidc
+          SSO_SAML_PATH = '/v1/mgmt/sso/saml' # configure ssp settings via saml
 
           # jwt
           UPDATE_JWT_PATH = '/v1/mgmt/jwt/update'
@@ -112,10 +112,12 @@ module Descope
           PROJECT_IMPORT_PATH = '/v1/mgmt/project/import'
           PROJECT_DELETE_PATH = '/v1/mgmt/project/delete'
 
-          # Represents a tenant association for a User or Access Key. The tenant_id is required to denote
-          # which tenant the user or access key belongs to. The role_names array is an optional list of
-          # roles for the user or access key in this specific tenant.
           def associated_tenants_to_hash(associated_tenants)
+            # Represents a tenant association for a User or Access Key. The tenant_id is required to denote
+            # which tenant the user or access key belongs to. The role_names array is an optional list of
+            # roles for the user or access key in this specific tenant.
+            # @param [Array] associated_tenants - list of associated tenants in the format of
+            #  [{tenant_id: 'tenant_id', role_names: ['role_name1', 'role_name2']}]
             associated_tenant_list = []
             associated_tenants.each do |tenant|
               associated_tenant_list.append(

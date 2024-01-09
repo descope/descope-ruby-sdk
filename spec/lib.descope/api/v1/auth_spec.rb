@@ -14,7 +14,8 @@ describe Descope::Api::V1::Auth do
   LEEWAY = 10
   CLOCK = Time.now.to_i
   ALGORITHM = 'RS256'.freeze
-  CONTEXT = { algorithm: ALGORITHM, leeway: LEEWAY, audience: 'tokens-test-123', issuer: 'https://tokens-test.descope.com/', clock: CLOCK }.freeze
+  CONTEXT = { algorithm: ALGORITHM, leeway: LEEWAY, audience: 'tokens-test-123',
+              issuer: 'https://tokens-test.descope.com/', clock: CLOCK }.freeze
 
   let(:public_key) do
     {
@@ -29,7 +30,7 @@ describe Descope::Api::V1::Auth do
 
   context 'validate_and_load_public_key' do
     it 'is expected to validate and load public key' do
-      expect { @instance.send(:validate_and_load_public_key, ['some_key'])}.to raise_error(Descope::AuthException)
+      expect { @instance.send(:validate_and_load_public_key, ['some_key']) }.to raise_error(Descope::AuthException)
     end
 
     it 'is expected to fail parsing bad public key JSON' do
@@ -174,7 +175,8 @@ describe Descope::Api::V1::Auth do
       )
 
       payload = { data: 'test' }
-      default_payload = { iss: CONTEXT[:issuer], sub: 'user123', aud: CONTEXT[:audience], exp: CLOCK + LEEWAY, iat: CLOCK }
+      default_payload = { iss: CONTEXT[:issuer], sub: 'user123', aud: CONTEXT[:audience], exp: CLOCK + LEEWAY,
+                          iat: CLOCK }
       token = JWT.encode(default_payload.merge(payload), rsa_private, ALGORITHM)
 
       expect do
@@ -302,7 +304,7 @@ describe Descope::Api::V1::Auth do
     end
 
     it 'is expected to return true when jwt response tenants has a tenant with permissions field ad string and the passed permissions is an array' do
-      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' =>  'Perm 1' } } }, tenant: 't1', permissions: ['Perm 1'])).to be true
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' => 'Perm 1' } } }, tenant: 't1', permissions: ['Perm 1'])).to be true
     end
 
     it 'is expected to return false when jwt response tenants has a tenant with permissions field and the passed permissions do not match' do
@@ -312,6 +314,59 @@ describe Descope::Api::V1::Auth do
 
     it 'is expected to return false when jwt response tenants and passed tenant do not match' do
       expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' => 'Perm 1' } } }, tenant: 't2', permissions: [])).to be false
+    end
+  end
+
+  context '.validate_roles' do
+    it 'is expected to respond to validate roles' do
+      expect(@instance).to respond_to(:validate_roles)
+    end
+
+    it 'is expected to return false when jwt response are empty' do
+      expect(@instance.validate_roles(jwt_response: {}, roles: ['Role 1'])).to be false
+    end
+
+    it 'is expected to return false when jwt response roles are empty and the passed roles are not empty' do
+      expect(@instance.validate_roles(jwt_response: { 'roles' => [] }, roles: ['Role 1'])).to be false
+    end
+
+    it 'is expected to return true when jwt response roles are empty and the passed roles are empty' do
+      expect(@instance.validate_roles(jwt_response: { 'roles' => [] }, roles: [])).to be true
+    end
+
+    it 'is expected to return true when jwt response roles and the passed roles match' do
+      expect(@instance.validate_roles(jwt_response: { 'roles' => ['Role 1'] }, roles: 'Role 1')).to be true
+      expect(@instance.validate_roles(jwt_response: { 'roles' => ['Role 1'] }, roles: ['Role 1'])).to be true
+    end
+
+    it 'is expected to return false when jwt response roles and the passed roles do not match' do
+      expect(@instance.validate_roles(jwt_response: { 'roles' => ['Role 1'] }, roles: ['Role 2'])).to be false
+    end
+
+    # Tenant level
+    it 'is expected to return false when jwt response tenants are empty and the passed roles are not empty' do
+      expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => {} }, tenant: 't1', roles: ['Role 2'])).to be false
+    end
+
+    it 'is expected to return false when jwt response tenants has a tenant with empty or no roles field and the passed roles are not empty' do
+      expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => { 't1' => {} } }, tenant: 't1', roles: ['Role 2'])).to be false
+    end
+
+    it 'is expected to return true when jwt response tenants has a tenant with roles field and the passed roles are empty' do
+      expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => { 't1' => { 'roles' => 'Role 1' } } }, tenant: 't1', roles: [])).to be true
+    end
+
+    it 'is expected to return true when jwt response tenants has a tenant with roles field ad string and the passed roles is an array' do
+      expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => { 't1' => { 'roles' => 'Role 1' } } }, tenant: 't1', roles: ['Role 1'])).to be true
+    end
+
+    it 'is expected to return false when jwt response tenants has a tenant with roles field and the passed roles do not match' do
+      expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => { 't1' => { 'roles' => 'Role 1' } } }, tenant: 't1', roles: ['Role 2'])).to be false
+      expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => { 't1' => { 'roles' => 'Role 1' } } }, tenant: 't1', roles: ['Role 1', 'Role 2'])).to be false
+    end
+
+    it 'is expected to return false when jwt response tenants and passed tenant do not match' do
+      expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => { 't1' => { 'roles' => 'Role 1' } } }, tenant: 't2', roles: [])).to be false
     end
   end
 end

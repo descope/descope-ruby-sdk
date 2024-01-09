@@ -74,7 +74,6 @@ module Descope
             )
           end
 
-          puts "jwt_response: #{jwt_response}"
           return false unless jwt_response
 
           granted_permissions = if tenant.nil? || tenant.to_s.empty?
@@ -101,6 +100,53 @@ module Descope
           # Validate all permissions are granted
           permissions.all? do |permission|
             granted_permissions.include?(permission)
+          end
+        end
+
+        def validate_roles(jwt_response: nil, roles: nil)
+          # Validate that a jwt_response has been granted the specified roles.
+          # For a multi-tenant environment use validate_tenant_roles function
+          validate_tenant_roles(jwt_response:, tenant: '', roles:)
+        end
+
+        def validate_tenant_roles(jwt_response: nil, tenant: nil, roles: nil)
+          # Validate that a jwt_response has been granted the specified roles on the specified tenant.
+          # For a multi-tenant environment use validate_tenant_roles function
+          if roles.is_a?(String)
+            roles = [roles]
+          else
+            roles ||= []
+          end
+
+          unless jwt_response.is_a?(Hash)
+            raise Descope::ArgumentException.new(
+              'Invalid JWT response hash', code: 400
+            )
+          end
+
+          return false unless jwt_response
+
+          granted_roles = if tenant.nil? || tenant.to_s.empty?
+                            jwt_response.fetch('roles', [])
+                          else
+                            # ensure that the tenant is associated with the jwt_response
+                            return false unless jwt_response['tenants'].key?(tenant)
+
+                            # dig is a method in Ruby for safely navigating nested data structures like hashes
+                            # and arrays. It allows you to access deeply nested values without worrying about
+                            # raising an error if a middle value is nil.
+                            tenant_roles = jwt_response.dig('tenants', tenant, 'roles') || []
+                            tenant_roles = [] if tenant_roles.nil?
+                            if tenant_roles.is_a?(String)
+                              [tenant_roles]
+                            else
+                              tenant_roles
+                            end
+                          end
+
+          # Validate all roles are granted
+          roles.all? do |role|
+            granted_roles.include?(role)
           end
         end
 

@@ -98,7 +98,8 @@ module Descope
 
           # Delete a user, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/DeleteUser/
-          def delete_user(login_id: nil)
+          def delete_user(login_id = nil)
+            validate_login_id(login_id)
             path = Common::USER_DELETE_PATH
             request_params = {
               loginId: login_id
@@ -113,9 +114,9 @@ module Descope
 
           # Load a user's data, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/LoadUser/
-          def load_user(login_id: nil)
+          def load_user(login_id)
             # Retrieve user information based on the provided Login ID
-            raise Descope::ArgumentException, 'Missing login id' if login_id.nil? || login_id.empty?
+            validate_login_id(login_id)
 
             request_params = {
               loginId: login_id
@@ -126,10 +127,10 @@ module Descope
 
           # Load a user's data, using a valid management key by user id.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/LoadUser/
-          def load_by_user_id(user_id: nil)
+          def load_by_user_id(user_id)
             # Retrieve user information based on the provided user ID
             # The user ID can be found on the user's JWT.
-            raise Descope::ArgumentException, 'Missing user id' if user_id.nil? || user_id.to_s.empty?
+            validate_user_id(user_id)
 
             path = Common::USER_LOAD_PATH
             request_params = {
@@ -140,7 +141,8 @@ module Descope
 
           # Log a user out of all sessions, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/LogoutAllUserDevices/
-          def logout_user(login_id: nil)
+          def logout_user(login_id)
+            validate_login_id(login_id)
             path = Common::USER_LOGOUT_PATH
             request_params = {
               loginId: login_id
@@ -148,7 +150,8 @@ module Descope
             post(path, request_params)
           end
 
-          def logout_user_by_id(user_id: nil)
+          def logout_user_by_id(user_id)
+            validate_user_id(user_id)
             path = Common::USER_LOGOUT_PATH
             request_params = {
               userId: user_id
@@ -158,7 +161,7 @@ module Descope
 
           # Search for users, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/SearchUsers/
-          def search_all(
+          def search_all_users(
             tenant_ids: [],
             role_names: [],
             limit: 0,
@@ -199,7 +202,8 @@ module Descope
 
           # Updates an existing user's status, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserStatus/
-          def activate(login_id: nil)
+          def activate(login_id)
+            validate_login_id(login_id)
             path = Common::USER_UPDATE_STATUS_PATH
             request_params = {
               loginId: login_id,
@@ -208,7 +212,8 @@ module Descope
             post(path, request_params)
           end
 
-          def deactivate(login_id: nil)
+          def deactivate(login_id)
+            validate_login_id(login_id)
             path = Common::USER_UPDATE_STATUS_PATH
             request_params = {
               loginId: login_id,
@@ -220,6 +225,7 @@ module Descope
           # Updates an existing user's login ID, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserLoginID/
           def update_login_id(login_id: nil, new_login_id: nil)
+            validate_login_id(login_id)
             path = Common::USER_UPDATE_LOGIN_ID_PATH
             request_params = {
               loginId: login_id,
@@ -339,7 +345,7 @@ module Descope
             post(Common::USER_ADD_TENANT_PATH, body)
           end
 
-          def remove_tenant_role(login_id: nil, tenant_id: nil, role_names: [])
+          def remove_tenant_roles(login_id: nil, tenant_id: nil, role_names: [])
             body = {
               loginId: login_id,
               tenantId: tenant_id,
@@ -356,7 +362,8 @@ module Descope
             post(Common::USER_SET_PASSWORD_PATH, body)
           end
 
-          def expire_password(login_id: nil)
+          def expire_password(login_id)
+            validate_login_id(login_id)
             body = {
               loginId: login_id
             }

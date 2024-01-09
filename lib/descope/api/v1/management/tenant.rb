@@ -27,14 +27,14 @@ module Descope
             post(TENANT_UPDATE_PATH, compose_create_update_body(name, id, self_provisioning_domains, custom_attributes))
           end
 
-          def delete_tenant(id: nil)
+          def delete_tenant(id = nil)
             # Delete an existing tenant. IMPORTANT: This action is irreversible. Use carefully.
-            post(TENANT_DELETE_PATH, { id: id })
+            post(TENANT_DELETE_PATH, { id: })
           end
 
-          def load_tenant(id: nil)
+          def load_tenant(id = nil)
             # Load tenant by id.
-            get(TENANT_LOAD_PATH, { id: id })
+            get(TENANT_LOAD_PATH, { id: })
           end
 
           def load_all_tenants

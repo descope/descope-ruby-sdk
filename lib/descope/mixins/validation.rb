@@ -23,6 +23,10 @@ module Descope
         raise AuthException, 'login_id cannot be empty' unless login_id.is_a?(String) && !login_id.empty?
       end
 
+      def validate_user_id(user_id)
+        raise Descope::ArgumentException, 'Missing user id' if user_id.nil? || user_id.to_s.empty?
+      end
+
       def validate_password(password)
         raise AuthException, 'password cannot be empty' unless password.is_a?(String) && !password.empty?
       end

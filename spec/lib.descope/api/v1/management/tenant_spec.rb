@@ -80,7 +80,7 @@ describe Descope::Api::V1::Management::Tenant do
       expect(@instance).to receive(:post).with(
         TENANT_DELETE_PATH, { id: 'test' }
       )
-      expect { @instance.delete_tenant(id: 'test') }.not_to raise_error
+      expect { @instance.delete_tenant('test') }.not_to raise_error
     end
   end
 
@@ -93,7 +93,7 @@ describe Descope::Api::V1::Management::Tenant do
       expect(@instance).to receive(:get).with(
         TENANT_LOAD_PATH, { id: 'test' }
       )
-      expect { @instance.load_tenant(id: 'test') }.not_to raise_error
+      expect { @instance.load_tenant('test') }.not_to raise_error
     end
   end
 
