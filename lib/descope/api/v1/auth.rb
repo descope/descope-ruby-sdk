@@ -7,6 +7,7 @@ require 'descope/api/v1/auth/magiclink'
 require 'descope/api/v1/auth/oauth'
 require 'descope/api/v1/auth/otp'
 require 'descope/api/v1/auth/saml'
+require 'descope/api/v1/auth/totp'
 
 module Descope
   module Api
@@ -22,6 +23,7 @@ module Descope
         include Descope::Api::V1::Auth::OAuth
         include Descope::Api::V1::Auth::OTP
         include Descope::Api::V1::Auth::SAML
+        include Descope::Api::V1::Auth::TOTP
 
         ALGORITHM_KEY = 'alg'
 

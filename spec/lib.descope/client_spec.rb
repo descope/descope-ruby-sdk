@@ -21,6 +21,8 @@ describe Descope::Client do
     it { should be_a Descope::Api::V1::Auth::OAuth }
     it { should be_a Descope::Api::V1::Auth::OTP }
     it { should be_a Descope::Api::V1::Auth::SAML }
+    it { should be_a Descope::Api::V1::Auth::SAML }
+    it { should be_a Descope::Api::V1::Auth::TOTP }
   end
 
   let(:project_id) { 'P2AbcZVJYEUBGhX8LNjItawh5nAp' }
