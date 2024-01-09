@@ -41,6 +41,20 @@ module Descope
         def validate_session(refresh_token = nil)
           post(VALIDATE_SESSION_PATH, {}, {}, refresh_token)
         end
+
+        def validate_and_refresh_session(session_token: nil, refresh_token: nil, audience: nil)
+          # Validate the session token and refresh it if it has expired, the session token will automatically be refreshed.
+          # Either the session_token or the refresh_token must be provided.
+          # Call this function for every incoming request to your
+          # private endpoints. Alternatively, use validate_session to only validate the session.
+
+          if session_token.nil? && refresh_token.nil?
+            raise Descope::AuthException.new('Either session_token or refresh_token must be provided', code: 400)
+          end
+
+          validate_session(refresh_token)
+          refresh_session(refresh_token:, audience:)
+        end
       end
     end
   end

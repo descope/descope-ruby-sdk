@@ -43,7 +43,7 @@ module Descope
             post(uri, body)
           end
 
-          def enchanted_link_verify_token(token: nil)
+          def enchanted_link_verify_token(token = nil)
             validate_token_not_empty(token)
             post(VERIFY_ENCHANTEDLINK_AUTH_PATH, { token: })
           end

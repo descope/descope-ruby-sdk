@@ -43,9 +43,69 @@ module Descope
           post(EXCHANGE_AUTH_ACCESS_KEY_PATH, {}, {}, refresh_token)
         end
 
+        def select_tenant(tenant_id: nil, refresh_token: nil)
+          validate_refresh_token_not_nil(refresh_token)
+          res = post(SELECT_TENANT_PATH, { tenantId: tenant_id }, {}, refresh_token)
+          generate_jwt_response(
+            response_body: res,
+            refresh_cookie: res['refreshJwt']
+          )
+        end
+
+        def validate_permissions(jwt_response: nil, permissions: nil)
+          # Validate that a jwt_response has been granted the specified permissions.
+          # For a multi-tenant environment use validate_tenant_permissions function
+          validate_tenant_permissions(jwt_response:, permissions:)
+        end
+
+        # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/MethodLength
+        def validate_tenant_permissions(jwt_response: nil, tenant: nil, permissions: nil)
+          # Validate that a jwt_response has been granted the specified permissions on the specified tenant.
+          # For a multi-tenant environment use validate_tenant_permissions function
+          if permissions.is_a?(String)
+            permissions = [permissions]
+          else
+            permissions ||= []
+          end
+
+          unless jwt_response.is_a?(Hash)
+            raise Descope::ArgumentException.new(
+              'Invalid JWT response hash', code: 400
+            )
+          end
+
+          puts "jwt_response: #{jwt_response}"
+          return false unless jwt_response
+
+          granted_permissions = if tenant.nil? || tenant.to_s.empty?
+                                  jwt_response.fetch('permissions', [])
+                                else
+                                  # ensure that the tenant is associated with the jwt_response
+                                  puts "tenant associated jwt: #{jwt_response['tenants']&.key?(tenant)}"
+                                  return false unless jwt_response['tenants'].key?(tenant)
+
+                                  # dig is a method in Ruby for safely navigating nested data structures like hashes
+                                  # and arrays. It allows you to access deeply nested values without worrying about
+                                  # raising an error if a middle value is nil.
+                                  tenant_permission = jwt_response.dig('tenants', tenant, 'permissions') || []
+                                  tenant_permission = [] if tenant_permission.nil?
+                                  if tenant_permission.is_a?(String)
+                                    puts "tenant_permission string: #{tenant_permission}"
+                                    [tenant_permission]
+                                  else
+                                    puts "tenant_permission array: #{tenant_permission}"
+                                    tenant_permission
+                                  end
+                                end
+
+          # Validate all permissions are granted
+          permissions.all? do |permission|
+            granted_permissions.include?(permission)
+          end
+        end
+
         private
 
-        # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         def generate_auth_info(response_body, refresh_token, user_jwt, audience = nil)
           jwt_response = {}
 

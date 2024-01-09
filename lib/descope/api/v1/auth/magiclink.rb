@@ -39,7 +39,7 @@ module Descope
             extract_masked_address(res, method)
           end
 
-          def magiclink_verify_token(token: nil)
+          def magiclink_verify_token(token = nil)
             validate_token_not_empty(token)
             post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
           end

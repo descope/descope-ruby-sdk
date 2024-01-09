@@ -193,7 +193,7 @@ describe Descope::Api::V1::MagicLink do
         { token: 'token' }
       )
 
-      expect { @instance.magiclink_verify_token(token: 'token') }.not_to raise_error
+      expect { @instance.magiclink_verify_token('token') }.not_to raise_error
     end
   end
 

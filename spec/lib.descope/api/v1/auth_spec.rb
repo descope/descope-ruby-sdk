@@ -238,4 +238,80 @@ describe Descope::Api::V1::Auth do
       expect(counter).to eq(1)
     end
   end
+
+  context '.select_tenant' do
+    it 'is expected to respond to select tenant' do
+      expect(@instance).to respond_to(:select_tenant)
+    end
+
+    it 'is expected to select tenant' do
+      jwt_response = { 'fake': 'response' }
+
+      expect(@instance).to receive(:post).with(
+        SELECT_TENANT_PATH, { tenantId: 'tenant123' }, {}, 'refresh-token'
+      ).and_return(jwt_response)
+
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+
+      expect { @instance.select_tenant(tenant_id: 'tenant123', refresh_token: 'refresh-token') }.not_to raise_error
+    end
+  end
+
+  context '.validate_tenant_permissions' do
+    it 'is expected to respond to validate tenant permissions' do
+      expect(@instance).to respond_to(:validate_tenant_permissions)
+    end
+
+    it 'is expected to respond to validate permissions' do
+      expect(@instance).to respond_to(:validate_permissions)
+    end
+
+    # rubocop:disable Metrics/LineLength
+    it 'is expected to return false when jwt response are empty' do
+      expect(@instance.validate_permissions(jwt_response: {}, permissions: ['Perm 1'])).to be false
+    end
+
+    it 'is expected to return false when jwt response permissions are empty and the passed permissions are not empty' do
+      expect(@instance.validate_permissions(jwt_response: { 'permissions' => [] }, permissions: ['Perm 1'])).to be false
+    end
+
+    it 'is expected to return true when jwt response permissions are empty and the passed permissions are empty' do
+      expect(@instance.validate_permissions(jwt_response: { 'permissions' => [] }, permissions: [])).to be true
+    end
+
+    it 'is expected to return true when jwt response permissions and the passed permissions match' do
+      expect(@instance.validate_permissions(jwt_response: { 'permissions' => ['Perm 1'] }, permissions: 'Perm 1')).to be true
+      expect(@instance.validate_permissions(jwt_response: { 'permissions' => ['Perm 1'] }, permissions: ['Perm 1'])).to be true
+    end
+
+    it 'is expected to return false when jwt response permissions and the passed permissions do not match' do
+      expect(@instance.validate_permissions(jwt_response: { 'permissions' => ['Perm 1'] }, permissions: ['Perm 2'])).to be false
+    end
+
+    #   # Tenant level
+    it 'is expected to return false when jwt response tenants are empty and the passed permissions are not empty' do
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => {} }, tenant: 't1', permissions: ['Perm 2'])).to be false
+    end
+
+    it 'is expected to return false when jwt response tenants has a tenant with empty or no permissions field and the passed permissions are not empty' do
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => {} } }, tenant: 't1', permissions: ['Perm 2'])).to be false
+    end
+
+    it 'is expected to return true when jwt response tenants has a tenant with permissions field and the passed permissions are empty' do
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' => 'Perm 1' } } }, tenant: 't1', permissions: [])).to be true
+    end
+
+    it 'is expected to return true when jwt response tenants has a tenant with permissions field ad string and the passed permissions is an array' do
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' =>  'Perm 1' } } }, tenant: 't1', permissions: ['Perm 1'])).to be true
+    end
+
+    it 'is expected to return false when jwt response tenants has a tenant with permissions field and the passed permissions do not match' do
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' => 'Perm 1' } } }, tenant: 't1', permissions: ['Perm 2'])).to be false
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' => 'Perm 1' } } }, tenant: 't1', permissions: ['Perm 1', 'Perm 2'])).to be false
+    end
+
+    it 'is expected to return false when jwt response tenants and passed tenant do not match' do
+      expect(@instance.validate_tenant_permissions(jwt_response: { 'tenants' => { 't1' => { 'permissions' => 'Perm 1' } } }, tenant: 't2', permissions: [])).to be false
+    end
+  end
 end

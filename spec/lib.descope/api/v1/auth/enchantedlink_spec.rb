@@ -137,7 +137,7 @@ describe Descope::Api::V1::EnhancedLink do
         { token: 'token' }
       )
 
-      expect { @instance.enchanted_link_verify_token(token: 'token') }.not_to raise_error
+      expect { @instance.enchanted_link_verify_token('token') }.not_to raise_error
     end
   end
 

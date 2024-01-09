@@ -84,4 +84,24 @@ describe Descope::Api::V1::Session do
       expect { @instance.validate_session }.not_to raise_error
     end
   end
+
+  context '.validate_and_refresh_session' do
+    it 'is expected to respond to validate and refresh session' do
+      expect(@instance).to respond_to(:validate_and_refresh_session)
+    end
+
+    it 'is expected to post validate and refresh session' do
+      expect(@instance).to receive(:validate_session).with('refresh_token')
+      expect(@instance).to receive(:refresh_session).with(refresh_token: 'refresh_token', audience: nil)
+
+      expect { @instance.validate_and_refresh_session(refresh_token: 'refresh_token') }.not_to raise_error
+    end
+
+    it 'is expected to raise error if neither session_token nor refresh_token is provided' do
+      expect { @instance.validate_and_refresh_session }.to raise_error(
+        Descope::AuthException,
+        'Either session_token or refresh_token must be provided'
+      )
+    end
+  end
 end

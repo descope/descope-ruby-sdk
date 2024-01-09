@@ -23,7 +23,7 @@ class DescopeServer < Sinatra::Base
     end
 
     begin
-      response = @client.enchanted_link_verify_token(token: token)
+      response = @client.enchanted_link_verify_token(token)
       puts response
 
       # valid response is {}
