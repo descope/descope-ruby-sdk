@@ -20,7 +20,8 @@ module Descope
             exchange_token(OAUTH_EXCHANGE_TOKEN_PATH, code)
           end
 
-          def oauth_create_redirect_url_for_sign_in_request(stepup: false, custom_claims: {}, mfa: false, sso_app_id: nil)
+          def oauth_create_redirect_url_for_sign_in_request(stepup: false, custom_claims: {}, mfa: false,
+                                                            sso_app_id: nil)
             request_params = {
               stepup:,
               customClaims: custom_claims,
@@ -30,7 +31,8 @@ module Descope
             post(OAUTH_CREATE_REDIRECT_URL_FOR_SIGN_IN_REQUEST_PATH, request_params)
           end
 
-          def oauth_create_redirect_url_for_sign_up_request(stepup: false, custom_claims: {}, mfa: false, sso_app_id: nil)
+          def oauth_create_redirect_url_for_sign_up_request(stepup: false, custom_claims: {}, mfa: false,
+                                                            sso_app_id: nil)
             request_params = {
               stepup:,
               customClaims: custom_claims,
