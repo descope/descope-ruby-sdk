@@ -29,49 +29,29 @@ module Descope
             post(SSO_OIDC_PATH, request_params)
           end
 
-          def configure_sso_settings_via_metadata(tenant_id: nil, idp_metadata_url: nil, redirect_url: nil, domain: nil)
-            # Configure SSO setting for am IDP metadata URL. Alternatively, `configure` can be used instead.
-            post(SSO_METADATA_PATH, compose_metadata_body(tenant_id, idp_metadata_url, redirect_url, domain))
+          def configure_sso_saml(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
+            raise Descope::ArgumentException.new('SSO settings must be a Hash', code: 400) unless settings.is_a?(Hash)
+
+            # Configure tenant SSO SAML Settings, using a valid management key.
+            request_params = {
+              tenantId: tenant_id,
+              settings: compose_settings_body(settings),
+              redirectUrl: redirect_url,
+              domain:
+            }
+            post(SSO_SAML_PATH, request_params)
+          end
+
+          def configure_sso_saml_metadata(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
+            # Configure tenant SSO SAML Metadata, using a valid management key.
+            post(SSO_SAML_METADATA_PATH, compose_metadata_body(tenant_id, settings, redirect_url, domain))
           end
 
           private
 
           # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           def compose_settings_body(settings)
-            # these are the settings that all needs to be optionally added to body if exists
-            # settings": {
-            #     "name": "string",
-            #     "clientId": "string",
-            #     "clientSecret": "string",
-            #     "redirectUrl": "string",
-            #     "authUrl": "string",
-            #     "tokenUrl": "string",
-            #     "userDataUrl": "string",
-            #     "scope": [
-            #       "string"
-            #     ],
-            #     "JWKsUrl": "string",
-            #     "userAttrMapping": {
-            #       "loginId": "string",
-            #       "username": "string",
-            #       "name": "string",
-            #       "email": "string",
-            #       "phoneNumber": "string",
-            #       "verifiedEmail": "string",
-            #       "verifiedPhone": "string",
-            #       "picture": "string",
-            #       "givenName": "string",
-            #       "middleName": "string",
-            #       "familyName": "string"
-            #     },
-            #     "manageProviderTokens": true,
-            #     "callbackDomain": "string",
-            #     "prompt": [
-            #       "string"
-            #     ],
-            #     "grantType": "string",
-            #     "issuer": "string"
-            #   },
+
             body = {}
             body[:name] = settings[:name] if settings.key?(:name)
             body[:clientId] = settings[:client_id] if settings.key?(:client_id)
@@ -109,10 +89,10 @@ module Descope
             body
           end
 
-          def compose_metadata_body(tenant_id, idp_metadata_url, redirect_url, domain)
+          def compose_metadata_body(tenant_id, settings, redirect_url, domain)
             {
               tenantId: tenant_id,
-              idpMetadataUrl: idp_metadata_url,
+              settings: compose_settings_body(settings),
               redirectUrl: redirect_url,
               domain:
             }

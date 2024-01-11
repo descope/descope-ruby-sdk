@@ -53,9 +53,10 @@ module Descope
           ACCESS_KEY_DELETE_PATH = '/v1/mgmt/accesskey/delete'
 
           # sso
-          SSO_SETTINGS_PATH = '/v1/mgmt/sso/settings'
+          SSO_SETTINGS_PATH = '/v2/mgmt/sso/settings'
           SSO_OIDC_PATH = '/v1/mgmt/sso/oidc' # configure ssp settings via oidc
           SSO_SAML_PATH = '/v1/mgmt/sso/saml' # configure ssp settings via saml
+          SSO_SAML_METADATA_PATH = '/v1/mgmt/sso/saml/metadata' # configure ssp settings via saml metadata
 
           # SCIM
           SCIM_GROUPS_PATH = '/scim/v2/Groups'
