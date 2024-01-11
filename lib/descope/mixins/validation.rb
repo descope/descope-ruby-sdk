@@ -60,15 +60,19 @@ module Descope
       end
 
       def validate_tenant(tenant)
-        raise ArgumentError, 'Tenant cannot be empty' unless tenant.is_a?(String) && !tenant.empty?
+        raise AuthException.new('Tenant cannot be empty', code: 400) unless tenant.is_a?(String) && !tenant.empty?
       end
 
       def validate_redirect_url(return_url)
-        raise ArgumentError, 'Return_url cannot be empty' unless return_url.is_a?(String) && !return_url.empty?
+        raise AuthException.new('Return_url cannot be empty', code: 400) unless return_url.is_a?(String) && !return_url.empty?
       end
 
       def validate_code(code)
-        raise ArgumentError, 'Code cannot be empty' unless code.is_a?(String) && !code.empty?
+        raise AuthException.new('Code cannot be empty', code: 400) unless code.is_a?(String) && !code.empty?
+      end
+
+      def validate_scim_group_id(group_id)
+        raise AuthException.new('SCIM Group ID cannot be empty', code: 400) unless group_id.is_a?(String) && !group_id.empty?
       end
     end
   end

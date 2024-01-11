@@ -20,62 +20,62 @@ describe Descope::Api::V1::Management::SSOSettings do
       )
       expect { @instance.get_sso_settings('123') }.not_to raise_error
     end
+  end
 
-    context '.delete_sso_settings' do
-      it 'should respond to .delete_sso_settings' do
-        expect(@instance).to respond_to :delete_sso_settings
+  context '.delete_sso_settings' do
+    it 'should respond to .delete_sso_settings' do
+      expect(@instance).to respond_to :delete_sso_settings
+    end
+
+    it 'is expected to delete SSO settings' do
+      expect(@instance).to receive(:delete).with(
+        SSO_SETTINGS_PATH, { tenantId: '123' }
+      )
+      expect { @instance.delete_sso_settings('123') }.not_to raise_error
+    end
+
+    context '.configure_sso_oidc_settings' do
+      it 'should respond to .configure_sso_oidc' do
+        expect(@instance).to respond_to :configure_sso_oidc
       end
 
-      it 'is expected to delete SSO settings' do
-        expect(@instance).to receive(:delete).with(
-          SSO_SETTINGS_PATH, { tenantId: '123' }
+      it 'is expected to configure SSO settings' do
+        expect(@instance).to receive(:post).with(
+          SSO_OIDC_PATH, {
+            tenantId: '123',
+            settings: {
+              name: 'test',
+              clientId: 'test',
+              scope: ['test'],
+              userAttrMapping: {
+                loginId: 'test',
+                username: 'test',
+                name: 'test'
+              },
+              callbackDomain: 'test'
+            },
+            redirectUrl: 'test',
+            domain: 'test'
+          }
         )
-        expect { @instance.delete_sso_settings('123') }.not_to raise_error
-      end
-
-      context '.configure_sso_oidc_settings' do
-        it 'should respond to .configure_sso_oidc' do
-          expect(@instance).to respond_to :configure_sso_oidc
-        end
-
-        it 'is expected to configure SSO settings' do
-          expect(@instance).to receive(:post).with(
-            SSO_OIDC_PATH, {
-              tenantId: '123',
-              settings: {
-                name: 'test',
-                clientId: 'test',
-                scope: ['test'],
-                userAttrMapping: {
-                  loginId: 'test',
-                  username: 'test',
-                  name: 'test'
-                },
-                callbackDomain: 'test'
+        expect do
+          @instance.configure_sso_oidc(
+            tenant_id: '123',
+            settings: {
+              name: 'test',
+              client_id: 'test',
+              scope: ['test'],
+              user_attr_mapping: {
+                login_id: 'test',
+                username: 'test',
+                name: 'test'
               },
-              redirectUrl: 'test',
-              domain: 'test'
-            }
+              callback_domain: 'test'
+            },
+            redirect_url: 'test',
+            domain: 'test'
           )
-          expect do
-            @instance.configure_sso_oidc(
-              tenant_id: '123',
-              settings: {
-                name: 'test',
-                client_id: 'test',
-                scope: ['test'],
-                user_attr_mapping: {
-                  login_id: 'test',
-                  username: 'test',
-                  name: 'test'
-                },
-                callback_domain: 'test'
-              },
-              redirect_url: 'test',
-              domain: 'test'
-            )
-          end.not_to raise_error
-        end
+        end.not_to raise_error
       end
     end
   end

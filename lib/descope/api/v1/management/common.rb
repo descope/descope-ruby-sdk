@@ -56,6 +56,14 @@ module Descope
           SSO_OIDC_PATH = '/v1/mgmt/sso/oidc' # configure ssp settings via oidc
           SSO_SAML_PATH = '/v1/mgmt/sso/saml' # configure ssp settings via saml
 
+          # SCIM
+          SCIM_GROUPS_PATH = '/scim/v2/Groups'
+          SCIM_RESOURCE_TYPES_PATH = '/scim/v2/ResourceTypes'
+          SCIM_SERVICE_PROVIDER_CONFIG_PATH = '/scim/v2/ServiceProviderConfig'
+          SCIM_USERS_PATH = '/scim/v2/Users'
+
+
+
           # jwt
           UPDATE_JWT_PATH = '/v1/mgmt/jwt/update'
 
