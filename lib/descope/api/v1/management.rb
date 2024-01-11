@@ -12,6 +12,7 @@ require 'descope/api/v1/management/authz'
 require 'descope/api/v1/management/audit'
 require 'descope/api/v1/management/sso_settings'
 require 'descope/api/v1/management/scim'
+require 'descope/api/v1/management/password'
 
 module Descope
   module Api
@@ -30,6 +31,7 @@ module Descope
         include Descope::Api::V1::Management::Audit
         include Descope::Api::V1::Management::SSOSettings
         include Descope::Api::V1::Management::SCIM
+        include Descope::Api::V1::Management::Password
       end
     end
   end

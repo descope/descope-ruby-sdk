@@ -13,6 +13,7 @@ module Descope
           TENANT_LOAD_PATH = '/v1/mgmt/tenant'
           TENANT_LOAD_ALL_PATH = '/v1/mgmt/tenant/all'
           TENANT_SEARCH_ALL_PATH = '/v1/mgmt/tenant/search'
+          PASSWORD_SETTINGS_PATH = '/v1/mgmt/password/settings'
 
           # userUSER_CREATE_PATH
           USER_CREATE_PATH = '/v1/mgmt/user/create'
