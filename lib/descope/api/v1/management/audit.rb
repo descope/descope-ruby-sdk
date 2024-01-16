@@ -6,7 +6,7 @@ module Descope
       module Management
         # Management API calls
         module Audit
-          def search(
+          def audit_search(
             user_ids: nil,
             actions: nil,
             exclude_actions: nil,

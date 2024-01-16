@@ -51,13 +51,13 @@ describe Descope::Api::V1::Management::Audit do
     end
 
     it 'should respond to .search' do
-      expect(@instance).to respond_to :search
+      expect(@instance).to respond_to :audit_search
     end
 
     it 'is expected to search audit trail and get audits' do
       res = nil # define res outside the block
       expect do
-        res = @instance.search(
+        res = @instance.audit_search(
           no_tenants: true,
           user_ids: %w[user1 user2],
           exclude_actions: %w[exclude1 exclude2],

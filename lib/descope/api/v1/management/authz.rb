@@ -6,7 +6,7 @@ module Descope
       module Management
         # Management API calls
         module Authz
-          def save_schema(schema: nil, upgrade: false)
+          def authz_save_schema(schema: nil, upgrade: false)
             #  Create or update the ReBAC schema.
             #  In case of update, will update only given namespaces and will not delete namespaces unless upgrade flag is true.
             #  Args:
@@ -41,17 +41,17 @@ module Descope
             post(AUTHZ_SCHEMA_SAVE, request_params)
           end
 
-          def delete_schema
+          def authz_delete_schema
             # Delete the schema for the project which will also delete all relations.
             post(AUTHZ_SCHEMA_DELETE)
           end
 
-          def load_schema
+          def authz_load_schema
             # Load the schema for the project.
             post(AUTHZ_SCHEMA_LOAD)
           end
 
-          def save_namespace(namespace: nil, old_name: nil, schema_name: nil)
+          def authz_save_namespace(namespace: nil, old_name: nil, schema_name: nil)
             # Create or update the given namespace
             # Will not delete relation definitions not mentioned in the namespace.
             request_params = { namespace: namespace }
@@ -60,14 +60,14 @@ module Descope
             post(AUTHZ_NS_SAVE, request_params)
           end
 
-          def delete_namespace(name: nil, schema_name: nil)
+          def authz_delete_namespace(name: nil, schema_name: nil)
             # Delete the given namespace
             request_params = { name: name }
             request_params[:schemaName] = schema_name unless schema_name.nil?
             post(AUTHZ_NS_DELETE, request_params)
           end
 
-          def save_relation_definition(relation_definition: nil, namespace_name: nil, old_name: nil, schema_name: nil)
+          def authz_save_relation_definition(relation_definition: nil, namespace_name: nil, old_name: nil, schema_name: nil)
             # Create or update the given relation definition
             #  Will not delete relation definitions not mentioned in the namespace.
             request_params = {
@@ -79,14 +79,14 @@ module Descope
             post(AUTHZ_RD_SAVE, request_params)
           end
 
-          def delete_relation_definition(name: nil, namespace: nil, schema_name: nil)
+          def authz_delete_relation_definition(name: nil, namespace: nil, schema_name: nil)
             # Delete the given relation definition
             request_params = { name: name, namespace: namespace }
             request_params[:schemaName] = schema_name unless schema_name.nil?
             post(AUTHZ_RD_DELETE, request_params)
           end
 
-          def create_relation(relations: nil)
+          def authz_create_relations(relations: nil)
             # Create the given relations based on the existing schema
             #  relations (Array[]): the relations to create. Each in the following format:
             #   {
@@ -115,22 +115,22 @@ module Descope
             post(AUTHZ_RE_CREATE, { relations: relations })
           end
 
-          def delete_relation(relations: nil)
+          def authz_delete_relation(relations: nil)
             # Delete the given relations based on the existing schema
             post(AUTHZ_RE_DELETE, { relations: relations })
           end
 
-          def delete_relations_for_resources(resources: nil)
+          def authz_delete_relations_for_resources(resources: nil)
             # Delete all relations for the given resources
             post(AUTHZ_RE_DELETE_RESOURCES, { resources: resources })
           end
 
-          def has_relations?(relation_queries: nil)
+          def authz_has_relations?(relation_queries: nil)
             # Queries the given relations to see if they exist returning true if they do
             post(AUTHZ_RE_HAS_RELATIONS, { relationQueries: relation_queries })
           end
 
-          def who_can_access?(resource: nil, relation_definition: nil, namespace: nil)
+          def authz_who_can_access?(resource: nil, relation_definition: nil, namespace: nil)
             #  Finds the list of targets (usually users) who can access the given resource with the given RD
             request_params = {
               resource: resource,
@@ -140,16 +140,16 @@ module Descope
             post(AUTHZ_RE_WHO, request_params)
           end
 
-          def resource_relations(resources: nil)
+          def authz_resource_relations(resources: nil)
             post(AUTHZ_RE_RESOURCE, { resources: resources })
           end
 
-          def target_relations(targets: nil)
+          def authz_target_relations(targets: nil)
             # Returns the list of all defined relations (not recursive) for the given targets.
             post(AUTHZ_RE_TARGETS, { targets: targets })
           end
 
-          def what_can_target_access?(target: nil)
+          def authz_what_can_target_access?(target: nil)
             # Returns the list of all relations for the given target including derived relations from the schema tree.
             res = post(AUTHZ_RE_TARGET_ALL, { target: target })
             raise Descope::AuthException, "could not get relation for target: #{res}" if res['relations'].nil?

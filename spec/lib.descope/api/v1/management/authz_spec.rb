@@ -11,7 +11,7 @@ describe Descope::Api::V1::Management::Authz do
 
   context '.save_schema' do
     it 'should respond to .save_schema' do
-      expect(@instance).to respond_to :save_schema
+      expect(@instance).to respond_to :authz_save_schema
     end
 
     it 'is expected to create or update ReBac schema' do
@@ -42,40 +42,40 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.save_schema(schema: schema, upgrade: true)
+        @instance.authz_save_schema(schema: schema, upgrade: true)
       end.not_to raise_error
     end
   end
 
   context '.delete_schema' do
     it 'should respond to .delete_schema' do
-      expect(@instance).to respond_to :delete_schema
+      expect(@instance).to respond_to :authz_delete_schema
     end
 
     it 'is expected to delete the schema for the project which will also delete all relations' do
       expect(@instance).to receive(:post).with(AUTHZ_SCHEMA_DELETE)
       expect do
-        @instance.delete_schema
+        @instance.authz_delete_schema
       end.not_to raise_error
     end
   end
 
   context '.load_schema' do
     it 'should respond to .load_schema' do
-      expect(@instance).to respond_to :load_schema
+      expect(@instance).to respond_to :authz_load_schema
     end
 
     it 'is expected to load the schema for the project' do
       expect(@instance).to receive(:post).with(AUTHZ_SCHEMA_LOAD)
       expect do
-        @instance.load_schema
+        @instance.authz_load_schema
       end.not_to raise_error
     end
   end
 
   context '.save_namespace' do
     it 'should respond to .save_namespace' do
-      expect(@instance).to respond_to :save_namespace
+      expect(@instance).to respond_to :authz_save_namespace
     end
 
     it 'is expected to create or update the given namespace' do
@@ -88,14 +88,14 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.save_namespace(namespace: 'test-namespace', old_name: 'old-namespace', schema_name: 'schema-name')
+        @instance.authz_save_namespace(namespace: 'test-namespace', old_name: 'old-namespace', schema_name: 'schema-name')
       end.not_to raise_error
     end
   end
 
   context '.delete_namespace' do
     it 'should respond to .delete_namespace' do
-      expect(@instance).to respond_to :delete_namespace
+      expect(@instance).to respond_to :authz_delete_namespace
     end
 
     it 'is expected to delete the given namespace' do
@@ -107,14 +107,14 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.delete_namespace(name: 'test-namespace', schema_name: 'schema-name')
+        @instance.authz_delete_namespace(name: 'test-namespace', schema_name: 'schema-name')
       end.not_to raise_error
     end
   end
 
   context '.save_relation_definition' do
     it 'should respond to .save_relation_definition' do
-      expect(@instance).to respond_to :save_relation_definition
+      expect(@instance).to respond_to :authz_save_relation_definition
     end
 
     it 'is expected to create or update the given relation definition' do
@@ -128,7 +128,7 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.save_relation_definition(
+        @instance.authz_save_relation_definition(
           relation_definition: 'test-relation-definition',
           namespace_name: 'test-namespace',
           old_name: 'old-relation-definition',
@@ -140,7 +140,7 @@ describe Descope::Api::V1::Management::Authz do
 
   context '.delete_relation_definition' do
     it 'should respond to .delete_relation_definition' do
-      expect(@instance).to respond_to :delete_relation_definition
+      expect(@instance).to respond_to :authz_delete_relation_definition
     end
 
     it 'is expected to delete the given relation definition' do
@@ -153,7 +153,7 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.delete_relation_definition(
+        @instance.authz_delete_relation_definition(
           name: 'test-relation-definition',
           namespace: 'test-namespace',
           schema_name: 'schema-name'
@@ -164,7 +164,7 @@ describe Descope::Api::V1::Management::Authz do
 
   context '.create_relation' do
     it 'should respond to .create_relation' do
-      expect(@instance).to respond_to :create_relation
+      expect(@instance).to respond_to :authz_create_relations
     end
 
     it 'is expected to create the given relation' do
@@ -175,14 +175,14 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.create_relation(relations: 'test-relations')
+        @instance.authz_create_relations(relations: 'test-relations')
       end.not_to raise_error
     end
   end
 
   context '.delete_relation' do
     it 'should respond to .delete_relation' do
-      expect(@instance).to respond_to :delete_relation
+      expect(@instance).to respond_to :authz_delete_relation
     end
 
     it 'is expected to delete the given relation' do
@@ -193,14 +193,14 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.delete_relation(relations: 'test-relations')
+        @instance.authz_delete_relation(relations: 'test-relations')
       end.not_to raise_error
     end
   end
 
   context '.delete_relations_for_resources' do
     it 'should respond to .delete_relations_for_resources' do
-      expect(@instance).to respond_to :delete_relations_for_resources
+      expect(@instance).to respond_to :authz_delete_relations_for_resources
     end
 
     it 'is expected to delete the given relations for resources' do
@@ -211,14 +211,14 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.delete_relations_for_resources(resources: 'test-resources')
+        @instance.authz_delete_relations_for_resources(resources: 'test-resources')
       end.not_to raise_error
     end
   end
 
   context 'has_relations?' do
     it 'should respond to .has_relations?' do
-      expect(@instance).to respond_to :has_relations?
+      expect(@instance).to respond_to :authz_has_relations?
     end
 
     it 'is expected to return true if the given resource has relations' do
@@ -229,14 +229,14 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.has_relations?(relation_queries: ['some-query'])
+        @instance.authz_has_relations?(relation_queries: ['some-query'])
       end.not_to raise_error
     end
   end
 
   context 'who_can_access?' do
     it 'should respond to .who_can_access?' do
-      expect(@instance).to respond_to :who_can_access?
+      expect(@instance).to respond_to :authz_who_can_access?
     end
 
     it 'is expected to return the list of targets who can access the given resource with the given RD' do
@@ -249,15 +249,15 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.who_can_access?(resource: 'test-resource', relation_definition: 'test-relation-definition',
-                                  namespace: 'test-namespace')
+        @instance.authz_who_can_access?(resource: 'test-resource', relation_definition: 'test-relation-definition',
+                                        namespace: 'test-namespace')
       end.not_to raise_error
     end
   end
 
   context 'resource_relations' do
     it 'should respond to .resource_relations' do
-      expect(@instance).to respond_to :resource_relations
+      expect(@instance).to respond_to :authz_resource_relations
     end
 
     it 'is expected to return the list of relations for the given resources' do
@@ -268,14 +268,14 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.resource_relations(resources: ['test-resources'])
+        @instance.authz_resource_relations(resources: ['test-resources'])
       end.not_to raise_error
     end
   end
 
   context 'target_relations' do
     it 'should respond to .target_relations' do
-      expect(@instance).to respond_to :target_relations
+      expect(@instance).to respond_to :authz_target_relations
     end
 
     it 'is expected to return the list of relations for the given targets' do
@@ -286,7 +286,7 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.target_relations(targets: ['test-targets'])
+        @instance.authz_target_relations(targets: ['test-targets'])
       end.not_to raise_error
     end
   end
@@ -315,7 +315,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'should respond to .what_can_target_access?' do
-      expect(@instance).to respond_to :what_can_target_access?
+      expect(@instance).to respond_to :authz_what_can_target_access?
     end
 
     it 'is expected to return the list of relations for the given target' do
@@ -327,7 +327,7 @@ describe Descope::Api::V1::Management::Authz do
       )
       res = nil
       expect do
-        res = @instance.what_can_target_access?(target: 'test-target')
+        res = @instance.authz_what_can_target_access?(target: 'test-target')
       end.not_to raise_error
       expect(res).to be_a(Array)
       expect(res.size).to eq(1)

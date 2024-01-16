@@ -45,6 +45,6 @@ module Descope
   # exception for incorrect request, you've sent wrong params
   class BadRequest < Descope::HTTPError; end
   class AccessDenied < Descope::HTTPError; end
-  class RateLimitEncountered < Descope::HTTPError; end
+  class RateLimitException < Descope::HTTPError; end
   class RequestTimeout < Descope::HTTPError; end
 end

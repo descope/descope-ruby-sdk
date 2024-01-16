@@ -23,7 +23,7 @@ module Descope
               name: name,
               expireTime: expire_time,
               roleNames: role_names,
-              keyTenants: associated_tenants_to_hash(key_tenants)
+              keyTenants: associated_tenants_to_hash_array(key_tenants)
             }
           end
 

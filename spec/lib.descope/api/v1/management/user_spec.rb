@@ -33,7 +33,7 @@ describe Descope::Api::V1::Management::User do
           givenName: 'name',
           familyName: 'Ruby SDK',
           roleNames: [],
-          userTenants: associated_tenants_to_hash(user_tenants_args),
+          userTenants: associated_tenants_to_hash_array(user_tenants_args),
           test: false,
           picture: 'https://www.example.com/picture.png',
           customAttributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
@@ -585,7 +585,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.generate_otp_for_test' do
     it 'is expected to respond to a generate_otp_for_test method' do
-      expect(@instance).to respond_to(:generate_otp_for_test)
+      expect(@instance).to respond_to(:generate_otp_for_test_user)
 
       expect(@instance).to receive(:post).with(
         USER_GENERATE_OTP_FOR_TEST_PATH, {
@@ -595,7 +595,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.generate_otp_for_test(
+        @instance.generate_otp_for_test_user(
           method: DeliveryMethod::EMAIL,
           login_id: 'someone@example.com'
         )
@@ -605,7 +605,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.generate_enchanted_link_for_test' do
     it 'is expected to respond to a generate_enchanted_link_for_test method' do
-      expect(@instance).to respond_to(:generate_enchanted_link_for_test)
+      expect(@instance).to respond_to(:generate_enchanted_link_for_test_user)
 
       expect(@instance).to receive(:post).with(
         USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, {
@@ -615,7 +615,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.generate_enchanted_link_for_test(
+        @instance.generate_enchanted_link_for_test_user(
           login_id: 'someone@example.com',
           uri: 'https://www.example.com'
         )

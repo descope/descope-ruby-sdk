@@ -122,7 +122,7 @@ module Descope
           PROJECT_IMPORT_PATH = '/v1/mgmt/project/import'
           PROJECT_DELETE_PATH = '/v1/mgmt/project/delete'
 
-          def associated_tenants_to_hash(associated_tenants)
+          def associated_tenants_to_hash_array(associated_tenants)
             # Represents a tenant association for a User or Access Key. The tenant_id is required to denote
             # which tenant the user or access key belongs to. The role_names array is an optional list of
             # roles for the user or access key in this specific tenant.

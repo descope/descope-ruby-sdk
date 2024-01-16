@@ -30,7 +30,7 @@ require 'descope'
 
 descope_client = Descope::Client.new(
   {
-    project_id: <project_id>,
+    project_id: '<project_id>',
     management_key: ENV['MGMT_KEY']
   }
 )
@@ -82,18 +82,9 @@ Send a user a one-time password (OTP) using your preferred delivery method (_ema
 The user can either `sign up`, `sign in` or `sign up or in`
 
 ```ruby
-require 'descope'
-include Descope::Mixins::Common
-descope_client = Descope::Client.new(
-  {
-    project_id: '<project_id>',
-    management_key: ENV['MGMT_KEY']
-  }
-)
-
 # Every user must have a login ID. All other user information is optional
 # For sign up either phone or email is required
-email :  'desmond@descope.com'
+email = 'desmond@descope.com'
 user = {'name': 'Desmond Copeland', 'phone': '212-555-1234', 'email': email}
 masked_address = descope_client.otp_sign_up(method: DeliveryMethod.EMAIL, login_id: 'someone@example.com', user: user)
 ```
@@ -119,13 +110,10 @@ This redirection can be configured in code, or generally in the [Descope Console
 The user can either `sign up`, `sign in` or `sign up or in`
 
 ```ruby
-require 'descope'
-include Descope::Mixins::Common
-
 masked_address = descope_client.magiclink_sign_up_or_in(
     method: DeliveryMethod.EMAIL,
     login_id: 'desmond@descope.com',
-    uri: 'http://myapp.com/verify-magic-link', # Set redirect URI here or via console
+    uri: 'https://myapp.com/verify-magic-link', # Set redirect URI here or via console
 )
 ```
 
@@ -161,7 +149,7 @@ The user can either `sign up`, `sign in` or `sign up or in`
 ```ruby
 res = descope_client.enchanted_link_sign_up_or_in(
     login_id: 'someone@example.com',
-    uri: 'http://myapp.com/verify-enchanted-link', # Set redirect URI here or via console
+    uri: 'https://myapp.com/verify-enchanted-link', # Set redirect URI here or via console
 )
 link_identifier = res['linkId'] # Show the user which link they should press in their email
 pending_ref = res['pendingRef'] # Used to poll for a valid session
@@ -208,10 +196,10 @@ poll_for_session(descope_client, pending_ref)
 To verify an enchanted link, your redirect page must call the validation function on the token (`t`) parameter (`https://your-redirect-address.com/verify?t=<token>`). Once the token is verified, the session polling will receive a valid `jwt_response`.
 
 ```ruby
-begin:
+begin
     descope_client.enchanted_link_verify_token(token=token)
     # Token is valid
-rescue AuthException as e:
+rescue AuthException => e
     # Token is invalid
 end
 ```
@@ -274,11 +262,8 @@ on the link provided by the `provisioning_url`.
 Existing users can add TOTP using the `update` function.
 
 ```ruby
-include Descope::Mixins::Common
-
-
 # Every user must have a login ID. All other user information is optional
-email :  'desmond@descope.com'
+email = 'desmond@descope.com'
 user = {name: 'Desmond Copeland', phone: '212-555-1234', email: 'someone@example.com'}
 totp_response = descope_client.totp_sign_up(method: DeliveryMethod.EMAIL, login_id: 'someone@example.com', user: user)
 
@@ -313,8 +298,8 @@ for the [password authentication method](https://app.descope.com/settings/authen
 
 ```ruby
 # Every user must have a login_id and a password. All other user information is optional
-login_id :  'desmond@descope.com'
-password :  'qYlvi65KaX'
+login_id = 'desmond@descope.com'
+password = 'qYlvi65KaX'
 user = {
     name: 'Desmond Copeland',
     email: login_id,
@@ -346,8 +331,8 @@ In the [password authentication method](https://app.descope.com/settings/authent
 # Start the reset process by sending a password reset prompt. In this example we'll assume
 # that magic link is configured as the reset method. The optional redirect URL is used in the
 # same way as in regular magic link authentication.
-login_id :  'desmond@descope.com'
-redirect_url :  'https://myapp.com/password-reset'
+login_id = 'desmond@descope.com'
+redirect_url = 'https://myapp.com/password-reset'
 descope_client.password_reset(login_id:, redirect_url:)
 ```
 
@@ -377,9 +362,9 @@ the session and refresh tokens with every request, and they are validated using 
 
 ```ruby
 # Validate the session. Will raise if expired
-begin:
+begin
     jwt_response = descope_client.validate_session('session_token')
-rescue AuthException -> e:
+rescue AuthException => e
     # Session expired
 end
 
@@ -416,17 +401,21 @@ For multi-tenant uses:
 ```ruby
 # You can validate specific permissions
 valid_permissions = descope_client.validate_tenant_permissions(
-    jwt_response, 'my-tenant-ID', ['Permission to validate']
+    jwt_response: 'resp', tenant: 'my-tenant-ID', permissions: ['Permission to validate']
 )
-if not valid_permissions:
+
+unless valid_permissions
     # Deny access
+end
 
 # Or validate roles directly
 valid_roles = descope_client.validate_tenant_roles(
-    jwt_response, 'my-tenant-ID', ['Role to validate']
+    jwt_response: 'resp', tenant: 'my-tenant-ID', roles: ['Role to validate']
 )
-if not valid_roles:
+
+unless valid_roles
     # Deny access
+end
 ```
 
 When not using tenants use:
@@ -434,17 +423,20 @@ When not using tenants use:
 ```ruby
 # You can validate specific permissions
 valid_permissions = descope_client.validate_permissions(
-    jwt_response, ['Permission to validate']
+    jwt_response: 'resp', permissions: ['Permission to validate']
 )
-if not valid_permissions:
+unless valid_permissions
     # Deny access
+end
 
 # Or validate roles directly
 valid_roles = descope_client.validate_roles(
-    jwt_response, ['Role to validate']
+    jwt_response: 'resp', roles: ['Role to validate']
 )
-if not valid_roles:
+
+unless valid_roles
     # Deny access
+end
 ```
 
 ### Tenant selection
@@ -452,7 +444,7 @@ For a user that has permissions to multiple tenants, you can set a specific tena
 This will add an extra attribute to the refresh JWT and the session JWT with the selected tenant ID
 
 ```ruby
-tenant_id :  't1'
+tenant_id = 't1'
 jwt_response = descope_client.select_tenant(tenant_id:, refresh_token: 'refresh_token')
 ```
 
@@ -487,7 +479,7 @@ Create one in the [Descope Console](https://app.descope.com/settings/company/man
 require 'descope'
 
 # Initialized after setting the DESCOPE_PROJECT_ID and the DESCOPE_MANAGEMENT_KEY env vars
-project_id :  '<project_id>'
+project_id = '<project_id>'
 client = Descope::Client.new(
         {
                 project_id: project_id,
@@ -527,14 +519,17 @@ tenant_resp = descope_client.load_tenant('my-custom-id')
 # Load all tenants
 tenants_resp = descope_client.load_all_tenants
 tenants = tenants_resp['tenants']
-for tenant in tenants :
+tenants.each do |tenant|
   # Do something
+end
 
-  # search all tenants
-  tenants_resp = descope_client.search_all_tenants(ids: ['id1'], names: ['name1'], custom_attributes: { 'k1': 'v1' }, self_provisioning_domains: ['spd1'])
-  tenants = tenants_resp['tenants']
-  for tenant in tenants :
-    # Do something
+# search all tenants
+tenants_resp = descope_client.search_all_tenants(ids: ['id1'], names: ['name1'], custom_attributes: { 'k1': 'v1' }, self_provisioning_domains: ['spd1'])
+tenants = tenants_resp['tenants']
+tenants.each do |tenant|
+  # Do something
+  tenant_id = tenant['id']
+end
 ```
 
 ### Manage Users
@@ -562,7 +557,7 @@ descope_client.invite_user(
         login_id: 'desmond@descope.com',
         email: 'desmond@descope.com',
         display_name: 'Desmond Copeland',
-        user_tenants: client.associated_tenants_to_hash(associated_tenants),
+        user_tenants: client.associated_tenants_to_hash_array(associated_tenants),
 )
 
 # Update will override all fields as is. Use carefully.
@@ -570,7 +565,7 @@ descope_client.update_user(
         login_id: 'desmond@descope.com',
         email: 'desmond@descope.com',
         display_name: 'Desmond Copeland',
-        user_tenants: client.associated_tenants_to_hash(associated_tenants)
+        user_tenants: client.associated_tenants_to_hash_array(associated_tenants)
 )
 
 # Update explicit data for a user rather than overriding all fields
@@ -612,8 +607,9 @@ descope_client.logout_user_by_id('<user-id>')
 # results can be paginated using the limit and page parameters
 users_resp = descope_client.search_all_users(tenant_ids = ['my-tenant-id'])
 users = users_resp['users']
-for user in users :
+users.each do |user|
   # Do something
+end
 ```
 
 #### Set or Expire User Password
@@ -654,8 +650,9 @@ access_key = access_key_resp['key']
 # Search all access keys, optionally according to a tenant filter
 keys_resp = descope_client.search_all_access_keys(tenant_ids: ['my-tenant-id'])
 keys = keys_resp['keys']
-    for key in keys:
+keys.each do |key|
         # Do something
+end
 
 # Update will override all fields as is. Use carefully.
 descope_client.update_access_key(
@@ -674,7 +671,7 @@ descope_client.delete_access_key('key-id')
 
 ```
 
-### Manage SSO Setting
+### Manage SSO SAML Settings
 
 You can manage SSO settings and map SSO group roles and user attributes.
 
@@ -699,6 +696,7 @@ descope_client.configure_sso_saml_metadata(
     redirect_url: 'https://your.domain.com', # Global redirection after successful authentication
     domain: 'tenant-users.com' # Users authentication with this domain will be logged in to this tenant
 )
+```
 
 
 ### Manage Permissions
@@ -725,8 +723,9 @@ descope_client.mgmt.permission.delete('My Updated Permission')
 # Load all permissions
 permissions_resp = descope_client.load_all_permissions
 permissions = permissions_resp['permissions']
-    for permission in permissions:
+    permissions.each do |permission|
         # Do something
+    end
 ```
 
 ### Manage Roles
@@ -770,8 +769,9 @@ You can list your flows and also import and export flows and screens, or the pro
 flows_resp = descope_client.list_flows()
 puts("Total number of flows: #{flows_resp['total']}")
 flows = flows_resp['flows']
-for flow in flows:
+flows.each do |flow|
     # Do something
+end
 
 # Export a selected flow by id for the flow and matching screens.
 exported_flow_and_screens = descope_client.export_flow(
@@ -786,12 +786,11 @@ imported_flow_and_screens = descope_client.import_flow(
 )
 
 # Export your project theme.
-exported_theme = descope_client.export_theme()
+exported_theme = descope_client.export_theme
 
 # Import a theme to your project.
-imported_theme = descope_client.import_theme(
-    theme...
-)
+imported_theme = descope_client.import_theme('theme')
+
 ```
 
 ### Query SCIM Groups
@@ -808,26 +807,20 @@ groups_resp = descope_client.scim_search_groups(
         excluded_attributes: { abc: '123' }
 )
 
-# Load all groups for the given user IDs (can be found in the user's JWT)
-groups_resp = descope_client.mgmt.group.load_all_groups_for_members(
-    tenant_id='tenant-id',
-    user_ids=['user-id-1', 'user-id-2'],
+# Load SCIM group
+group = descope_client.scim_load_group(
+    tenant_id: 'tenant-id',
+    group_id: 'group-id'
 )
 
-# Load all groups for the given user's login IDs (used for sign-in)
-groups_resp = descope_client.mgmt.group.load_all_groups_for_members(
-    tenant_id='tenant-id',
-    login_ids=['login-id-1', 'login-id-2'],
+# Load SCIM group members
+group = descope_client.scim_create_group(
+        group_id: 'group_id',
+        display_name: 'display_name',
+        members: ['members'],
+        external_id: 'external_id',
+        excluded_attributes: { abc: '123' }
 )
-
-# Load all group's members by the given group id
-groups_resp = descope_client.mgmt.group.load_all_group_members(
-    tenant_id='tenant-id',
-    group_id='group-id,
-)
-
-for group in groups_resp:
-    # Do something
 ```
 
 ### Manage JWTs
@@ -835,9 +828,9 @@ for group in groups_resp:
 You can add custom claims to a valid JWT.
 
 ```ruby
-updated_jwt = descope_client.mgmt.jwt.update_jwt(
-    jwt='original-jwt',
-    custom_claims={
+updated_jwt = descope_client.update_jwt(
+    jwt: 'original-jwt',
+    custom_claims: {
         'custom-key1': 'custom-value1',
         'custom-key2': 'custom-value2'
     },
@@ -855,7 +848,7 @@ Embedded links can be created to directly receive a verifiable token without sen
 This token can then be verified using the magic link 'verify' function, either directly or through a flow.
 
 ```ruby
-token = descope_client.mgmt.user.generate_embedded_link('desmond@descope.com', {'key1':'value1'})
+token = descope_client.generate_embedded_link(login_id: 'desmond@descope.com', custom_claims: {'key1':'value1'})
 ```
 
 ### Search Audit
@@ -865,12 +858,24 @@ Below are some examples. For a full list of available search criteria options, s
 
 ```ruby
 # Full text search on last 10 days
-audits = descope_client.mgmt.audit.search(
-    text='some-text',
-    from_ts=datetime.now(timezone.utc)-timedelta(days=10)
+audits = descope_client.audit_search(
+        no_tenants: true,
+        actions: ['LoginSucceed'],
+        user_ids: %w[user1 user2],
+        exclude_actions: %w[exclude1 exclude2],
+        devices: %w[Bot Mobile Desktop Tablet Unknown],
+        methods: %w[otp totp magiclink oauth saml password],
+        geos: %w[US IL],
+        remote_addresses: %w[remote1 remote2],
+        login_ids: %w[login1 login2],
+        tenants: %w[tenant1 tenant2],
+        text: 'text123',
+        from_ts: time.now - 10 * 24 * 60 * 60,
+        to_ts: time.now - 1 * 24 * 60 * 60,
 )
+
 # Search successful logins in the last 30 days
-audits = descope_client.mgmt.audit.search(actions=['LoginSucceed'])
+audits = descope_client.audit_search(actions: ['LoginSucceed'])
 ```
 
 ### Manage ReBAC Authz
@@ -1018,34 +1023,34 @@ Descope SDK allows you to fully manage the schema and relations as well as perfo
 
 ```ruby
 # Load the existing schema
-schema = descope_client.mgmt.authz.load_schema()
+schema = descope_client.authz_load_schema
 
 # Save schema and make sure to remove all namespaces not listed
-descope_client.mgmt.authz.save_schema(schema, True)
+descope_client.authz_save_schema(schema: schema, upgrade: true)
 
 # Create a relation between a resource and user
-descope_client.mgmt.authz.create_relations(
-    [
-        {
-            'resource': 'some-doc',
-            'relationDefinition': 'owner',
-            'namespace': 'doc',
-            'target': 'u1',
-        }
-    ]
+descope_client.authz_create_relations(
+        [
+                { 
+                        resource: 'some-doc',
+                        relationDefinition: 'owner',
+                        namespace: 'doc',
+                        target: 'u1'
+                }
+        ]
 )
 
 # Check if target has the relevant relation
 # The answer should be true because an owner is also a viewer
-relations = descope_client.mgmt.authz.has_relations(
-    [
-        {
-            'resource': 'some-doc',
-            'relationDefinition': 'viewer',
-            'namespace': 'doc',
-            'target': 'u1',
-        }
-    ]
+relations = descope_client.authz_has_relations?(
+        [
+                {
+                        resource: 'some-doc',
+                        relationDefinition: 'viewer',
+                        namespace: 'doc',
+                        target: 'u1'
+                }
+        ]
 )
 ```
 
@@ -1056,12 +1061,12 @@ You can change the project name, as well as to clone the current project to a ne
 ```ruby
 
 # Change the project name
-descope.client.mgmt.project.change_name('new-project-name')
+descope.client.rename_project('new-project-name')
 
 # Clone the current project, including its settings and configurations.
 # Note that this action is supported only with a pro license or above.
 # Users, tenants and access keys are not cloned.
-clone_resp = descope.client.mgmt.project.clone('new-project-name')
+clone_resp = descope.client.clone_project('new-project-name')
 ```
 
 ### Utils for your end to end (e2e) tests and integration tests
@@ -1075,36 +1080,37 @@ that way, you don't need to use 3rd party messaging services in order to receive
 # Test user must have a loginId, other fields are optional.
 # Roles should be set directly if no tenants exist, otherwise set
 # on a per-tenant basis.
-descope_client.mgmt.user.create_test_user(
-    login_id='desmond@descope.com',
-    email='desmond@descope.com',
-    display_name='Desmond Copeland',
-    user_tenants=[
-        AssociatedTenant('my-tenant-id', ['role-name1']),
-    ],
+
+associated_tenants = [{ tenant_id: 'tenant_id1', role_names: %w[role_name1 role_name2] }]
+descope_client.create_test_user(
+        login_id: 'desmond@descope.com',
+        email: 'desmond@descope.com',
+        display_name: 'Desmond Copeland',
+        user_tenants: client.associated_tenants_to_hash_array(associated_tenants)
 )
 
 # Now test user got created, and this user will be available until you delete it,
 # you can use any management operation for test user CRUD.
 # You can also delete all test users.
-descope_client.mgmt.user.delete_all_test_users()
+descope_client.delete_all_test_users
 
 # OTP code can be generated for test user, for example:
-resp = descope_client.mgmt.user.generate_otp_for_test_user(
-    DeliveryMethod.EMAIL, 'login-id'
+resp = descope_client.generate_otp_for_test_user(
+        method: DeliveryMethod.EMAIL, login_id: 'login-id'
 )
 code = resp['code']
 # Now you can verify the code is valid (using descope_client.*.verify for example)
 
 # Same as OTP, magic link can be generated for test user, for example:
-resp = descope_client.mgmt.user.generate_magic_link_for_test_user(
-    DeliveryMethod.EMAIL, 'login-id', ''
+resp = descope_client.generate_magic_link_for_test_user(
+        method: DeliveryMethod.EMAIL, 
+        login_id: 'login-id',
 )
 link = resp['link']
 
 # Enchanted link can be generated for test user, for example:
-resp = descope_client.mgmt.user.generate_enchanted_link_for_test_user(
-    'login-id', ''
+resp = descope_client.generate_enchanted_link_for_test_user(
+        'login-id', ''
 )
 link = resp['link']
 pending_ref = resp['pendingRef']
@@ -1115,14 +1121,16 @@ pending_ref = resp['pendingRef']
 Handle API rate limits by comparing the exception to the APIRateLimitExceeded exception, which includes the RateLimitParameters map with the key 'Retry-After.' This key indicates how many seconds until the next valid API call can take place.
 
 ```ruby
-try:
-    descope_client.magiclink.sign_up_or_in(
-        method=DeliveryMethod.EMAIL,
-        login_id='desmond@descope.com',
-        uri='http://myapp.com/verify-magic-link',
+begin
+    descope_client.magiclink_sign_up_or_in(
+        method: DeliveryMethod.EMAIL,
+        login_id: 'desmond@descope.com',
+        uri: 'https://myapp.com/verify-magic-link',
     )
-except RateLimitException as e:
-    retry_after_seconds = e.rate_limit_parameters.get(API_RATE_LIMIT_RETRY_AFTER_HEADER)
+rescue Descope::RateLimitException => e
+    retry_after_seconds = e['API_RATE_LIMIT_RETRY_AFTER_HEADER']
+    puts "Rate limit exceeded, retry after #{retry_after_seconds} seconds"
+end
     # This variable indicates how many seconds until the next valid API call can take place.
 ```
 
@@ -1134,13 +1142,14 @@ You can find various usage samples in the [samples folder](https://github.com/de
 
 ### Prerequisites
 
-- Python 3.7 or higher
-- [Poetry](https://ruby-poetry.org) installed
+- Ruby 3.3.0 or higher
+- Bundler
+
 
 ### Install dependencies
 
 ```bash
-poetry install
+bundle install
 ```
 
 ### Run tests
@@ -1148,13 +1157,7 @@ poetry install
 Running all tests:
 
 ```bash
-poetry run pytest tests
-```
-
-Running all tests with coverage:
-
-```bash
-poetry run pytest --junitxml=/tmp/pytest.xml --cov-report=term-missing:skip-covered --cov=descope tests/ --cov-report=xml:/tmp/cov.xml
+bundle exec rspec
 ```
 
 ## Learn More

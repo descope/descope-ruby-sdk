@@ -6,12 +6,12 @@ module Descope
       module Management
         # Management API calls
         module Project
-          def rename_project(name: nil)
+          def rename_project(name)
             # Rename a project.
-            post(PROJECT_UPDATE_NAME, { name: name })
+            post(PROJECT_UPDATE_NAME, { name: })
           end
 
-          def export_project(format: nil)
+          def export_project(format = nil)
             # Export a project.
             # The response is the JSON of the project items when the format is string.
             request_params = {}
@@ -24,10 +24,10 @@ module Descope
             end
           end
 
-          def import_project(files: nil)
+          def import_project(files)
             # Import a project.
             # The argument of files should be the output of the export project endpoint
-            post(PROJECT_IMPORT_PATH, { files: files })
+            post(PROJECT_IMPORT_PATH, { files: })
           end
 
           def delete_project

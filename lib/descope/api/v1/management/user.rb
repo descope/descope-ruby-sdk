@@ -370,7 +370,7 @@ module Descope
             post(Common::USER_EXPIRE_PASSWORD_PATH, body)
           end
 
-          def generate_otp_for_test(method: nil, login_id: nil)
+          def generate_otp_for_test_user(method: nil, login_id: nil)
             body = {
               loginId: login_id,
               deliveryMethod: get_method_string(method)
@@ -378,7 +378,7 @@ module Descope
             post(Common::USER_GENERATE_OTP_FOR_TEST_PATH, body)
           end
 
-          def generate_magic_link_for_test(method: nil, login_id: nil, uri: nil)
+          def generate_magic_link_for_test_user(method: nil, login_id: nil, uri: nil)
             body = {
               loginId: login_id,
               deliveryMethod: get_method_string(method),
@@ -387,7 +387,7 @@ module Descope
             post(Common::USER_GENERATE_MAGIC_LINK_FOR_TEST_PATH, body)
           end
 
-          def generate_enchanted_link_for_test(login_id: nil, uri: nil)
+          def generate_enchanted_link_for_test_user(login_id: nil, uri: nil)
             body = {
               loginId: login_id,
               URI: uri
@@ -533,7 +533,7 @@ module Descope
               phone: phone,
               displayName: display_name,
               roleNames: role_names,
-              userTenants: associated_tenants_to_hash(user_tenants),
+              userTenants: associated_tenants_to_hash_array(user_tenants),
               test: test,
               invite: invite,
               picture: picture,

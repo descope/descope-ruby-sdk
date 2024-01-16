@@ -18,7 +18,7 @@ describe Descope::Api::V1::Management::Project do
       expect(@instance).to receive(:post).with(
         PROJECT_UPDATE_NAME, { name: 'test' }
       )
-      expect { @instance.rename_project(name: 'test') }.not_to raise_error
+      expect { @instance.rename_project('test') }.not_to raise_error
     end
   end
 
@@ -32,7 +32,7 @@ describe Descope::Api::V1::Management::Project do
         PROJECT_EXPORT_PATH, { format: 'string' }
       )
       expect do
-        res = @instance.export_project(format: 'string')
+        res = @instance.export_project('string')
         JSON.parse(res)
       end.not_to raise_error
     end
@@ -48,7 +48,7 @@ describe Descope::Api::V1::Management::Project do
         PROJECT_IMPORT_PATH, { files: 'files' }
       )
       expect do
-        @instance.import_project(files: 'files')
+        @instance.import_project('files')
       end.not_to raise_error
     end
   end
