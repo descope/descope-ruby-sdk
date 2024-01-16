@@ -67,7 +67,7 @@ describe Descope::Api::V1::Management::Role do
         ROLE_DELETE_PATH, { name: 'test' }
       )
       expect do
-        @instance.delete_role(name: 'test')
+        @instance.delete_role('test')
       end.not_to raise_error
     end
   end

@@ -679,43 +679,27 @@ descope_client.delete_access_key('key-id')
 You can manage SSO settings and map SSO group roles and user attributes.
 
 ```ruby
-# You can get SSO settings for a tenant
+# You can get SSO SAML settings for a tenant
 sso_settings_res = descope_client.sso_get_settings('tenant-id')  
 
-# You can configure SSO settings manually by setting the required fields directly
-descope_client.mgmt.sso.configure(
-    tenant_id, # Which tenant this configuration is for
-    idp_url='https://idp.com',
-    entity_id='my-idp-entity-id',
-    idp_cert='<your-cert-here>',
-    redirect_url='https://your.domain.com', # Global redirection after successful authentication
-    domain='tenant-users.com' # Users authentication with this domain will be logged in to this tenant
+# You can configure SSO SAML settings manually by setting the required fields directly
+descope_client.configure_sso_saml_metadata(
+    tenant_id: '123', # Which tenant this configuration is for
+    settings: {
+      name: 'test',
+      clientId: 'test',
+      scope: ['test'],
+      userAttrMapping: {
+              loginId: 'test',
+              username: 'test',
+              name: 'test'
+      },
+      callbackDomain: 'test'   
+    },
+    redirect_url: 'https://your.domain.com', # Global redirection after successful authentication
+    domain: 'tenant-users.com' # Users authentication with this domain will be logged in to this tenant
 )
 
-# Alternatively, configure using an SSO metadata URL
-descope_client.mgmt.sso.configure_via_metadata(
-    tenant_id, # Which tenant this configuration is for
-    idp_metadata_url='https://idp.com/my-idp-metadata',
-    redirect_url='', # Redirect URL will have to be provided in every authentication call
-    domain='' # Remove the current domain configuration if a value was previously set
-)
-
-# Map IDP groups to Descope roles, or map user attributes.
-# This function overrides any previous mapping (even when empty). Use carefully.
-descope_client.mgmt.sso.mapping(
-    tenant_id, # Which tenant this mapping is for
-    role_mappings = [RoleMapping(['IDP_ADMIN'], 'Tenant Admin')],
-    attribute_mapping=AttributeMapping(name='IDP_NAME', phone_number='IDP_PHONE'),
-)
-```
-
-Note: Certificates should have a similar structure to:
-
-```
------BEGIN CERTIFICATE-----
-Certifcate contents
------END CERTIFICATE-----
-```
 
 ### Manage Permissions
 
@@ -723,23 +707,23 @@ You can create, update, delete or load permissions:
 
 ```ruby
 # You can optionally set a description for a permission.
-descope_client.mgmt.permission.create(
-    name='My Permission',
-    description='Optional description to briefly explain what this permission allows.'
+descope_client.create_permission(
+    name:'My Permission',
+    description:'Optional description to briefly explain what this permission allows.'
 )
 
 # Update will override all fields as is. Use carefully.
-descope_client.mgmt.permission.update(
-    name='My Permission',
-    new_name='My Updated Permission',
-    description='A revised description'
+descope_client.mgmt.update_permission(
+    name: 'My Permission',
+    new_name: 'My Updated Permission',
+    description: 'A revised description'
 )
 
 # Permission deletion cannot be undone. Use carefully.
 descope_client.mgmt.permission.delete('My Updated Permission')
 
 # Load all permissions
-permissions_resp = descope_client.mgmt.permission.load_all()
+permissions_resp = descope_client.load_all_permissions
 permissions = permissions_resp['permissions']
     for permission in permissions:
         # Do something
@@ -751,28 +735,30 @@ You can create, update, delete or load roles:
 
 ```ruby
 # You can optionally set a description and associated permission for a roles.
-descope_client.mgmt.role.create(
-    name='My Role',
-    description='Optional description to briefly explain what this role allows.',
-    permission_names=['My Updated Permission'],
+descope_client.create_role(
+    name: 'My Role',
+    description: 'Optional description to briefly explain what this role allows.',
+    permission_names: ['My Updated Permission'],
 )
 
 # Update will override all fields as is. Use carefully.
-descope_client.mgmt.role.update(
-    name='My Role',
-    new_name='My Updated Role',
-    description='A revised description',
-    permission_names=['My Updated Permission', 'Another Permission']
+descope_client.update_role(
+    name: 'My Role',
+    new_name: 'My Updated Role',
+    description: 'A revised description',
+    permission_names: ['My Updated Permission', 'Another Permission']
 )
 
 # Role deletion cannot be undone. Use carefully.
-descope_client.mgmt.role.delete('My Updated Role')
+descope_client.delete_role('My Updated Role')
 
 # Load all roles
-roles_resp = descope_client.mgmt.role.load_all()
+roles_resp = descope_client.load_all_roles()
 roles = roles_resp['roles']
-    for role in roles:
-        # Do something
+    roles.each do |role|
+      # Do something
+    end
+# 
 ```
 
 ### Manage Flows and Theme
@@ -781,41 +767,45 @@ You can list your flows and also import and export flows and screens, or the pro
 
 ```ruby
 # List all project flows
-flows_resp = descope_client.mgmt.flow.list_flows()
-print(f'Total number of flows: {flows_resp['total']}')
+flows_resp = descope_client.list_flows()
+puts("Total number of flows: #{flows_resp['total']}")
 flows = flows_resp['flows']
 for flow in flows:
     # Do something
 
 # Export a selected flow by id for the flow and matching screens.
-exported_flow_and_screens = descope_client.mgmt.flow.export_flow(
-    flow_id='sign-up-or-in',
+exported_flow_and_screens = descope_client.export_flow(
+    flow_id: 'sign-up-or-in',
 )
 
 # Import a given flow and screens to the flow matching the id provided.
-imported_flow_and_screens = descope_client.mgmt.flow.import_flow(
-    flow_id='sign-up-or-in',
-    flow={},
-    screens=[]
+imported_flow_and_screens = descope_client.import_flow(
+    flow_id: 'sign-up-or-in',
+    flow: {},
+    screens: []
 )
 
 # Export your project theme.
-exported_theme = descope_client.mgmt.flow.export_theme()
+exported_theme = descope_client.export_theme()
 
 # Import a theme to your project.
-imported_theme = descope_client.mgmt.flow.import_flow(
-    theme={}
+imported_theme = descope_client.import_theme(
+    theme...
 )
 ```
 
-### Query SSO Groups
+### Query SCIM Groups
 
-You can query SSO groups:
+You can query SCIM groups:
 
 ```ruby
 # Load all groups for a given tenant id
-groups_resp = descope_client.mgmt.group.load_all_groups(
-    tenant_id='tenant-id',
+groups_resp = descope_client.scim_search_groups(
+        group_id: 'group_id',
+        display_name: 'display_name',
+        members: ['members'],
+        external_id: 'external_id',
+        excluded_attributes: { abc: '123' }
 )
 
 # Load all groups for the given user IDs (can be found in the user's JWT)

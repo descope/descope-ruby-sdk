@@ -72,7 +72,7 @@ describe Descope::Api::V1::Management::Flow do
 
     it 'is expected to import theme' do
       expect(@instance).to receive(:post).with(THEME_IMPORT_PATH, { theme: 'theme123' })
-      expect { @instance.import_theme(theme: 'theme123') }.not_to raise_error
+      expect { @instance.import_theme('theme123') }.not_to raise_error
     end
   end
 end

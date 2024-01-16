@@ -30,7 +30,7 @@ module Descope
           end
 
           def configure_sso_saml(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
-            raise Descope::ArgumentException.new('SSO settings must be a Hash', code: 400) unless settings.is_a?(Hash)
+            raise Descope::ArgumentException.new('SSO SAML settings must be a Hash', code: 400) unless settings.is_a?(Hash)
 
             # Configure tenant SSO SAML Settings, using a valid management key.
             request_params = {

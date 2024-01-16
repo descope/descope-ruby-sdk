@@ -30,9 +30,9 @@ module Descope
             post(ROLE_UPDATE_PATH, request_params)
           end
 
-          def delete_role(name: nil)
+          def delete_role(name)
             # Delete an existing role. IMPORTANT: This action is irreversible. Use carefully.
-            post(ROLE_DELETE_PATH, { name: name })
+            post(ROLE_DELETE_PATH, { name: })
           end
 
           def load_all_roles

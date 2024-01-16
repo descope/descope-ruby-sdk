@@ -38,8 +38,8 @@ module Descope
 
           # Import the current project theme.
           # @see https://docs.descope.com/api/openapi/flowmanagement/operation/ImportTheme/
-          def import_theme(theme: nil)
-            request_params = { theme: theme }
+          def import_theme(theme)
+            request_params = { theme: }
             post(THEME_IMPORT_PATH, request_params)
           end
         end
