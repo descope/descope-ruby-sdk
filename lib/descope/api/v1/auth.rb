@@ -80,7 +80,7 @@ module Descope
                                   jwt_response.fetch('permissions', [])
                                 else
                                   # ensure that the tenant is associated with the jwt_response
-                                  puts "tenant associated jwt: #{jwt_response['tenants']&.key?(tenant)}"
+                                  logger.debug "tenant associated jwt: #{jwt_response['tenants']&.key?(tenant)}"
                                   return false unless jwt_response['tenants'].key?(tenant)
 
                                   # dig is a method in Ruby for safely navigating nested data structures like hashes
@@ -89,10 +89,10 @@ module Descope
                                   tenant_permission = jwt_response.dig('tenants', tenant, 'permissions') || []
                                   tenant_permission = [] if tenant_permission.nil?
                                   if tenant_permission.is_a?(String)
-                                    puts "tenant_permission string: #{tenant_permission}"
+                                    logger.debug "tenant_permission string: #{tenant_permission}"
                                     [tenant_permission]
                                   else
-                                    puts "tenant_permission array: #{tenant_permission}"
+                                    logger.debug "tenant_permission array: #{tenant_permission}"
                                     tenant_permission
                                   end
                                 end

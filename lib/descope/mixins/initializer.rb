@@ -15,6 +15,10 @@ module Descope
         @project_id = options[:project_id] || ENV['DESCOPE_PROJECT_ID'] || ''
         @public_key = options[:public_key] || ENV['DESCOPE_PUBLIC_KEY']
         @mlock = Mutex.new
+        log_level = options[:log_level] || ENV['DESCOPE_LOG_LEVEL'] || 'info'
+        @logger ||= Descope::Mixins::Logging.logger_for(self.class.name, log_level)
+
+        logger.info("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
 
         if @public_key.nil?
           @public_keys = {}

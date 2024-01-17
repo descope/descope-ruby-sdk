@@ -31,8 +31,8 @@ describe Descope::Client do
   describe 'V1 client with token' do
     let(:subject) do
       Descope::Client.new(
-        project_id: project_id,
-        management_key: management_key
+        project_id:,
+        management_key:
       )
     end
     it_should_behave_like 'v1 API client'
