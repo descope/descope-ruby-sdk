@@ -33,6 +33,7 @@ module Descope
           end
 
           jwt_response = generate_auth_info(response_body, refresh_cookie, true, audience)
+          logger.debug "jwt_response: #{jwt_response}"
           jwt_response['user'] = response_body.key?('user') ? response_body['user'] : {}
           jwt_response['firstSeen'] = response_body.key?('firstSeen') ? response_body['firstSeen'] : true
 
@@ -46,6 +47,7 @@ module Descope
         def select_tenant(tenant_id: nil, refresh_token: nil)
           validate_refresh_token_not_nil(refresh_token)
           res = post(SELECT_TENANT_PATH, { tenantId: tenant_id }, {}, refresh_token)
+          logger.debug "select_tenant response: #{res}"
           generate_jwt_response(
             response_body: res,
             refresh_cookie: res['refreshJwt']
@@ -112,6 +114,7 @@ module Descope
         def validate_tenant_roles(jwt_response: nil, tenant: nil, roles: nil)
           # Validate that a jwt_response has been granted the specified roles on the specified tenant.
           # For a multi-tenant environment use validate_tenant_roles function
+          logger.debug "Validate_tenant_roles: #{jwt_response}, #{tenant}, #{roles}"
           if roles.is_a?(String)
             roles = [roles]
           else
@@ -144,8 +147,10 @@ module Descope
                             end
                           end
 
+          logger.debug "granted_roles: #{granted_roles}"
           # Validate all roles are granted
           roles.all? do |role|
+            logger.debug "granted_roles.include?(#{role}): #{granted_roles.include?(role)}"
             granted_roles.include?(role)
           end
         end
@@ -153,6 +158,7 @@ module Descope
         private
 
         def generate_auth_info(response_body, refresh_token, user_jwt, audience = nil)
+          logger.debug "generating auth info: #{response_body}, #{refresh_token}, #{user_jwt}, #{audience}"
           jwt_response = {}
 
           # validate the session token if sessionJwt is not empty
@@ -217,25 +223,31 @@ module Descope
         end
 
         def validate_token(token, _audience = nil)
+          logger.debug "validating token: #{token}"
           raise AuthException.new('Token validation received empty token', code: 500) if token.nil? || token.to_s.empty?
 
           unverified_header = jwt_get_unverified_header(token)
+          logger.debug "unverified_header: #{unverified_header}"
           alg_header = unverified_header[ALGORITHM_KEY]
+          logger.debug "alg_header: #{alg_header}"
 
           if alg_header.nil? || alg_header == 'none'
             raise AuthException.new('Token header is missing property: alg', code: 500)
           end
 
           kid = unverified_header['kid']
+          logger.debug "kid: #{kid}"
           raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
 
           found_key = nil
           @mlock.synchronize do
             if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
+              logger.debug 'fetching public keys'
               # fetch keys from /v2/keys and set them in @public_keys
               fetch_public_keys
             end
             found_key = @public_keys[kid]
+            logger.debug "found_key: #{found_key}"
             raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
           end
 
