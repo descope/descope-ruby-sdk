@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  checkstyle_job:
+    runs-on: ubuntu-latest
+    name: Checkstyle
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run check style
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: "github-pr-check"
+          tool_name: "testtool"
+          checkstyle_config: "checkstyle.xml"
+          level: error
+          fail_on_error: true
+
+  build:
+    name: Build Ruby SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+      - name: Run RSpec Test
+        run: bundle exec rspec
+
+  build-gem:
+    name: Build Ruby Gem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+      - run:  gem build descope.gemspec && gem install ./descope-*.gem
