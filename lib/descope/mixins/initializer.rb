@@ -18,7 +18,7 @@ module Descope
         log_level = options[:log_level] || ENV['DESCOPE_LOG_LEVEL'] || 'info'
         @logger ||= Descope::Mixins::Logging.logger_for(self.class.name, log_level)
 
-        logger.info("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
+        logger.debug("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
 
         if @public_key.nil?
           @public_keys = {}

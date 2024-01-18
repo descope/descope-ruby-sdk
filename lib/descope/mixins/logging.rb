@@ -19,7 +19,7 @@ module Descope
         end
 
         def configure_logger_for(classname, level = 'info')
-          logger = Logger.new(STDOUT                                                                             )
+          logger = Logger.new(STDOUT)
           logger.level = Object.const_get("Logger::#{level.upcase}")
           logger.progname = classname
           logger

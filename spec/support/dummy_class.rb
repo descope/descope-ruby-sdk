@@ -28,7 +28,6 @@ class DummyClass
   %i[get post post_file post_form put patch delete delete_with_body].each do |method|
     define_method(method) do |uri, body = {}, extra_headers = {}, pswd = nil|
       body = body.delete_if { |_, v| v.nil? }
-      logger.info "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
       authorization_header(pswd) unless pswd.nil? || pswd.empty?
       {}
     end

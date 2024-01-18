@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    descope (0.0.1)
+    descope (1.0.0)
       addressable (~> 2.8)
       jwt (~> 2.7)
       rest-client (~> 2.1)
@@ -167,6 +167,8 @@ GEM
 PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
+  x86_64-darwin-23
+  x86_64-linux
 
 DEPENDENCIES
   bundler
