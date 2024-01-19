@@ -41,7 +41,7 @@ module Descope
         {
           tries: tries,
           sleep: sleep_timer,
-          on: Descope::RateLimitEncountered
+          on: Descope::RateLimitException
         }
       end
 
@@ -99,7 +99,7 @@ module Descope
         when 403       then raise Descope::AccessDenied.new(result.body, code: result.code, headers: result.headers)
         when 404       then raise Descope::NotFound.new(result.body, code: result.code, headers: result.headers)
         when 405       then raise Descope::MethodNotAllowed.new(result.body, code: result.code, headers: result.headers)
-        when 429       then raise Descope::RateLimitEncountered.new(result.body, code: result.code,
+        when 429       then raise Descope::RateLimitException.new(result.body, code: result.code,
                                                                                headers: result.headers)
         when 500       then raise Descope::ServerError.new(result.body, code: result.code, headers: result.headers)
         else           raise Descope::Unsupported.new(result.body, code: result.code, headers: result.headers)
