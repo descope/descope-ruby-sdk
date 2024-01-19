@@ -155,6 +155,65 @@ module Descope
           end
         end
 
+        def validate_token(token, _audience = nil)
+          logger.debug "validating token: #{token}"
+          raise AuthException.new('Token validation received empty token', code: 500) if token.nil? || token.to_s.empty?
+
+          unverified_header = jwt_get_unverified_header(token)
+          logger.debug "unverified_header: #{unverified_header}"
+          alg_header = unverified_header[ALGORITHM_KEY]
+          logger.debug "alg_header: #{alg_header}"
+
+          if alg_header.nil? || alg_header == 'none'
+            raise AuthException.new('Token header is missing property: alg', code: 500)
+          end
+
+          kid = unverified_header['kid']
+          logger.debug "kid: #{kid}"
+          raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
+
+          found_key = nil
+          @mlock.synchronize do
+            if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
+              logger.debug 'fetching public keys'
+              # fetch keys from /v2/keys and set them in @public_keys
+              fetch_public_keys
+            end
+
+            found_key = @public_keys[kid]
+            logger.debug "found_key: #{found_key}"
+            raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
+          end
+
+          # save reference to the found key
+          # (as another thread can change the self.public_keys hash)
+          logger.debug 'checking if alg_header matches alg_from_key'
+          alg_from_key = found_key[1]
+          if alg_header != alg_from_key
+            raise AuthException.new(
+              'Algorithm signature in JWT header does not match the algorithm signature in the Public key.',
+              code: 500
+            )
+          end
+
+          begin
+            logger.debug 'decoding token'
+            claims = JWT.decode(
+              token,
+              found_key[0].public_key,
+              true,
+              { algorithm: alg_header, exp_leeway: @jwt_validation_leeway }
+            )[0] # the payload is the first index in the decoded array
+          rescue JWT::ExpiredSignature => e
+            raise AuthException.new(
+              "Received Invalid token times error due to time glitch (between machines) during jwt validation, try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default: #{e.message}", code: 500
+            )
+          end
+          claims['jwt'] = token
+          logger.debug "claims: #{claims}"
+          claims
+        end
+
         private
 
         def generate_auth_info(response_body, refresh_token, user_jwt, audience = nil)
@@ -220,62 +279,6 @@ module Descope
           end
 
           jwt_response
-        end
-
-        def validate_token(token, _audience = nil)
-          logger.debug "validating token: #{token}"
-          raise AuthException.new('Token validation received empty token', code: 500) if token.nil? || token.to_s.empty?
-
-          unverified_header = jwt_get_unverified_header(token)
-          logger.debug "unverified_header: #{unverified_header}"
-          alg_header = unverified_header[ALGORITHM_KEY]
-          logger.debug "alg_header: #{alg_header}"
-
-          if alg_header.nil? || alg_header == 'none'
-            raise AuthException.new('Token header is missing property: alg', code: 500)
-          end
-
-          kid = unverified_header['kid']
-          logger.debug "kid: #{kid}"
-          raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
-
-          found_key = nil
-          @mlock.synchronize do
-            if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
-              logger.debug 'fetching public keys'
-              # fetch keys from /v2/keys and set them in @public_keys
-              fetch_public_keys
-            end
-            found_key = @public_keys[kid]
-            logger.debug "found_key: #{found_key}"
-            raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
-          end
-
-          # save reference to the found key
-          # (as another thread can change the self.public_keys hash)
-          alg_from_key = found_key[1]
-          if alg_header != alg_from_key
-            raise AuthException.new(
-              'Algorithm signature in JWT header does not match the algorithm signature in the Public key.',
-              code: 500
-            )
-          end
-
-          begin
-            claims = JWT.decode(
-              token,
-              found_key[0].public_key,
-              true,
-              { algorithm: alg_header, exp_leeway: @jwt_validation_leeway }
-            )[0] # the payload is the first index in the decoded array
-          rescue JWT::ExpiredSignature => e
-            raise AuthException.new(
-              "Received Invalid token times error due to time glitch (between machines) during jwt validation, try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default: #{e.message}", code: 500
-            )
-          end
-
-          claims['jwt'] = token
-          claims
         end
 
         def jwt_get_unverified_header(token)

@@ -1,0 +1,40 @@
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons';
+
+.bg_primary-color {
+  background-color: #121217;
+}
+.primary-color {
+  background-color: #121217;
+  //width: 100%;
+  //height: 100%;
+  //background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTciIHZpZXdCb3g9IjAgMCAxOCAxNyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNy43IDE2LjdIMTcuNEMxNy4zIDE2LjcgMTcuMiAxNi42IDE3LjIgMTYuNUMxNy4yIDE2LjQgMTcuMyAxNi4zIDE3LjQgMTYuM0gxNy43QzE3LjggMTYuMyAxNy45IDE2LjQgMTcuOSAxNi41QzE3Ljg2MTggMTYuNTM4MiAxNy44MzgyIDE2LjU3NjQgMTcuODE4IDE2LjYwOUMxNy43ODU0IDE2LjY2MTggMTcuNzYxOCAxNi43IDE3LjcgMTYuN1pNMC41IDE2LjdIMC4yQzAuMSAxNi43IDAgMTYuNiAwIDE2LjVDMCAxNi40IDAuMSAxNi4zIDAuMiAxNi4zSDAuNUMwLjYgMTYuMyAwLjcgMTYuNCAwLjcgMTYuNUMwLjcgMTYuNiAwLjYgMTYuNyAwLjUgMTYuN1pNMTcuNyAwLjM5OTk5NEgxNy40QzE3LjMgMC4zOTk5OTQgMTcuMiAwLjI5OTk5NyAxNy4yIDAuMTk5OTk3QzE3LjIgMC4wOTk5OTY5IDE3LjMgMCAxNy40IDBIMTcuN0MxNy44IDAgMTcuOSAwLjA5OTk5NjkgMTcuOSAwLjE5OTk5N0MxNy45IDAuMjk5OTk3IDE3LjggMC4zOTk5OTQgMTcuNyAwLjM5OTk5NFpNMC41IDAuMzk5OTk0SDAuMkMwLjEgMC4zOTk5OTQgMCAwLjI5OTk5NyAwIDAuMTk5OTk3QzAgMC4wOTk5OTY5IDAuMSAwIDAuMiAwSDAuNUMwLjYgMCAwLjcgMC4wOTk5OTY5IDAuNyAwLjE5OTk5N0MwLjcgMC4yOTk5OTcgMC42IDAuMzk5OTk0IDAuNSAwLjM5OTk5NFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=);
+  //background-repeat: repeat;
+  //opacity: 0.25;
+}
+.bg_secondary-color {
+  background-color: #293241;
+}
+.secondary-color {
+  color: #0ed8d2;
+}
+.custom-button.btn {
+  background-color: #293241;
+  color: #0ed8d2;
+  border: none;
+}
+.hero {
+  width: 100vw;
+  height: 50vh;
+}
+.hero img {
+  object-fit: cover;
+  object-position: top;
+  height: 100%;
+  width: 100%;
+}
+.overlay {
+  height: 100%;
+  width: 100%;
+  opacity: 0.4;
+}
