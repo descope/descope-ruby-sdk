@@ -1,5 +1,5 @@
 PATH
-  remote: ../..
+  remote: ../../../..
   specs:
     descope (1.0.0)
       addressable (~> 2.8)
