@@ -38,6 +38,10 @@ module Descope
         name
       end
 
+      def deep_copy(obj)
+        Marshal.load(Marshal.dump(obj))
+      end
+
       module EndpointsV1
         REFRESH_TOKEN_PATH = '/v1/auth/refresh'
         SELECT_TENANT_PATH = '/v1/auth/tenant/select'

@@ -31,6 +31,9 @@ describe Descope::Api::V1::Session do
     end
 
     it 'is expected to post refresh session' do
+      jwt_response = { 'fake': 'response' }
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+
       expect(@instance).to receive(:post).with(REFRESH_TOKEN_PATH, {}, {}, 'refresh_token')
       allow(@instance).to receive(:validate_token).with('refresh_token', nil).and_return({})
       expect { @instance.refresh_session(refresh_token: 'refresh_token') }.not_to raise_error
@@ -78,11 +81,20 @@ describe Descope::Api::V1::Session do
       expect(@instance).to respond_to(:validate_session)
     end
 
-    it 'is expected to post validate session' do
-      expect(@instance).to receive(:post).with(VALIDATE_SESSION_PATH, {}, {}, nil)
-
-      expect { @instance.validate_session }.not_to raise_error
+    it 'is expected to raise error if session token is nil' do
+      expect { @instance.validate_session }.to raise_error(
+        Descope::AuthException,
+        'Session token is required for validation'
+      )
     end
+
+    it 'is expected to raise error if session token is empty' do
+      expect { @instance.validate_session(session_token: '') }.to raise_error(
+        Descope::AuthException,
+        'Session token is required for validation'
+      )
+    end
+
   end
 
   context '.validate_and_refresh_session' do
@@ -90,18 +102,16 @@ describe Descope::Api::V1::Session do
       expect(@instance).to respond_to(:validate_and_refresh_session)
     end
 
-    it 'is expected to post validate and refresh session' do
-      expect(@instance).to receive(:validate_session).with('refresh_token')
-      expect(@instance).to receive(:refresh_session).with(refresh_token: 'refresh_token', audience: nil)
-
-      expect { @instance.validate_and_refresh_session(refresh_token: 'refresh_token') }.not_to raise_error
-    end
-
-    it 'is expected to raise error if neither session_token nor refresh_token is provided' do
-      expect { @instance.validate_and_refresh_session }.to raise_error(
+    it 'is expected to try and validate session or refresh session' do
+      expect { @instance.validate_and_refresh_session(session_token: 'invalid_session_token') }.to raise_error(
         Descope::AuthException,
-        'Either session_token or refresh_token must be provided'
+        'Refresh token is required to refresh a session'
       )
+      allow(@instance).to receive(:validate_session).with(session_token: 'session_token', audience: nil).and_raise(Descope::AuthException).and_return({})
+      jwt_response = { 'fake': 'response' }
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+      allow(@instance).to receive(:refresh_session).and_return({})
+      expect { @instance.validate_and_refresh_session(session_token: 'session_token', refresh_token: 'refresh_token') }.to_not raise_error
     end
   end
 end
