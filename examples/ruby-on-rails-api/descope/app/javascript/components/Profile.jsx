@@ -61,15 +61,15 @@ function Profile() {
                         <p>Secret Message: <span style={{ padding: "5px 10px", color: "white", backgroundColor: "black" }}>{secret.secret}</span></p>
                         <p>Your Role(s): </p>
                         {!secret.roles || secret.roles.length === 0 ?
-                            <p><span style={{ color: "green" }}>No role found!</span></p>
+                            <p><span style={{ color: "green", fontWeight: "bold"}}>No role found!</span></p>
                             :
                             secret.roles.map((role, i) => (
-                                <p key={i}><span style={{ color: "green" }}>{role}</span></p>
+                                <p key={i}><span style={{ color: "green", fontWeight: "bold" }}>{role}</span></p>
                             ))
                         }
                         <Link className='link btn' to="/">Home</Link>
                         <Link className='link btn' to="/dashboard">Dashboard</Link>
-                        <button className='btn' onClick={logoutUser}>Logout</button>
+                        <button className='btn logout' onClick={logoutUser}>Logout</button>
                     </div>
                 </div>
             )}
