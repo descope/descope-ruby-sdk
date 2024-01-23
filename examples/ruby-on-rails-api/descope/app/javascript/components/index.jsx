@@ -4,7 +4,6 @@ import App from "./App";
 import reportWebVitals from '../reportWebVitals';
 import { AuthProvider } from '@descope/react-sdk'
 import '../App.css';
-import { REACT_APP_PROJECT_ID } from 'env';
 
 
 document.addEventListener("turbo:load", () => {
@@ -13,7 +12,7 @@ document.addEventListener("turbo:load", () => {
 
     root.render(
         <React.StrictMode>
-            <AuthProvider projectId={REACT_APP_PROJECT_ID}>
+            <AuthProvider projectId={process.env.REACT_APP_PROJECT_ID}>
                 <App />
             </AuthProvider>
         </React.StrictMode>
