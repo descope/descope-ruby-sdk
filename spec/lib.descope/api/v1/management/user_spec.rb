@@ -241,10 +241,14 @@ describe Descope::Api::V1::Management::User do
 
       expect(@instance).to receive(:post).with(
         USERS_SEARCH_PATH, {
+          loginId: 'someone@example.com',
           tenantIds: [],
           roleNames: [],
           limit: 10,
           page: 1,
+          ssoAppIds: [],
+          ssoOnly: false,
+          text: 'some text',
           testUsersOnly: false,
           withTestUser: false
         }
@@ -252,10 +256,13 @@ describe Descope::Api::V1::Management::User do
 
       expect do
         @instance.search_all_users(
+          login_id: 'someone@example.com',
           tenant_ids: [],
           role_names: [],
+          text: 'some text',
           limit: 10,
           page: 1,
+          sso_app_ids: [],
           test_users_only: false,
           with_test_user: false
         )
