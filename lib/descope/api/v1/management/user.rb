@@ -10,7 +10,7 @@ module Descope
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
           # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.
           def create_user(**args)
-            logger.debug('Creating user...')
+            logger.debug("Creating user with args: #{args}")
             user_create(**args)
           end
 
@@ -254,23 +254,25 @@ module Descope
 
           # Updates an existing user's email, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserEmail/
-          def update_email(login_id: nil, new_email: nil)
+          def update_email(login_id: nil, email: nil, verified: true)
+            logger.debug("Updating user's email with login_id: #{login_id} to #{email} verified: #{verified}")
             path = Common::USER_UPDATE_EMAIL_PATH
             request_params = {
               loginId: login_id,
-              newEmail: new_email
+              email:,
+              verified:
             }
             post(path, request_params)
           end
 
           # Updates an existing user's phone number, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserPhone/
-          def update_phone(login_id: nil, phone: nil, verified: nil)
+          def update_phone(login_id: nil, phone: nil, verified: true)
             path = Common::USER_UPDATE_PHONE_PATH
             request_params = {
               loginId: login_id,
-              phone: phone,
-              verified: verified
+              phone:,
+              verified:
             }
             post(path, request_params)
           end
@@ -304,11 +306,12 @@ module Descope
 
           # Update an existing user's custom attributes, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserCustomAttribute/
-          def update_custom_attribute(login_id: nil, attribute_key: nil, attribute_val: nil)
+          def update_custom_attribute(login_id: nil, attribute_key: nil, attribute_value: nil)
+            logger.debug("Updating user's custom attribute with login_id: #{login_id} to #{attribute_key}: #{attribute_value}")
             body = {
               loginId: login_id,
               attributeKey: attribute_key,
-              attributeVal: attribute_val
+              attributeValue: attribute_value
             }
             post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
           end
@@ -545,7 +548,7 @@ module Descope
             verified_phone: nil,
             additional_login_ids: nil
           )
-            res = {
+            body = {
               loginId: login_id,
               email:,
               phone:,
@@ -558,12 +561,12 @@ module Descope
               customAttributes: custom_attributes,
               additionalLoginIds: additional_login_ids
             }
-            res[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
-            res[:givenName] = given_name unless given_name.nil?
-            res[:middleName] = middle_name unless middle_name.nil?
-            res[:familyName] = family_name unless family_name.nil?
-            res[:verifiedPhone] = verified_phone unless verified_phone.nil?
-            res
+            body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
+            body[:givenName] = given_name unless given_name.nil?
+            body[:middleName] = middle_name unless middle_name.nil?
+            body[:familyName] = family_name unless family_name.nil?
+            body[:verifiedPhone] = verified_phone unless verified_phone.nil?
+            body
           end
         end
       end

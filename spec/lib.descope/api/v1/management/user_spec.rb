@@ -331,14 +331,16 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_UPDATE_EMAIL_PATH, {
           loginId: 'someone@example.com',
-          newEmail: 'tester@test.com'
+          email: 'tester@test.com',
+          verified: true
         }
       )
 
       expect do
         @instance.update_email(
           login_id: 'someone@example.com',
-          new_email: 'tester@test.com'
+          email: 'tester@test.com',
+          verified: true
         )
       end.not_to raise_error
     end
@@ -420,7 +422,7 @@ describe Descope::Api::V1::Management::User do
         USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, {
           loginId: 'someone@example.com',
           attributeKey: 'OU',
-          attributeVal: 'Engineering'
+          attributeValue: 'Engineering'
         }
       )
 
@@ -428,7 +430,7 @@ describe Descope::Api::V1::Management::User do
         @instance.update_custom_attribute(
           login_id: 'someone@example.com',
           attribute_key: 'OU',
-          attribute_val: 'Engineering'
+          attribute_value: 'Engineering'
         )
       end.not_to raise_error
     end
