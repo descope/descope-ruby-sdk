@@ -5,9 +5,10 @@ module Configuration
 
   def config
     {
-      base_uri: ENV.fetch('DESCOPE_BASE_URI', 'DESCOPE_BASE_URI'),
-      project_id: ENV.fetch('DESCOPE_PROJECT_ID', 'DESCOPE_PROJECT_ID'),
-      management_key: ENV.fetch('DESCOPE_MANAGEMENT_KEY', 'DESCOPE_MANAGEMENT_KEY')
+      base_uri: ENV.fetch('DESCOPE_BASE_URI', nil),
+      project_id: ENV.fetch('DESCOPE_PROJECT_ID', nil),
+      management_key: ENV.fetch('DESCOPE_MANAGEMENT_KEY', nil),
+      log_level: ENV.fetch('DESCOPE_LOG_LEVEL', 'info')
     }
   end
 end

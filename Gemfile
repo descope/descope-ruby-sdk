@@ -14,8 +14,8 @@ group :test do
   gem 'vcr', require: false
   gem 'simplecov-cobertura'
   gem 'timecop', require: false
-  gem 'pp'
   gem 'rack-test', require: false
   gem 'dotenv', require: false
-  gem "super_diff", require: false
+  gem 'super_diff', require: false
+  gem 'factory_bot', require: 'false'
 end

@@ -10,7 +10,8 @@ module Descope
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
           # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.
           def create_user(**args)
-            create(**args)
+            logger.debug('Creating user...')
+            user_create(**args)
           end
 
           # Batch Create Users, using a valid management key.
@@ -18,7 +19,7 @@ module Descope
           def create_batch_users(users: [])
             users_params = []
             users.each do |user|
-              users_params.append(create(**user.merge(skip_create: true)))
+              users_params.append(user_create(**user.merge(skip_create: true)))
             end
             path = Common::USER_CREATE_BATCH_PATH
             request_params = {
@@ -39,7 +40,7 @@ module Descope
           # 5. Delete Test Users
           def create_test_user(**args)
             args[:test] = true
-            create(**args)
+            user_create(**args)
           end
 
           # Create a new user and invite them via an email message.
@@ -53,7 +54,7 @@ module Descope
           #             calling the method.
           def invite_user(**args)
             args[:invite] = true
-            create(**args)
+            user_create(**args)
           end
 
           # Updates a user's details, using a valid management key.
@@ -77,7 +78,7 @@ module Descope
             role_names ||= []
             user_tenants ||= []
             path = Common::USER_UPDATE_PATH
-            request_params = compose_update_body(
+            request_params = user_compose_update_body(
               login_id: login_id,
               email: email,
               phone: phone,
@@ -115,6 +116,7 @@ module Descope
           # Load a user's data, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/LoadUser/
           def load_user(login_id)
+            logger.debug("Loading user with login_id: #{login_id}")
             # Retrieve user information based on the provided Login ID
             validate_login_id(login_id)
 
@@ -162,30 +164,46 @@ module Descope
           # Search for users, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/SearchUsers/
           def search_all_users(
+            login_id: nil,
             tenant_ids: [],
             role_names: [],
+            text: nil,
             limit: 0,
             page: 0,
+            sso_only: false,
             test_users_only: false,
             with_test_user: false,
             custom_attributes: {},
             statuses: [],
             emails: [],
-            phones: []
+            phones: [],
+            sso_app_ids: []
           )
             body = {
+              loginId: login_id,
               tenantIds: tenant_ids,
               roleNames: role_names,
-              limit: limit,
-              page: page,
+              ssoOnly: sso_only,
+              limit:,
+              page:,
+              text:,
               testUsersOnly: test_users_only,
               withTestUser: with_test_user,
+              ssoAppIds: sso_app_ids,
             }
             body[:statuses] = statuses unless statuses.empty?
             body[:emails] = emails unless emails.empty?
             body[:phones] = phones unless phones.empty?
             body[:customAttributes] = custom_attributes unless custom_attributes.empty?
-
+            body[:limit] = limit unless limit.zero?
+            body[:page] = page unless page.zero?
+            body[:text] = text unless text.nil?
+            body[:testUsersOnly] = test_users_only unless test_users_only.nil?
+            body[:withTestUser] = with_test_user unless with_test_user.nil?
+            body[:ssoOnly] = sso_only unless sso_only.nil?
+            body[:ssoAppIds] = sso_app_ids unless sso_app_ids.empty?
+            body[:tenantIds] = tenant_ids unless tenant_ids.empty?
+            body[:roleNames] = role_names unless role_names.empty?
             post(Common::USERS_SEARCH_PATH, body)
           end
 
@@ -357,7 +375,7 @@ module Descope
           def set_password(login_id: nil, password: nil)
             body = {
               loginId: login_id,
-              password: password
+              password:
             }
             post(Common::USER_SET_PASSWORD_PATH, body)
           end
@@ -414,7 +432,7 @@ module Descope
 
           private
 
-          def create(
+          def user_create(
             login_id: nil,
             email: nil,
             phone: nil,
@@ -437,33 +455,33 @@ module Descope
             role_names ||= []
             user_tenants ||= []
             path = Common::USER_CREATE_PATH
-            request_params = compose_create_body(
-              login_id: login_id,
-              email: email,
-              phone: phone,
-              display_name: display_name,
-              given_name: given_name,
-              middle_name: middle_name,
-              family_name: family_name,
-              role_names: role_names,
-              user_tenants: user_tenants,
-              invite: invite,
-              test: test,
-              picture: picture,
-              custom_attributes: custom_attributes,
-              verified_email: verified_email,
-              verified_phone: verified_phone,
-              invite_url: invite_url,
+            request_params = user_compose_create_body(
+              login_id:,
+              email:,
+              phone:,
+              display_name:,
+              given_name:,
+              middle_name:,
+              family_name:,
+              role_names:,
+              user_tenants:,
+              invite:,
+              test:,
+              picture:,
+              custom_attributes:,
+              verified_email:,
+              verified_phone:,
+              invite_url:,
               send_mail: nil,
               send_sms: nil,
-              additional_login_ids: additional_login_ids,
+              additional_login_ids:
             )
             return request_params if skip_create
 
             post(path, request_params)
           end
 
-          def compose_create_body(
+          def user_compose_create_body(
             login_id: nil,
             email: nil,
             phone: nil,
@@ -484,21 +502,21 @@ module Descope
             send_sms: nil,
             additional_login_ids: nil
           )
-            body = compose_update_body(
-              login_id: login_id,
-              email: email,
-              phone: phone,
-              display_name: display_name,
-              given_name: given_name,
-              middle_name: middle_name,
-              family_name: family_name,
-              role_names: role_names,
-              user_tenants: user_tenants,
-              test: test,
-              invite: invite,
-              picture: picture,
-              custom_attributes: custom_attributes,
-              additional_login_ids: additional_login_ids
+            body = user_compose_update_body(
+              login_id:,
+              email:,
+              phone:,
+              display_name:,
+              given_name:,
+              middle_name:,
+              family_name:,
+              role_names:,
+              user_tenants:,
+              test:,
+              invite:,
+              picture:,
+              custom_attributes:,
+              additional_login_ids:
             )
             body[:invite] = invite
             body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
@@ -509,7 +527,7 @@ module Descope
             body
           end
 
-          def compose_update_body(
+          def user_compose_update_body(
             login_id: nil,
             email: nil,
             phone: nil,
@@ -529,14 +547,14 @@ module Descope
           )
             res = {
               loginId: login_id,
-              email: email,
-              phone: phone,
+              email:,
+              phone:,
               displayName: display_name,
               roleNames: role_names,
               userTenants: associated_tenants_to_hash_array(user_tenants),
-              test: test,
-              invite: invite,
-              picture: picture,
+              test:,
+              invite:,
+              picture:,
               customAttributes: custom_attributes,
               additionalLoginIds: additional_login_ids
             }

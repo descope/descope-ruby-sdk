@@ -6,6 +6,7 @@ require 'openssl'
 require 'base64'
 require 'descope'
 require 'super_diff/rspec'
+require 'factory_bot'
 
 if RUBY_VERSION >= '2.7.2'
   # NOTE: https://bugs.ruby-lang.org/issues/17000
@@ -47,6 +48,11 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.max_formatted_output_length = 1000000
+  end
+
+  config.include FactoryBot::Syntax::Methods
+  config.before(:suite) do
+    FactoryBot.find_definitions
   end
 end
 

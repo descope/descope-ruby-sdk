@@ -1,5 +1,5 @@
 Metrics/MethodLength:
-  Max: 15
+  Enabled: false
 Metrics/BlockLength:
   Enabled: false
 Metrics/LineLength:

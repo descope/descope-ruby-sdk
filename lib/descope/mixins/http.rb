@@ -2,7 +2,6 @@
 require "addressable/uri"
 require 'retryable'
 require_relative '../exception'
-require 'pp'
 
 module Descope
   module Mixins
