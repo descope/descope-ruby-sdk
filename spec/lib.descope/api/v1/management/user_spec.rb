@@ -95,7 +95,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.create_batch_users(users: users_input)
+        @instance.create_batch_users(users_input)
       end.not_to raise_error
     end
   end

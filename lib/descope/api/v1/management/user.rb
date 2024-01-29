@@ -16,7 +16,7 @@ module Descope
 
           # Batch Create Users, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUsers/
-          def create_batch_users(users: [])
+          def create_batch_users(users = [])
             users_params = []
             users.each do |user|
               users_params.append(user_create(**user.merge(skip_create: true)))
@@ -79,20 +79,20 @@ module Descope
             user_tenants ||= []
             path = Common::USER_UPDATE_PATH
             request_params = user_compose_update_body(
-              login_id: login_id,
-              email: email,
-              phone: phone,
-              display_name: display_name,
-              given_name: given_name,
-              middle_name: middle_name,
-              family_name: family_name,
-              role_names: role_names,
-              user_tenants: user_tenants,
-              picture: picture,
-              custom_attributes: custom_attributes,
-              verified_email: verified_email,
-              verified_phone: verified_phone,
-              additional_login_ids: additional_login_ids,
+              login_id:,
+              email:,
+              phone:,
+              display_name:,
+              given_name:,
+              middle_name:,
+              family_name:,
+              role_names:,
+              user_tenants:,
+              picture:,
+              custom_attributes:,
+              verified_email:,
+              verified_phone:,
+              additional_login_ids:
             )
             post(path, request_params)
           end

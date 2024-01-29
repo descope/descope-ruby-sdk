@@ -7,7 +7,7 @@ FactoryBot.define do
 
     login_id { Faker::Internet.username }
     email { Faker::Internet.email }
-    phone { Faker::PhoneNumber.cell_phone_with_country_code }
+    phone { "+1#{Faker::Number.number(digits: 10)}" }
     display_name { Faker::Name.name }
     given_name { Faker::Name.first_name }
     middle_name { 'Ruby SDK User' }
