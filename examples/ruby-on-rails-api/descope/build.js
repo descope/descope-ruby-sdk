@@ -1,15 +1,11 @@
 const build = require('esbuild')
 const chokidar = require('chokidar');
-const envFilePlugin = require('esbuild-envfile-plugin');
 const dotenv = require('dotenv');
 const envFile = '.env';
 dotenv.config({ path: envFile })
 
 const buildOptions = {
-    define: {
-      'proces.env.REACT_APP_PROJECT_ID': `${process.env.REACT_APP_PROJECT_ID}`,
-    },
-    entryPoints: ['app/javascript/*.*'],
+    entryPoints: ['app/javascript/**/*.js', "app/javascript/**/*.jsx"],
     outdir: 'app/assets/builds',
     bundle: true,
     sourcemap: true,
@@ -18,7 +14,9 @@ const buildOptions = {
     loader: {
         '.js': 'jsx',
     },
-    plugins: [envFilePlugin]
+    define: {
+        'process.env.REACT_APP_PROJECT_ID': `"${process.env.REACT_APP_PROJECT_ID}"`,
+    }
 }
 
 chokidar.watch('app/javascript/**/*').on('change', async () => {

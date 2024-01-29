@@ -5,7 +5,6 @@ import reportWebVitals from '../reportWebVitals';
 import { AuthProvider } from '@descope/react-sdk'
 import '../App.css';
 
-
 document.addEventListener("turbo:load", () => {
     document.body.innerHTML = '<div id="root"></div>';
     const root = ReactDOM.createRoot(document.getElementById("root"));
