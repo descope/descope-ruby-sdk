@@ -176,4 +176,36 @@ describe Descope::Api::V1::Management::User do
       expect(e.message).to match(/"errorMessage":"Password expired"/)
     end
   end
+
+  it 'should set user password' do
+    user_args = build(:user)
+    password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+    user = @client.create_user(**user_args, password:)['user']
+    @client.password_sign_in(login_id: user['loginIds'][0], password:)
+
+    begin
+      new_password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+      @client.set_password(login_id: user['loginIds'][0], password: new_password)
+      @client.password_sign_in(login_id: user['loginIds'][0], password:)
+    rescue Descope::ServerError => e
+      expect(e.message).to match(/"errorMessage":"Password expired"/)
+    end
+  end
+
+  it 'should update create tenant, add to user, remove from user and delete tenant' do
+    res = @client.search_all_tenants(names: ['some-new-tenant'])
+    puts "res #{res}"
+    res['tenants'].each do |tenant|
+      puts "Deleting tenant #{tenant['id']}"
+      @client.delete_tenant(tenant['id'])
+    end
+    tenant_id = @client.create_tenant(name: 'some-new-tenant')['id']
+    user_args = build(:user)
+    user = @client.create_user(**user_args)['user']
+    @client.add_tenant(login_id: user['loginIds'][0], tenant_id:)
+    loaded_user = @client.load_user(user['loginIds'][0])['user']
+    expect(loaded_user['userTenants'][0]['tenantId']).to eq(tenant_id)
+    @client.remove_tenant(login_id: user['loginIds'][0], tenant_id:)
+    @client.delete_tenant(tenant_id)
+  end
 end

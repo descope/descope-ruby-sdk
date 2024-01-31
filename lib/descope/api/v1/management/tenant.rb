@@ -14,8 +14,8 @@ module Descope
             # @see https://docs.descope.com/api/openapi/tenantmanagement/operation/CreateTenant/
 
             self_provisioning_domains ||= []
-            custom_attributes ||= []
-            post(TENANT_CREATE_PATH, compose_create_update_body(name, id, self_provisioning_domains, custom_attributes))
+            custom_attributes ||= {}
+            post(TENANT_CREATE_PATH, compose_tenant_create_update_body(name, id, self_provisioning_domains, custom_attributes))
           end
 
           def update_tenant(name: nil, id: nil, self_provisioning_domains: nil, custom_attributes: nil)
@@ -23,8 +23,8 @@ module Descope
             #  to the existing tenant. Empty fields will override populated fields. Use carefully.
             # @see https://docs.descope.com/api/openapi/tenantmanagement/operation/UpdateTenant/
             self_provisioning_domains ||= []
-            custom_attributes ||= []
-            post(TENANT_UPDATE_PATH, compose_create_update_body(name, id, self_provisioning_domains, custom_attributes))
+            custom_attributes ||= {}
+            post(TENANT_UPDATE_PATH, compose_tenant_create_update_body(name, id, self_provisioning_domains, custom_attributes))
           end
 
           def delete_tenant(id = nil)
@@ -45,24 +45,20 @@ module Descope
           def search_all_tenants(ids: nil, names: nil, self_provisioning_domains: nil, custom_attributes: nil)
             # Search all tenants.
             request_params = {
-              ids: ids,
-              names: names,
+              ids:,
+              names:,
               selfProvisioningDomains: self_provisioning_domains,
               customAttributes: custom_attributes
             }
-            get(TENANT_SEARCH_ALL_PATH, request_params)
+            post(TENANT_SEARCH_ALL_PATH, request_params)
           end
 
           private
 
-          def compose_create_update_body(name, id, self_provisioning_domains, custom_attributes)
-            body = {
-              name: name,
-              id: id,
-              selfProvisioningDomains: self_provisioning_domains
-            }
-
-            body[:customAttributes] = custom_attributes unless custom_attributes.nil?
+          def compose_tenant_create_update_body(name, id, self_provisioning_domains, custom_attributes)
+            body = { name:, id: }
+            body[:selfProvisioningDomains] = self_provisioning_domains unless self_provisioning_domains.empty?
+            body[:customAttributes] = custom_attributes unless custom_attributes.empty?
 
             body
           end
