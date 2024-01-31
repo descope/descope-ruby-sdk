@@ -37,7 +37,9 @@ describe Descope::Api::V1::Management::User do
           test: false,
           picture: 'https://www.example.com/picture.png',
           customAttributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
-          additionalLoginIds: %w[id-1 id-2],
+          additionalIdentifiers: %w[id-1 id-2],
+          password: 's3cr3t',
+          ssoAppIds: %w[app1 app2],
           invite: false
         }
       )
@@ -53,7 +55,9 @@ describe Descope::Api::V1::Management::User do
           user_tenants: user_tenants_args,
           picture: 'https://www.example.com/picture.png',
           custom_attributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
-          additional_login_ids: %w[id-1 id-2]
+          additional_identifiers: %w[id-1 id-2],
+          password: 's3cr3t',
+          sso_app_ids: %w[app1 app2]
         )
       end.not_to raise_error
     end
@@ -76,17 +80,17 @@ describe Descope::Api::V1::Management::User do
           {
             loginId: 'first@mail.com', email: 'first@mail.com', phone: nil, displayName: nil,
             roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalLoginIds: nil
+            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
           },
           {
             loginId: 'second@mail.com', email: 'second@mail.com', phone: nil, displayName: nil,
             roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalLoginIds: nil
+            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
           },
           {
             loginId: 'third@mail.com', email: 'third@mail.com', phone: nil, displayName: nil,
             roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalLoginIds: nil
+            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
           }
         ]
       }
@@ -117,7 +121,8 @@ describe Descope::Api::V1::Management::User do
           test: false,
           picture: nil,
           customAttributes: nil,
-          additionalLoginIds: nil,
+          additionalIdentifiers: [],
+          ssoAppIds: [],
           invite: true
         }
       )
@@ -142,14 +147,15 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           givenName: 'mister',
-          phone: nil,
           displayName: 'something else',
+          phone: nil,
           roleNames: [],
           userTenants: [],
           test: false,
           picture: nil,
           customAttributes: nil,
-          additionalLoginIds: nil,
+          additionalIdentifiers: [],
+          ssoAppIds: [],
           invite: false
         }
       )

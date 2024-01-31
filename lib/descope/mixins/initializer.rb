@@ -18,8 +18,8 @@ module Descope
         log_level = options[:log_level] || ENV['DESCOPE_LOG_LEVEL'] || 'info'
         @logger ||= Descope::Mixins::Logging.logger_for(self.class.name, log_level)
 
-        logger.debug("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
-        logger.debug("Management Key ID: #{@management_key}")
+        @logger.debug("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
+        @logger.debug("Management Key ID: #{@management_key}")
 
         if @public_key.nil?
           @public_keys = {}
@@ -59,7 +59,7 @@ module Descope
 
       def authorization_header(pswd = nil)
         bearer = !pswd.nil? && !pswd.empty? ? "#{@project_id}:#{pswd}" : @project_id
-        logger.debug("setting bearer header #{bearer}")
+        @logger.debug("setting bearer header #{bearer}")
         add_headers('Authorization' => "Bearer #{bearer}")
       end
 

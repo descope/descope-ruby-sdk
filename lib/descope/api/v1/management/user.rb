@@ -10,7 +10,7 @@ module Descope
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
           # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.
           def create_user(**args)
-            logger.debug("Creating user with args: #{args}")
+            @logger.debug("Creating user with args: #{args}")
             user_create(**args)
           end
 
@@ -73,7 +73,10 @@ module Descope
             custom_attributes: nil,
             verified_email: nil,
             verified_phone: nil,
-            additional_login_ids: nil
+            additional_identifiers: [],
+            password: nil,
+            hashed_password: {},
+            sso_app_ids: []
           )
             role_names ||= []
             user_tenants ||= []
@@ -92,7 +95,10 @@ module Descope
               custom_attributes:,
               verified_email:,
               verified_phone:,
-              additional_login_ids:
+              additional_identifiers:,
+              password:,
+              hashed_password:,
+              sso_app_ids:
             )
             post(path, request_params)
           end
@@ -116,7 +122,7 @@ module Descope
           # Load a user's data, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/LoadUser/
           def load_user(login_id)
-            logger.debug("Loading user with login_id: #{login_id}")
+            @logger.debug("Loading user with login_id: #{login_id}")
             # Retrieve user information based on the provided Login ID
             validate_login_id(login_id)
 
@@ -255,7 +261,7 @@ module Descope
           # Updates an existing user's email, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserEmail/
           def update_email(login_id: nil, email: nil, verified: true)
-            logger.debug("Updating user's email with login_id: #{login_id} to #{email} verified: #{verified}")
+            @logger.debug("Updating user's email with login_id: #{login_id} to #{email} verified: #{verified}")
             path = Common::USER_UPDATE_EMAIL_PATH
             request_params = {
               loginId: login_id,
@@ -307,7 +313,7 @@ module Descope
           # Update an existing user's custom attributes, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserCustomAttribute/
           def update_custom_attribute(login_id: nil, attribute_key: nil, attribute_value: nil)
-            logger.debug("Updating user's custom attribute with login_id: #{login_id} to #{attribute_key}: #{attribute_value}")
+            @logger.debug("Updating user's custom attribute with login_id: #{login_id} to #{attribute_key}: #{attribute_value}")
             body = {
               loginId: login_id,
               attributeKey: attribute_key,
@@ -439,20 +445,25 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
+            verified_email: nil,
+            verified_phone: nil,
             display_name: nil,
+            role_names: [],
+            user_tenants: [],
+            invite: false,
+            test: false,
+            custom_attributes: nil,
+            picture: nil,
+            send_mail: nil,
+            send_sms: nil,
+            additional_identifiers: [],
+            invite_url: nil,
+            password: nil,
+            hashed_password: {},
             given_name: nil,
             middle_name: nil,
             family_name: nil,
-            role_names: [],
-            user_tenants: [],
-            picture: nil,
-            custom_attributes: nil,
-            verified_email: nil,
-            verified_phone: nil,
-            invite_url: nil,
-            test: false,
-            invite: false,
-            additional_login_ids: nil,
+            sso_app_ids: [],
             skip_create: false
           )
             role_names ||= []
@@ -475,9 +486,12 @@ module Descope
               verified_email:,
               verified_phone:,
               invite_url:,
-              send_mail: nil,
-              send_sms: nil,
-              additional_login_ids:
+              send_mail:,
+              send_sms:,
+              additional_identifiers:,
+              password:,
+              hashed_password:,
+              sso_app_ids:
             )
             return request_params if skip_create
 
@@ -503,7 +517,10 @@ module Descope
             invite_url: nil,
             send_mail: nil,
             send_sms: nil,
-            additional_login_ids: nil
+            additional_identifiers: [],
+            password: nil,
+            hashed_password: {},
+            sso_app_ids: []
           )
             body = user_compose_update_body(
               login_id:,
@@ -519,7 +536,10 @@ module Descope
               invite:,
               picture:,
               custom_attributes:,
-              additional_login_ids:
+              additional_identifiers:,
+              password:,
+              hashed_password:,
+              sso_app_ids:
             )
             body[:invite] = invite
             body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
@@ -527,6 +547,7 @@ module Descope
             body[:inviteUrl] = invite_url unless invite_url.nil? || !invite_url.empty?
             body[:sendMail] = send_mail unless send_mail.nil? || !send_mail.empty?
             body[:sendSMS] = send_sms unless send_sms.nil? || !send_sms.empty?
+
             body
           end
 
@@ -546,7 +567,10 @@ module Descope
             custom_attributes: nil,
             verified_email: nil,
             verified_phone: nil,
-            additional_login_ids: nil
+            additional_identifiers: [],
+            password: nil,
+            hashed_password: {},
+            sso_app_ids: []
           )
             body = {
               loginId: login_id,
@@ -559,9 +583,24 @@ module Descope
               invite:,
               picture:,
               customAttributes: custom_attributes,
-              additionalLoginIds: additional_login_ids
+              additionalIdentifiers: additional_identifiers,
+              ssoAppIds: sso_app_ids
             }
-            body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
+            if (hashed_password.nil? || hashed_password.empty?) && (!password.nil? && !password.empty?)
+              body[:password] = password
+            end
+
+            if password.nil? && (!hashed_password.nil? && !hashed_password.empty?)
+              unless hashed_password.is_a?(Hash)
+                raise Descope::ArgumentException.new(
+                  'Invalid password hash', code: 400
+                )
+              end
+
+              body[:hashedPassword] = hashed_password.to_hash
+            end
+
+            body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.to_s.empty?
             body[:givenName] = given_name unless given_name.nil?
             body[:middleName] = middle_name unless middle_name.nil?
             body[:familyName] = family_name unless family_name.nil?

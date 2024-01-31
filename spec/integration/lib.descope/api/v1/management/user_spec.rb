@@ -138,5 +138,42 @@ describe Descope::Api::V1::Management::User do
     expect(loaded_user['customAttributes']).to eq({ 'newUser' => true })
   end
 
-  
+  it 'should update display name' do
+    user_args = build(:user)
+    user = @client.create_user(**user_args)['user']
+    display_name = Faker::Name.name
+    @client.update_display_name(login_id: user['loginIds'][0], display_name:)
+    loaded_user = @client.load_user(user['loginIds'][0])['user']
+    expect(loaded_user['name']).to eq(display_name)
+  end
+
+  it 'should update user JWT and custom claims' do
+    user_args = build(:user)
+    password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+    custom_claims = { "custom-key1": 'custom-value1', "custom-key2": 'custom-value2' }
+    user = @client.create_user(**user_args, password:)['user']
+    jwt = @client.password_sign_in(login_id: user['loginIds'][0], password:)['refreshSessionToken']['jwt']
+    jwt_res = @client.update_jwt(jwt:, custom_claims: )
+    decoded_jwt = @client.validate_token(jwt_res['jwt'])
+
+    # check if all keys and values from custom_claims are present in decoded_jwt
+    claims_in_jwt = custom_claims.all? do |k, v|
+      decoded_jwt[k.to_s] == v
+    end
+
+    expect(claims_in_jwt).to be true
+  end
+
+  it 'should expire user password' do
+    user_args = build(:user)
+    password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+    user = @client.create_user(**user_args, password:)['user']
+    @client.password_sign_in(login_id: user['loginIds'][0], password:)
+    begin
+      @client.expire_password(user['loginIds'][0])
+      @client.password_sign_in(login_id: user['loginIds'][0], password:)
+    rescue Descope::ServerError => e
+      expect(e.message).to match(/"errorMessage":"Password expired"/)
+    end
+  end
 end

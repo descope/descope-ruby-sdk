@@ -21,7 +21,7 @@ module Descope
           body = body.delete_if { |_, v| v.nil? }
           authorization_header(pswd) unless pswd.nil? || pswd.empty?
 
-          logger.debug "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
+          @logger.debug "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
           request_with_retry(method, uri, body, extra_headers)
         end
       end
@@ -45,7 +45,7 @@ module Descope
       end
 
       def safe_parse_json(body)
-        logger.debug "response => #{JSON.parse(body.to_s)}"
+        @logger.debug "response => #{JSON.parse(body.to_s)}"
         JSON.parse(body.to_s)
       rescue JSON::ParserError
         body
@@ -54,7 +54,7 @@ module Descope
       def encode_uri(uri)
         # if a base_uri is set then the uri can be encoded as a path
         path = base_uri ? Addressable::URI.new(path: uri).normalized_path : Addressable::URI.escape(uri)
-        logger.debug "will call #{url(path)}"
+        @logger.debug "will call #{url(path)}"
         url(path)
       end
 
@@ -77,8 +77,8 @@ module Descope
 
       def request(method, uri, body = {}, extra_headers = {})
         # @headers is getting the authorization header merged in initializer.rb
-        logger.debug "base url: #{@base_uri}"
-        logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{@headers}"
+        @logger.debug "base url: #{@base_uri}"
+        @logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{@headers}"
         result = case method
                  when :get
                    get_headers = @headers.merge({ params: body }).merge(extra_headers)

@@ -33,7 +33,7 @@ module Descope
           end
 
           jwt_response = generate_auth_info(response_body, refresh_cookie, true, audience)
-          logger.debug "jwt_response: #{jwt_response}"
+          @logger.debug "jwt_response: #{jwt_response}"
           jwt_response['user'] = response_body.key?('user') ? response_body['user'] : {}
           jwt_response['firstSeen'] = response_body.key?('firstSeen') ? response_body['firstSeen'] : true
 
@@ -47,7 +47,7 @@ module Descope
         def select_tenant(tenant_id: nil, refresh_token: nil)
           validate_refresh_token_not_nil(refresh_token)
           res = post(SELECT_TENANT_PATH, { tenantId: tenant_id }, {}, refresh_token)
-          logger.debug "select_tenant response: #{res}"
+          @logger.debug "select_tenant response: #{res}"
           generate_jwt_response(
             response_body: res,
             refresh_cookie: res['refreshJwt']
@@ -82,7 +82,7 @@ module Descope
                                   jwt_response.fetch('permissions', [])
                                 else
                                   # ensure that the tenant is associated with the jwt_response
-                                  logger.debug "tenant associated jwt: #{jwt_response['tenants']&.key?(tenant)}"
+                                  @logger.debug "tenant associated jwt: #{jwt_response['tenants']&.key?(tenant)}"
                                   return false unless jwt_response['tenants'].key?(tenant)
 
                                   # dig is a method in Ruby for safely navigating nested data structures like hashes
@@ -91,10 +91,10 @@ module Descope
                                   tenant_permission = jwt_response.dig('tenants', tenant, 'permissions') || []
                                   tenant_permission = [] if tenant_permission.nil?
                                   if tenant_permission.is_a?(String)
-                                    logger.debug "tenant_permission string: #{tenant_permission}"
+                                    @logger.debug "tenant_permission string: #{tenant_permission}"
                                     [tenant_permission]
                                   else
-                                    logger.debug "tenant_permission array: #{tenant_permission}"
+                                    @logger.debug "tenant_permission array: #{tenant_permission}"
                                     tenant_permission
                                   end
                                 end
@@ -114,7 +114,7 @@ module Descope
         def validate_tenant_roles(jwt_response: nil, tenant: nil, roles: nil)
           # Validate that a jwt_response has been granted the specified roles on the specified tenant.
           # For a multi-tenant environment use validate_tenant_roles function
-          logger.debug "Validate_tenant_roles: #{jwt_response}, #{tenant}, #{roles}"
+          @logger.debug "Validate_tenant_roles: #{jwt_response}, #{tenant}, #{roles}"
           if roles.is_a?(String)
             roles = [roles]
           else
@@ -147,47 +147,47 @@ module Descope
                             end
                           end
 
-          logger.debug "granted_roles: #{granted_roles}"
+          @logger.debug "granted_roles: #{granted_roles}"
           # Validate all roles are granted
           roles.all? do |role|
-            logger.debug "granted_roles.include?(#{role}): #{granted_roles.include?(role)}"
+            @logger.debug "granted_roles.include?(#{role}): #{granted_roles.include?(role)}"
             granted_roles.include?(role)
           end
         end
 
         def validate_token(token, _audience = nil)
-          logger.debug "validating token: #{token}"
+          @logger.debug "validating token: #{token}"
           raise AuthException.new('Token validation received empty token', code: 500) if token.nil? || token.to_s.empty?
 
           unverified_header = jwt_get_unverified_header(token)
-          logger.debug "unverified_header: #{unverified_header}"
+          @logger.debug "unverified_header: #{unverified_header}"
           alg_header = unverified_header[ALGORITHM_KEY]
-          logger.debug "alg_header: #{alg_header}"
+          @logger.debug "alg_header: #{alg_header}"
 
           if alg_header.nil? || alg_header == 'none'
             raise AuthException.new('Token header is missing property: alg', code: 500)
           end
 
           kid = unverified_header['kid']
-          logger.debug "kid: #{kid}"
+          @logger.debug "kid: #{kid}"
           raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
 
           found_key = nil
           @mlock.synchronize do
             if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
-              logger.debug 'fetching public keys'
+              @logger.debug 'fetching public keys'
               # fetch keys from /v2/keys and set them in @public_keys
               fetch_public_keys
             end
 
             found_key = @public_keys[kid]
-            logger.debug "found_key: #{found_key}"
+            @logger.debug "found_key: #{found_key}"
             raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if found_key.nil?
           end
 
           # save reference to the found key
           # (as another thread can change the self.public_keys hash)
-          logger.debug 'checking if alg_header matches alg_from_key'
+          @logger.debug 'checking if alg_header matches alg_from_key'
           alg_from_key = found_key[1]
           if alg_header != alg_from_key
             raise AuthException.new(
@@ -197,7 +197,7 @@ module Descope
           end
 
           begin
-            logger.debug 'decoding token'
+            @logger.debug 'decoding token'
             claims = JWT.decode(
               token,
               found_key[0].public_key,
@@ -210,14 +210,14 @@ module Descope
             )
           end
           claims['jwt'] = token
-          logger.debug "claims: #{claims}"
+          @logger.debug "claims: #{claims}"
           claims
         end
 
         private
 
         def generate_auth_info(response_body, refresh_token, user_jwt, audience = nil)
-          logger.debug "generating auth info: #{response_body}, #{refresh_token}, #{user_jwt}, #{audience}"
+          @logger.debug "generating auth info: #{response_body}, #{refresh_token}, #{user_jwt}, #{audience}"
           jwt_response = {}
 
           # validate the session token if sessionJwt is not empty

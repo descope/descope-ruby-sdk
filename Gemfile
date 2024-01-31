@@ -11,7 +11,6 @@ end
 
 group :test do
   gem 'webmock', require: false
-  gem 'vcr', require: false
   gem 'simplecov-cobertura'
   gem 'timecop', require: false
   gem 'rack-test', require: false
