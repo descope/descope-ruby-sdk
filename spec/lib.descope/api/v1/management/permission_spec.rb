@@ -63,7 +63,7 @@ describe Descope::Api::V1::Management::Permission do
         PERMISSION_DELETE_PATH, { name: 'test' }
       )
       expect do
-        @instance.delete_permission(name: 'test')
+        @instance.delete_permission('test')
       end.not_to raise_error
     end
   end
