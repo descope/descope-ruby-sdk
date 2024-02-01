@@ -766,23 +766,21 @@ You can list your flows and also import and export flows and screens, or the pro
 
 ```ruby
 # List all project flows
-flows_resp = descope_client.list_flows()
+flows_resp = descope_client.list_or_search_flows()
 puts("Total number of flows: #{flows_resp['total']}")
 flows = flows_resp['flows']
 flows.each do |flow|
-    # Do something
+  # Do something
 end
 
 # Export a selected flow by id for the flow and matching screens.
-exported_flow_and_screens = descope_client.export_flow(
-    flow_id: 'sign-up-or-in',
-)
+exported_flow_and_screens = descope_client.export_flow('sign-up-or-in')
 
 # Import a given flow and screens to the flow matching the id provided.
 imported_flow_and_screens = descope_client.import_flow(
-    flow_id: 'sign-up-or-in',
-    flow: {},
-    screens: []
+        flow_id: 'sign-up-or-in',
+        flow: {},
+        screens: []
 )
 
 # Export your project theme.

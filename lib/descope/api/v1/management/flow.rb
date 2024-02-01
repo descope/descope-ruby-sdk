@@ -8,15 +8,19 @@ module Descope
         module Flow
           #        List all project flows
           # @see https://docs.descope.com/api/openapi/flowmanagement/operation/ListFlows/
-          def list_flows
-            get(FLOW_LIST_PATH)
+          # To list all flows, send an empty body such as: { } or { "ids": [] }.
+          #
+          # To search for a flow or several flows, send a body with the flowIds you want to search such as { "ids": ["sign-in"] } or { "ids": ["sign-in", "sign-up"] }.
+          def list_or_search_flows(ids = [])
+            request_params = { ids: }
+            post(FLOW_LIST_PATH, request_params)
           end
 
           # Export the given flow id flow and screens.
           # @see https://docs.descope.com/api/openapi/flowmanagement/operation/ExportFlow/
-          def export_flow(flow_id: nil)
+          def export_flow(flow_id = nil)
             request_params = { flowId: flow_id }
-            get(FLOW_EXPORT_PATH, request_params)
+            post(FLOW_EXPORT_PATH, request_params)
           end
 
           # Import the given flow and screens.
@@ -24,8 +28,8 @@ module Descope
           def import_flow(flow_id: nil, flow: nil, screens: nil)
             request_params = {
               flowId: flow_id,
-              flow: flow,
-              screens: screens
+              flow:,
+              screens:
             }
             post(FLOW_IMPORT_PATH, request_params)
           end

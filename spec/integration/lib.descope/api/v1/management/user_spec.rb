@@ -256,6 +256,4 @@ describe Descope::Api::V1::Management::User do
     expect(login_info['loginId']).to eq(user['loginIds'][0])
     expect(login_info['link']).to start_with('http://localhost:3001/verify?t=')
   end
-
-
 end
