@@ -648,13 +648,13 @@ access_key_resp = descope_client.load_access_key('key-id')
 access_key = access_key_resp['key']
 
 # Search all access keys, optionally according to a tenant filter
-keys_resp = descope_client.search_all_access_keys(tenant_ids: ['my-tenant-id'])
+keys_resp = descope_client.search_all_access_keys(['my-tenant-id'])
 keys = keys_resp['keys']
 keys.each do |key|
-        # Do something
+        # Do something with key
 end
 
-# Update will override all fields as is. Use carefully.
+# Update will rename the access key
 descope_client.update_access_key(
     id: 'key-id',
     name: 'new name'

@@ -60,7 +60,7 @@ describe Descope::Api::V1::Management::AccessKey do
       expect(@instance).to receive(:post).with(
         ACCESS_KEYS_SEARCH_PATH, { tenantIds: %w[123 456] }
       )
-      expect { @instance.search_all_access_keys(tenant_ids: %w[123 456]) }.not_to raise_error
+      expect { @instance.search_all_access_keys(%w[123 456]) }.not_to raise_error
     end
   end
 
