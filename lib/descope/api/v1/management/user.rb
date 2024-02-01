@@ -324,30 +324,32 @@ module Descope
 
           def update_jwt(jwt: nil, custom_claims: nil)
             body = {
-              jwt: jwt,
+              jwt:,
               customClaims: custom_claims,
             }
             post(Common::UPDATE_JWT_PATH, body)
           end
 
           #
-          def add_roles(login_id: nil, role_names: [])
+          def user_add_roles(login_id: nil, tenant_id: nil, role_names: [])
             body = {
               loginId: login_id,
-              roleNames: role_names
+              roleNames: role_names,
+              tenantId: tenant_id
             }
             post(Common::USER_ADD_ROLE_PATH, body)
           end
 
-          def remove_roles(login_id: nil, role_names: [])
+          def user_remove_roles(login_id: nil, tenant_id:nil, role_names: [])
             body = {
               loginId: login_id,
-              roleNames: role_names
+              roleNames: role_names,
+              tenantId: tenant_id
             }
             post(Common::USER_REMOVE_ROLE_PATH, body)
           end
 
-          def add_tenant(login_id: nil, tenant_id: nil)
+          def user_add_tenant(login_id: nil, tenant_id: nil)
             body = {
               loginId: login_id,
               tenantId: tenant_id
@@ -355,7 +357,7 @@ module Descope
             post(Common::USER_ADD_TENANT_PATH, body)
           end
 
-          def remove_tenant(login_id: nil, tenant_id: nil)
+          def user_remove_tenant(login_id: nil, tenant_id: nil)
             body = {
               loginId: login_id,
               tenantId: tenant_id
@@ -372,7 +374,7 @@ module Descope
             post(Common::USER_ADD_TENANT_PATH, body)
           end
 
-          def remove_tenant_roles(login_id: nil, tenant_id: nil, role_names: [])
+          def user_remove_tenant_roles(login_id: nil, tenant_id: nil, role_names: [])
             body = {
               loginId: login_id,
               tenantId: tenant_id,

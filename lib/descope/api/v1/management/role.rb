@@ -10,8 +10,8 @@ module Descope
             # Create a new role.
             permission_names ||= []
             request_params = {
-              name: name,
-              description: description,
+              name:,
+              description:,
               permissionNames: permission_names
             }
             post(ROLE_CREATE_PATH, request_params)
@@ -22,9 +22,9 @@ module Descope
             # to the existing role. Empty fields will override populated fields. Use carefully.
             permission_names ||= []
             request_params = {
-              name: name,
+              name:,
               newName: new_name,
-              description: description,
+              description:,
               permissionNames: permission_names
             }
             post(ROLE_UPDATE_PATH, request_params)

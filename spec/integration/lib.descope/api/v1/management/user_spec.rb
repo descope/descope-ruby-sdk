@@ -5,6 +5,7 @@ require 'spec_helper'
 describe Descope::Api::V1::Management::User do
   before(:all) do
     @client = DescopeClient.new(Configuration.config)
+    include Descope::Mixins::Common::DeliveryMethod
   end
 
   after(:all) do
@@ -149,11 +150,11 @@ describe Descope::Api::V1::Management::User do
 
   it 'should update user JWT and custom claims' do
     user_args = build(:user)
-    password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+    password = SpecUtils.generate_password
     custom_claims = { "custom-key1": 'custom-value1', "custom-key2": 'custom-value2' }
     user = @client.create_user(**user_args, password:)['user']
     jwt = @client.password_sign_in(login_id: user['loginIds'][0], password:)['refreshSessionToken']['jwt']
-    jwt_res = @client.update_jwt(jwt:, custom_claims: )
+    jwt_res = @client.update_jwt(jwt:, custom_claims:)
     decoded_jwt = @client.validate_token(jwt_res['jwt'])
 
     # check if all keys and values from custom_claims are present in decoded_jwt
@@ -166,7 +167,7 @@ describe Descope::Api::V1::Management::User do
 
   it 'should expire user password' do
     user_args = build(:user)
-    password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+    password = SpecUtils.generate_password
     user = @client.create_user(**user_args, password:)['user']
     @client.password_sign_in(login_id: user['loginIds'][0], password:)
     begin
@@ -179,12 +180,12 @@ describe Descope::Api::V1::Management::User do
 
   it 'should set user password' do
     user_args = build(:user)
-    password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+    password = SpecUtils.generate_password
     user = @client.create_user(**user_args, password:)['user']
     @client.password_sign_in(login_id: user['loginIds'][0], password:)
 
     begin
-      new_password = Faker::Internet.password(min_length: 10, max_length: 20, special_characters: true, mix_case: true) + rand(100..999).to_s
+      new_password = SpecUtils.generate_password
       @client.set_password(login_id: user['loginIds'][0], password: new_password)
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
     rescue Descope::ServerError => e
@@ -202,10 +203,59 @@ describe Descope::Api::V1::Management::User do
     tenant_id = @client.create_tenant(name: 'some-new-tenant')['id']
     user_args = build(:user)
     user = @client.create_user(**user_args)['user']
-    @client.add_tenant(login_id: user['loginIds'][0], tenant_id:)
+    @client.user_add_tenant(login_id: user['loginIds'][0], tenant_id:)
     loaded_user = @client.load_user(user['loginIds'][0])['user']
     expect(loaded_user['userTenants'][0]['tenantId']).to eq(tenant_id)
-    @client.remove_tenant(login_id: user['loginIds'][0], tenant_id:)
+    @client.user_remove_tenant(login_id: user['loginIds'][0], tenant_id:)
     @client.delete_tenant(tenant_id)
   end
+
+  it 'should add and remove role from user create and delete role' do
+    role_name = 'some-new-role'
+
+    # ensure no roles exist with that name
+    all_roles = @client.load_all_roles
+    all_roles['roles'].each do |role|
+      @client.delete_role(role['name']) if role['name'] == role_name
+    end
+
+    @client.create_role(name: role_name)
+    user_args = build(:user)
+    user = @client.create_user(**user_args)['user']
+    @client.user_add_roles(login_id: user['loginIds'][0], role_names: ['some-new-role'])
+    loaded_user = @client.load_user(user['loginIds'][0])['user']
+    expect(loaded_user['roleNames'][0]).to eq(role_name)
+    @client.user_remove_roles(login_id: user['loginIds'][0], role_names: [role_name])
+    @client.delete_role(role_name)
+  end
+
+
+  it 'should logout user of all sessions' do
+    user_args = build(:user)
+    password = SpecUtils.generate_password
+    user = @client.create_user(**user_args, password:)['user']
+    session_token = @client.password_sign_in(login_id: user['loginIds'][0], password:)['refreshSessionToken']['jwt']
+    @client.logout_user(user['loginIds'][0])
+    @client.validate_and_refresh_session(session_token:)
+  end
+
+  it 'should generate login methods for test user' do
+    @client.delete_all_test_users
+    user_args = build(:user)
+    user = @client.create_test_user(**user_args)['user']
+    login_info = @client.generate_otp_for_test_user(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: user['loginIds'][0])
+    expect(login_info['loginId']).to eq(user['loginIds'][0])
+    expect(login_info['code']).to_not be_nil
+
+    login_info = @client.generate_enchanted_link_for_test_user(login_id: user['loginIds'][0], uri: 'http://localhost:3001/verify')
+    expect(login_info['loginId']).to eq(user['loginIds'][0])
+    expect(login_info['link']).to start_with('http://localhost:3001/verify?t=')
+    expect(login_info['pendingRef']).to_not be_nil
+
+    login_info = @client.generate_magic_link_for_test_user(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: user['loginIds'][0], uri: 'http://localhost:3001/verify')
+    expect(login_info['loginId']).to eq(user['loginIds'][0])
+    expect(login_info['link']).to start_with('http://localhost:3001/verify?t=')
+  end
+
+
 end

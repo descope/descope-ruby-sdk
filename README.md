@@ -580,7 +580,7 @@ descope_client.update_phone(
         verified: true
 )
 
-descope_client.remove_tenant_roles(
+descope_client.user_remove_tenant_roles(
         login_id: 'desmond@descope.com',
         tenant_id: 'my-tenant-id',
         role_names: ['role-name1']

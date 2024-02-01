@@ -444,7 +444,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.add_roles' do
     it 'is expected to respond to a add_roles method' do
-      expect(@instance).to respond_to(:add_roles)
+      expect(@instance).to respond_to(:user_add_roles)
 
       expect(@instance).to receive(:post).with(
         USER_ADD_ROLE_PATH, {
@@ -454,7 +454,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.add_roles(
+        @instance.user_add_roles(
           login_id: 'someone@example.com',
           role_names: %w[role1 role2]
         )
@@ -462,9 +462,9 @@ describe Descope::Api::V1::Management::User do
     end
   end
 
-  context '.remove_roles' do
-    it 'is expected to respond to a remove_roles method' do
-      expect(@instance).to respond_to(:remove_roles)
+  context '.user_remove_roles' do
+    it 'is expected to respond to a user_remove_roles method' do
+      expect(@instance).to respond_to(:user_remove_roles)
 
       expect(@instance).to receive(:post).with(
         USER_REMOVE_ROLE_PATH, {
@@ -474,7 +474,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.remove_roles(
+        @instance.user_remove_roles(
           login_id: 'someone@example.com',
           role_names: %w[role1 role2]
         )
@@ -484,7 +484,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.add_tenant' do
     it 'is expected to respond to a add_tenant method' do
-      expect(@instance).to respond_to(:add_tenant)
+      expect(@instance).to respond_to(:user_add_tenant)
 
       expect(@instance).to receive(:post).with(
         USER_ADD_TENANT_PATH, {
@@ -494,7 +494,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.add_tenant(
+        @instance.user_add_tenant(
           login_id: 'someone@example.com',
           tenant_id: 'tenant1'
         )
@@ -504,7 +504,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.remove_tenant' do
     it 'is expected to respond to a remove_tenant method' do
-      expect(@instance).to respond_to(:remove_tenant)
+      expect(@instance).to respond_to(:user_remove_tenant)
 
       expect(@instance).to receive(:post).with(
         USER_REMOVE_TENANT_PATH, {
@@ -514,7 +514,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.remove_tenant(
+        @instance.user_remove_tenant(
           login_id: 'someone@example.com',
           tenant_id: 'tenant1'
         )
@@ -546,7 +546,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.remove_tenant_role' do
     it 'is expected to respond to a remove_tenant_role method' do
-      expect(@instance).to respond_to(:remove_tenant_roles)
+      expect(@instance).to respond_to(:user_remove_tenant_roles)
 
       expect(@instance).to receive(:post).with(
         USER_REMOVE_TENANT_PATH, {
@@ -557,7 +557,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.remove_tenant_roles(
+        @instance.user_remove_tenant_roles(
           login_id: 'someone@example.com',
           tenant_id: 'tenant1',
           role_names: %w[role1 role2]
