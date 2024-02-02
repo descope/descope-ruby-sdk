@@ -878,8 +878,8 @@ audits = descope_client.audit_search(actions: ['LoginSucceed'])
 
 ### Manage ReBAC Authz
 
-Descope supports full relation based access control (ReBAC) using a zanzibar like schema and operations.
-A schema is comprized of namespaces (entities like documents, folders, orgs, etc.) and each namespace has relation definitions to define relations.
+Descope supports full relation based access control (ReBAC) using a [Google Zanzibar](https://research.google/pubs/pub48190/) like schema and operations.
+A schema comprises namespaces (entities like documents, folders, orgs, etc.) and each namespace has relation definitions to define relations.
 Each relation definition can be simple (either you have it or not) or complex (union of nodes).
 
 A simple example for a file system like schema would be:

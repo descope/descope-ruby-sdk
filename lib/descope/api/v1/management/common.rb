@@ -116,7 +116,7 @@ module Descope
           AUTHZ_RE_TARGET_ALL = '/v1/mgmt/authz/re/targetall'
 
           # Project
-          PROJECT_UPDATE_NAME = '/v1/mgmt/project/eupdate/name'
+          PROJECT_UPDATE_NAME = '/v1/mgmt/project/update/name'
           PROJECT_CLONE = '/v1/mgmt/project/clone'
           PROJECT_EXPORT_PATH = '/v1/mgmt/project/export'
           PROJECT_IMPORT_PATH = '/v1/mgmt/project/import'

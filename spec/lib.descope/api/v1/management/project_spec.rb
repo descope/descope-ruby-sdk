@@ -29,11 +29,11 @@ describe Descope::Api::V1::Management::Project do
 
     it 'is expected to export the current project' do
       expect(@instance).to receive(:post).with(
-        PROJECT_EXPORT_PATH, { format: 'string' }
+        PROJECT_EXPORT_PATH, { }
       )
       expect do
-        res = @instance.export_project('string')
-        JSON.parse(res)
+        res = @instance.export_project
+        expect(res).to be_a(Hash)
       end.not_to raise_error
     end
   end

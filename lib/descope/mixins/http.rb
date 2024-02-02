@@ -107,10 +107,10 @@ module Descope
 
       def call(method, url, timeout, headers, body = nil)
         RestClient::Request.execute(
-          method: method,
-          url: url,
-          timeout: timeout,
-          headers: headers,
+          method:,
+          url:,
+          timeout:,
+          headers:,
           payload: body
         )
       rescue RestClient::Exception => e

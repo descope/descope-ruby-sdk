@@ -14,4 +14,12 @@ module SpecUtils
     password += 7.times.map { characters.sample }.join
     password + rand(100..999).to_s
   end
+
+  def deep_stringify_keys(hash)
+    hash.transform_keys!(&:to_s)
+    hash.each_value do |value|
+      deep_stringify_keys(value) if value.is_a? Hash
+      value.each { |v| deep_stringify_keys(v) if v.is_a? Hash } if value.is_a? Array
+    end
+  end
 end
