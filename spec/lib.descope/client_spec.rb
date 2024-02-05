@@ -16,7 +16,7 @@ describe Descope::Client do
     it { should be_a Descope::Api::V1::Session }
     it { should be_a Descope::Api::V1::Auth }
     it { should be_a Descope::Api::V1::Auth::Password }
-    it { should be_a Descope::Api::V1::Auth::EnhancedLink }
+    it { should be_a Descope::Api::V1::Auth::EnchantedLink }
     it { should be_a Descope::Api::V1::Auth::MagicLink }
     it { should be_a Descope::Api::V1::Auth::OAuth }
     it { should be_a Descope::Api::V1::Auth::OTP }

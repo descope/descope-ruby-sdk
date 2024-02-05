@@ -18,7 +18,7 @@ module Descope
         include Descope::Mixins::Common::EndpointsV1
         include Descope::Mixins::Common::EndpointsV2
         include Descope::Api::V1::Auth::Password
-        include Descope::Api::V1::Auth::EnhancedLink
+        include Descope::Api::V1::Auth::EnchantedLink
         include Descope::Api::V1::Auth::MagicLink
         include Descope::Api::V1::Auth::OAuth
         include Descope::Api::V1::Auth::OTP

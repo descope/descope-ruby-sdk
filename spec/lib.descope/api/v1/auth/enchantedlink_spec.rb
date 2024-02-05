@@ -2,11 +2,11 @@
 
 require 'spec_helper'
 
-describe Descope::Api::V1::EnhancedLink do
+describe Descope::Api::V1::EnchantedLink do
   before(:all) do
     dummy_instance = DummyClass.new
     dummy_instance.extend(Descope::Api::V1::Session)
-    dummy_instance.extend(Descope::Api::V1::Auth::EnhancedLink)
+    dummy_instance.extend(Descope::Api::V1::Auth::EnchantedLink)
     @instance = dummy_instance
   end
 

@@ -5,7 +5,7 @@ module Descope
     module V1
       module Auth
         # Holds all the password API calls
-        module EnhancedLink
+        module EnchantedLink
           include Descope::Mixins::Validation
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
@@ -43,6 +43,22 @@ module Descope
             post(uri, body)
           end
 
+          def enchanted_link_update_user_email(login_id: nil, email: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, refresh_token: nil)
+            validate_login_id(login_id)
+            validate_token_not_empty(refresh_token)
+            validate_email(email)
+
+            body = enchanted_link_compose_update_user_email_body(
+              login_id, email, add_to_login_ids, on_merge_use_existing
+            )
+            body[:redirectUrl] = uri
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
+            body[:templateOptions] = template_options if template_options
+            uri = UPDATE_USER_EMAIL_ENCHANTEDLINK_PATH
+            post(uri, body, {}, refresh_token)
+          end
+
           def enchanted_link_verify_token(token = nil)
             validate_token_not_empty(token)
             post(VERIFY_ENCHANTEDLINK_AUTH_PATH, { token: })
@@ -57,6 +73,7 @@ module Descope
           private
 
           def enchanted_link_compose_signin_body(login_id, uri, login_options)
+            login_options ||= {}
             unless login_options.is_a?(Hash)
               raise Descope::ArgumentException.new(
                 'Unable to read login_option, not a Hash',
@@ -101,6 +118,18 @@ module Descope
               method_str, val = get_login_id_by_method(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, user:)
               body[method_str.to_sym] = val
             end
+
+            body
+          end
+
+          def enchanted_link_compose_update_user_email_body(login_id, email, add_to_login_ids, on_merge_use_existing)
+            body = {
+              loginId: login_id,
+              email:
+            }
+
+            body[:addToLoginIds] = add_to_login_ids if add_to_login_ids
+            body[:onMergeUseExisting] = on_merge_use_existing if on_merge_use_existing
 
             body
           end

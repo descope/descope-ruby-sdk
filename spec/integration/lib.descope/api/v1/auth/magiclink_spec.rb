@@ -31,15 +31,17 @@ describe Descope::Api::V1::Auth::MagicLink do
       token = mail_response.text.match(/^http.+verify\?t=(.+)/)[1]
       puts "token: #{token}"
 
-      begin
-        jwt_response = @client.magiclink_verify_token(token)
-        puts "jwt_response #{jwt_response}"
-        my_details = @client.me(jwt_response['refreshJwt'])
-        expect(my_details['email']).to eq(user[:email])
-        puts 'Magiclink Token Verified via sign up!'
-      rescue StandardError => e
-        puts "Verification failed - Could not verify token: #{e.message}"
-      end
+      expect do
+        begin
+          jwt_response = @client.magiclink_verify_token(token)
+          puts "jwt_response #{jwt_response}"
+          my_details = @client.me(jwt_response['refreshJwt'])
+          expect(my_details['email']).to eq(user[:email])
+          puts 'Magiclink Token Verified via sign up!'
+        rescue StandardError => e
+          raise StandardError "Verification failed - Could not verify token: #{e.message}"
+        end
+      end.to_not raise_error
     end
 
     it 'should sign in with magiclink' do
@@ -53,6 +55,7 @@ describe Descope::Api::V1::Auth::MagicLink do
       token = mail_response.text.match(/^http.+verify\?t=(.+)/)[1]
       puts "token: #{token}"
 
+      expect do
       begin
         jwt_response = @client.magiclink_verify_token(token)
         puts "jwt_response #{jwt_response}"
@@ -60,8 +63,8 @@ describe Descope::Api::V1::Auth::MagicLink do
         expect(my_details['email']).to eq(user[:email])
         puts 'Magiclink Token Verified via sign in!'
       rescue StandardError => e
-        puts "Verification failed - Could not verify token: #{e.message}"
-      end
+        raise StandardError "Verification failed - Could not verify token: #{e.message}"
+      end.to_not raise_error
     end
 
     it 'should sign up or in with magiclink' do
@@ -74,6 +77,7 @@ describe Descope::Api::V1::Auth::MagicLink do
       token = mail_response.text.match(/^http.+verify\?t=(.+)/)[1]
       puts "token: #{token}"
 
+      expect do
       begin
         jwt_response = @client.magiclink_verify_token(token)
         puts "jwt_response #{jwt_response}"
@@ -81,8 +85,8 @@ describe Descope::Api::V1::Auth::MagicLink do
         expect(my_details['email']).to eq(user[:email])
         puts 'Magiclink Token Verified via sign up or in!'
       rescue StandardError => e
-        puts "Verification failed - Could not verify token: #{e.message}"
-      end
+        raise StandardError "Verification failed - Could not verify token: #{e.message}"
+      end.to_not raise_error
     end
 
     it 'should update email on magiclink' do
@@ -99,6 +103,7 @@ describe Descope::Api::V1::Auth::MagicLink do
       token = mail_response.text.match(/^http.+verify\?t=(.+)/)[1]
       puts "token: #{token}"
 
+      expect do
       begin
         puts 'verifying token from magiclink...'
         jwt_response = @client.magiclink_verify_token(token)
@@ -118,8 +123,8 @@ describe Descope::Api::V1::Auth::MagicLink do
         expect(my_details['email']).to eq(@mailbox_new.email)
         puts 'Magiclink Token Verified!'
       rescue StandardError => e
-        puts "Verification failed - Could not verify token: #{e.message}"
-      end
+        raise StandardError "Verification failed - Could not verify token: #{e.message}"
+      end.to_not raise_error
     end
   end
 end
