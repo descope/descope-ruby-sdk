@@ -168,20 +168,20 @@ describe Descope::Api::V1::Management::Authz do
           }
         ]
       )
-    end
 
-    # Check if target has the relevant relation
-    # The answer should be true because an owner is also a viewer
-    relations = @client.authz_has_relations?(
-      [
-        {
-          "resource": 'some-doc',
-          "relationDefinition": 'viewer',
-          "namespace": 'note',
-          "target": 'user1'
-        }
-      ]
-    )
-    expect(relations[0]['hasRelation']).to be_truthy
+      # Check if target has the relevant relation
+      # The answer should be true because an owner is also a viewer
+      relations = @client.authz_has_relations?(
+        [
+          {
+            "resource": 'some-doc',
+            "relationDefinition": 'viewer',
+            "namespace": 'note',
+            "target": 'user1'
+          }
+        ]
+      )
+      expect(relations['relationQueries'][0]['hasRelation']).to be_truthy
+    end
   end
 end

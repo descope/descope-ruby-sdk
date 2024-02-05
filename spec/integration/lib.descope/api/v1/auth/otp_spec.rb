@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Descope::Api::V1::AUTH::OTP do
+describe Descope::Api::V1::Auth::OTP do
   before(:all) do
     @client = DescopeClient.new(Configuration.config)
     include Mailmock
