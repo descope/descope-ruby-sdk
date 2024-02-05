@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Descope::Api::V1::OTP do
+describe Descope::Api::V1::AUTH::OTP do
   before(:all) do
     @client = DescopeClient.new(Configuration.config)
     include Mailmock
@@ -13,7 +13,7 @@ describe Descope::Api::V1::OTP do
     puts 'Cleaning up test users...'
     all_users = @client.search_all_users
     all_users['users'].each do |user|
-      if user['middleName'] == 'Ruby SDK User'
+      if user['middleName'] == 'Ruby SDK User' || user['email'].include?('aws.mailmock.io')
         puts "Deleting ruby spec test user #{user['loginIds'][0]}"
         @client.delete_user(user['loginIds'][0])
       end

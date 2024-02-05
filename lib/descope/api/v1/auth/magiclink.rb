@@ -44,23 +44,25 @@ module Descope
             post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
           end
 
-          def magiclink_update_user_email(login_id: nil, email: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, refresh_token: nil)
+          def magiclink_update_user_email(login_id: nil, email: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, refresh_token: nil)
             validate_login_id(login_id)
             validate_token_not_empty(refresh_token)
             validate_email(email)
 
-            body = magiclink_compose_update_user_email_body(login_id, email, add_to_login_ids, on_merge_use_existing)
+            body = magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing, template_options)
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
             uri = UPDATE_USER_EMAIL_MAGICLINK_PATH
             res = post(uri, body, {}, refresh_token)
             extract_masked_address(res, DeliveryMethod::EMAIL)
           end
 
-          def magiclink_update_user_phone(login_id: nil, phone: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, refresh_token: nil, method: nil)
+          def magiclink_update_user_phone(login_id: nil, phone: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, method: nil, refresh_token: nil)
             validate_login_id(login_id)
             validate_token_not_empty(refresh_token)
             validate_phone(method, phone)
 
-            body = magiclink_compose_update_user_phone_body(login_id, phone, add_to_login_ids, on_merge_use_existing)
+            body = magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing, template_options)
             body[:providerId] = provider_id if provider_id
             body[:templateId] = template_id if template_id
             uri = UPDATE_USER_PHONE_MAGICLINK_PATH
@@ -124,21 +126,25 @@ module Descope
             body
           end
 
-          def magiclink_compose_update_user_email_body(login_id, email, add_to_login_ids, on_merge_use_existing)
+          def magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing, template_options)
             {
               loginId: login_id,
               email:,
+              redirectUrl: uri,
               addToLoginIDs: add_to_login_ids,
-              onMergeUseExisting: on_merge_use_existing
+              onMergeUseExisting: on_merge_use_existing,
+              templateOptions: template_options
             }
           end
 
-          def magiclink_compose_update_user_phone_body(login_id, phone, add_to_login_ids, on_merge_use_existing)
+          def magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing, template_options)
             {
               loginId: login_id,
               phone:,
+              redirectUrl: uri,
               addToLoginIDs: add_to_login_ids,
-              onMergeUseExisting: on_merge_use_existing
+              onMergeUseExisting: on_merge_use_existing,
+              templateOptions: template_options
             }
           end
         end
