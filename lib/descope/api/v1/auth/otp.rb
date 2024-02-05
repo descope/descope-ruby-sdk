@@ -10,7 +10,7 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil,  provider_id: nil, 
+          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil,  provider_id: nil,
                           template_id: nil, sso_app_id: nil)
             # Sign in (log in) an existing user with the unique login_id you provide. (See 'sign_up' function for an explanation of the
             # login_id field.) Provide the DeliveryMethod required for this user. If the login_id value cannot be used for the

@@ -58,18 +58,16 @@ module Descope
       end
 
       def authorization_header(pswd = nil)
-        bearer = !pswd.nil? && !pswd.empty? ? "#{@project_id}:#{pswd}" : @project_id
+        pswd = @default_pswd if pswd.nil? || pswd.empty?
+        bearer = "#{@project_id}:#{pswd}"
         @logger.debug("setting bearer header #{bearer}")
         add_headers('Authorization' => "Bearer #{bearer}")
       end
 
       def initialize_api(options)
         initialize_v1(options)
-        if options.fetch(:management_key, nil)
-          authorization_header(options[:management_key])
-        else
-          authorization_header
-        end
+        @default_pswd = options.fetch(:management_key)
+        authorization_header
       end
 
       def initialize_v1(_options)
