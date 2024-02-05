@@ -114,7 +114,7 @@ describe Descope::Api::V1::Management::Tenant do
     end
 
     it 'is expected to search all tenants' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:post).with(
         TENANT_SEARCH_ALL_PATH, {
           ids: %w[test1 test2],
           names: %w[test1 test2],

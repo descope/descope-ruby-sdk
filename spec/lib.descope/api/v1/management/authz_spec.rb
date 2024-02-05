@@ -122,7 +122,7 @@ describe Descope::Api::V1::Management::Authz do
         AUTHZ_RD_SAVE,
         {
           relationDefinition: 'test-relation-definition',
-          namespaceName: 'test-namespace',
+          namespace: 'test-namespace',
           old_name: 'old-relation-definition',
           schemaName: 'schema-name'
         }
@@ -182,16 +182,18 @@ describe Descope::Api::V1::Management::Authz do
 
   context '.delete_relation' do
     it 'should respond to .delete_relation' do
-      expect(@instance).to respond_to :authz_delete_relation
+      expect(@instance).to respond_to :authz_delete_relations
     end
 
     it 'is expected to delete the given relation' do
       expect(@instance).to receive(:post).with(
         AUTHZ_RE_DELETE,
-        [{resource: 'some-note', relationDefinition: 'owner', namespace: 'note', target: 'some-user'}]
+        { relations: [{ resource: 'some-note', relationDefinition: 'owner', namespace: 'note', target: 'some-user' }] }
       )
       expect do
-        @instance.authz_delete_relation([{resource: 'some-note', relationDefinition: 'owner', namespace: 'note', target: 'some-user'}])
+        @instance.authz_delete_relations(
+          [{ resource: 'some-note', relationDefinition: 'owner', namespace: 'note', target: 'some-user' }]
+        )
       end.not_to raise_error
     end
   end

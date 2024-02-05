@@ -115,7 +115,7 @@ module Descope
             post(AUTHZ_RE_CREATE, { relations: })
           end
 
-          def authz_delete_relation(relations = nil)
+          def authz_delete_relations(relations = nil)
             # Delete the given relations based on the existing schema
             post(AUTHZ_RE_DELETE, { relations: })
           end

@@ -449,14 +449,16 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_ADD_ROLE_PATH, {
           loginId: 'someone@example.com',
-          roleNames: %w[role1 role2]
+          roleNames: %w[role1 role2],
+          tenantId: 'tenant1'
         }
       )
 
       expect do
         @instance.user_add_roles(
           login_id: 'someone@example.com',
-          role_names: %w[role1 role2]
+          role_names: %w[role1 role2],
+          tenant_id: 'tenant1'
         )
       end.not_to raise_error
     end
@@ -469,14 +471,16 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_REMOVE_ROLE_PATH, {
           loginId: 'someone@example.com',
-          roleNames: %w[role1 role2]
+          roleNames: %w[role1 role2],
+          tenantId: 'tenant1'
         }
       )
 
       expect do
         @instance.user_remove_roles(
           login_id: 'someone@example.com',
-          role_names: %w[role1 role2]
+          role_names: %w[role1 role2],
+          tenant_id: 'tenant1'
         )
       end.not_to raise_error
     end

@@ -207,7 +207,8 @@ describe Descope::Api::V1::MagicLink do
         loginId: 'test',
         email: 'dummy@dummy.com',
         addToLoginIDs: true,
-        onMergeUseExisting: true
+        onMergeUseExisting: true,
+        redirectUrl: 'https://some-uri/email'
       }
 
       expect(@instance).to receive(:post).with(
@@ -223,7 +224,8 @@ describe Descope::Api::V1::MagicLink do
           email: 'dummy@dummy.com',
           add_to_login_ids: true,
           on_merge_use_existing: true,
-          refresh_token: 'token'
+          refresh_token: 'token',
+          uri: 'https://some-uri/email'
         )
       end.not_to raise_error
     end
@@ -241,7 +243,11 @@ describe Descope::Api::V1::MagicLink do
         addToLoginIDs: true,
         onMergeUseExisting: true,
         providerId: 'provider-id',
-        templateId: 'template-id'
+        templateId: 'template-id',
+        templateOptions: {
+          'abc': '123'
+        },
+        redirectUrl: 'https://some-uri/sms'
       }
 
       expect(@instance).to receive(:post).with(
@@ -260,7 +266,11 @@ describe Descope::Api::V1::MagicLink do
           refresh_token: 'token',
           method: DeliveryMethod::SMS,
           provider_id: 'provider-id',
-          template_id: 'template-id'
+          template_id: 'template-id',
+          template_options: {
+            'abc': '123'
+          },
+          uri: 'https://some-uri/sms'
         )
       end.not_to raise_error
     end

@@ -49,9 +49,10 @@ module Descope
             validate_token_not_empty(refresh_token)
             validate_email(email)
 
-            body = magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing, template_options)
+            body = magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing)
             body[:providerId] = provider_id if provider_id
             body[:templateId] = template_id if template_id
+            body[:templateOptions] = template_options if template_options
             uri = UPDATE_USER_EMAIL_MAGICLINK_PATH
             res = post(uri, body, {}, refresh_token)
             extract_masked_address(res, DeliveryMethod::EMAIL)
@@ -62,9 +63,10 @@ module Descope
             validate_token_not_empty(refresh_token)
             validate_phone(method, phone)
 
-            body = magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing, template_options)
+            body = magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing)
             body[:providerId] = provider_id if provider_id
             body[:templateId] = template_id if template_id
+            body[:templateOptions] = template_options if template_options
             uri = UPDATE_USER_PHONE_MAGICLINK_PATH
             res = post(uri, body, {}, refresh_token)
             extract_masked_address(res, DeliveryMethod::SMS)
@@ -126,25 +128,23 @@ module Descope
             body
           end
 
-          def magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing, template_options)
+          def magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing)
             {
               loginId: login_id,
               email:,
               redirectUrl: uri,
               addToLoginIDs: add_to_login_ids,
-              onMergeUseExisting: on_merge_use_existing,
-              templateOptions: template_options
+              onMergeUseExisting: on_merge_use_existing
             }
           end
 
-          def magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing, template_options)
+          def magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing)
             {
               loginId: login_id,
               phone:,
               redirectUrl: uri,
               addToLoginIDs: add_to_login_ids,
-              onMergeUseExisting: on_merge_use_existing,
-              templateOptions: template_options
+              onMergeUseExisting: on_merge_use_existing
             }
           end
         end
