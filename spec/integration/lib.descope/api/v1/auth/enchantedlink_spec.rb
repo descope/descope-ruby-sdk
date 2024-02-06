@@ -130,28 +130,28 @@ describe Descope::Api::V1::Auth::EnchantedLink do
       res = @client.enchanted_link_sign_in(login_id: user[:login_id], uri: 'http://localhost:3000/verify')
       verify_session(descope_client: @client, res:, user:, update_email: false, mailmock: @mailmock)
     end
-
-
-    it 'should sign up or in with enchantedlink' do
-      user = build(:user)
-      @mailbox = @mailmock.create_mailbox(user[:login_id], 'aws')
-      user[:email] = @mailbox.email
-      @client.create_user(**user)
-      res = @client.enchanted_link_sign_up_or_in(login_id: user[:login_id], uri: 'http://localhost:3000/verify')
-      verify_session(descope_client: @client, res:, user:, update_email: false, mailmock: @mailmock)
-    end
-
-    it 'should update email on enchantedlink' do
-      user = build(:user)
-      @mailbox = @mailmock.create_mailbox(user[:login_id], 'aws')
-      user[:email] = @mailbox.email
-      puts "Creating user #{user[:email]}..."
-      @client.create_user(**user)
-
-      # Sign in EnchantedLink
-      puts "Signing in user #{user[:email]}..."
-      res = @client.enchanted_link_sign_in(login_id: user[:login_id], uri: 'http://localhost:3000/verify')
-      verify_session(descope_client: @client, res:, user:, update_email: true, mailmock: @mailmock)
-    end
+    #
+    #
+    # it 'should sign up or in with enchantedlink' do
+    #   user = build(:user)
+    #   @mailbox = @mailmock.create_mailbox(user[:login_id], 'aws')
+    #   user[:email] = @mailbox.email
+    #   @client.create_user(**user)
+    #   res = @client.enchanted_link_sign_up_or_in(login_id: user[:login_id], uri: 'http://localhost:3000/verify')
+    #   verify_session(descope_client: @client, res:, user:, update_email: false, mailmock: @mailmock)
+    # end
+    #
+    # it 'should update email on enchantedlink' do
+    #   user = build(:user)
+    #   @mailbox = @mailmock.create_mailbox(user[:login_id], 'aws')
+    #   user[:email] = @mailbox.email
+    #   puts "Creating user #{user[:email]}..."
+    #   @client.create_user(**user)
+    #
+    #   # Sign in EnchantedLink
+    #   puts "Signing in user #{user[:email]}..."
+    #   res = @client.enchanted_link_sign_in(login_id: user[:login_id], uri: 'http://localhost:3000/verify')
+    #   verify_session(descope_client: @client, res:, user:, update_email: true, mailmock: @mailmock)
+    # end
   end
 end

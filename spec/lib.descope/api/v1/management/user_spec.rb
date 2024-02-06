@@ -29,7 +29,7 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           phone: '+1-212-669-2542',
-          displayName: 'name',
+          name: 'name',
           givenName: 'name',
           familyName: 'Ruby SDK',
           userTenants: associated_tenants_to_hash_array(user_tenants_args),
@@ -48,7 +48,7 @@ describe Descope::Api::V1::Management::User do
           login_id: 'name@mail.com',
           email: 'name@mail.com',
           phone: '+1-212-669-2542',
-          display_name: 'name',
+          name: 'name',
           given_name: 'name',
           family_name: 'Ruby SDK',
           user_tenants: user_tenants_args,
@@ -132,7 +132,7 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           givenName: 'mister',
-          displayName: 'something else',
+          name: 'something else',
           test: false,
           invite: false
         }
@@ -143,7 +143,7 @@ describe Descope::Api::V1::Management::User do
           login_id: 'name@mail.com',
           email: 'name@mail.com',
           given_name: 'mister',
-          display_name: 'something else'
+          name: 'something else'
         )
       end.not_to raise_error
     end
@@ -359,7 +359,7 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_UPDATE_NAME_PATH, {
           loginId: 'someone@example.com',
-          displayName: 'some guy',
+          name: 'some guy',
           givenName: 'some',
           familyName: 'guy',
           middleName: 'middle'
@@ -369,7 +369,7 @@ describe Descope::Api::V1::Management::User do
       expect do
         @instance.update_display_name(
           login_id: 'someone@example.com',
-          display_name: 'some guy',
+          name: 'some guy',
           given_name: 'some',
           family_name: 'guy',
           middle_name: 'middle'

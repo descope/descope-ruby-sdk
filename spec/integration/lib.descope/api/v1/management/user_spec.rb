@@ -142,10 +142,10 @@ describe Descope::Api::V1::Management::User do
   it 'should update display name' do
     user_args = build(:user)
     user = @client.create_user(**user_args)['user']
-    display_name = Faker::Name.name
-    @client.update_display_name(login_id: user['loginIds'][0], display_name:)
+    name = Faker::Name.name
+    @client.update_display_name(login_id: user['loginIds'][0], name:)
     loaded_user = @client.load_user(user['loginIds'][0])['user']
-    expect(loaded_user['name']).to eq(display_name)
+    expect(loaded_user['name']).to eq(name)
   end
 
   it 'should update user JWT and custom claims' do

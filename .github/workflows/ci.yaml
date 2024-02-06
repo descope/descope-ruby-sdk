@@ -1,7 +1,12 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -16,25 +21,15 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Run RSpec Test
-        run: bundle exec rspec
+        run: bundle exec rspec spec/lib.descope
 
-  build-gem:
-    name: Build Ruby Gem
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Run Integration Test
+        run: bundle exec rspec spec/integration
 
-      - uses: ruby/setup-ruby@v1
+      - name: Build Ruby Gem
       - run:  gem build descope.gemspec && gem install ./descope-*.gem
 
-  integratrion-test:
-    name: Integration Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - uses: ruby/setup-ruby@v1
-      - run:  gem build descope.gemspec && gem install ./descope-*.gem
-      - run:  bundle exec rspec spec/integration/integration_spec.rb
+      - name: Publish to rubygems.org
+        run: gem push descope-*.gem
+        env:
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}

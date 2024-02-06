@@ -63,7 +63,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -85,7 +85,7 @@ module Descope
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -287,13 +287,13 @@ module Descope
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserDisplayName/
           def update_display_name(
             login_id: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil
           )
             body = { loginId: login_id }
-            body[:displayName] = display_name unless display_name.nil?
+            body[:name] = name unless name.nil?
             body[:givenName] = given_name unless given_name.nil?
             body[:middleName] = middle_name unless middle_name.nil?
             body[:familyName] = family_name unless family_name.nil?
@@ -450,7 +450,7 @@ module Descope
             phone: nil,
             verified_email: nil,
             verified_phone: nil,
-            display_name: nil,
+            name: nil,
             role_names: [],
             user_tenants: [],
             invite: false,
@@ -476,7 +476,7 @@ module Descope
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -505,7 +505,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -529,7 +529,7 @@ module Descope
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -558,7 +558,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -594,7 +594,7 @@ module Descope
 
             body[:email] = email unless email.nil? || email.empty?
             body[:phone] = phone unless phone.nil? || phone.empty?
-            body[:displayName] = display_name unless display_name.nil? || display_name.empty?
+            body[:name] = name unless name.nil? || name.empty?
             body[:roleNames] = role_names unless role_names.nil? || role_names.empty?
             body[:userTenants] = associated_tenants_to_hash_array(user_tenants) unless user_tenants.nil? || user_tenants.empty?
             body[:test] = test unless test.nil?
