@@ -16,13 +16,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Configure Bundler
-        run: |
-          echo "BUNDLE_GITHUB__COM=${{ secrets.CI_READ_COMMON }}:x-oauth-basic" >> $GITHUB_ENV
-
       - uses: ruby/setup-ruby@v1
         with:
-          bundler-cache: true
+          # We are not letting this step to run bundle install, we will do it later
+          bundler-cache: false
+
+      - name: Configure Bundler
+        run: |
+          # Configure bundler with the required GitHub token
+          echo "BUNDLE_GITHUB__COM=${{ secrets.CI_READ_COMMON }}:x-oauth-basic" >> $GITHUB_ENV
+          bundle config set --global github.com ${{ secrets.CI_READ_COMMON }}:x-oauth-basic
+
+      - name: Install dependencies
+        run: bundle install
 
       - name: Run RSpec Test
         run: bundle exec rspec spec/lib.descope
