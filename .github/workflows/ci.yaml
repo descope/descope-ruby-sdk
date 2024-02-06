@@ -20,9 +20,11 @@ jobs:
         env:
           BUNDLE_GITHUB__COM: x-access-token:${{ secrets.CI_READ_COMMON }}
         with:
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
 
-      - run: bundle config github.com ${{ secrets.CI_READ_COMMON }}
+      - name: Configure Bundler
+        run: |
+          bundle config --global github.com x-access-token:${{secrets.CI_READ_COMMON}}
 
       - name: Run RSpec Test
         run: bundle exec rspec spec/lib.descope
