@@ -27,7 +27,7 @@ jobs:
         run: |
           # Configure bundler with the required GitHub token
           git config --global url."https://x-access-token:${{ secrets.CI_READ_COMMON }}@github.com".insteadOf "https://github.com"
-          git clone https://<token>:x-oauth-basic@github.com/descope/mailmock.git
+          git clone https://#{{ secrets.CI_READ_COMMON }}:x-oauth-basic@github.com/descope/mailmock.git
           
           echo "Bundle install"
           bundle install
