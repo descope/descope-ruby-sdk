@@ -18,7 +18,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         env:
-          BUNDLE_GITHUB__COM: ${{ secrets.GITHUB_TOKEN }}
+          BUNDLE_GITHUB__COM: ${{ secrets.CI_READ_COMMON }}:x-oauth-basic
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
