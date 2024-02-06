@@ -12,6 +12,8 @@ jobs:
   build:
     name: Build Ruby SDK
     runs-on: ubuntu-latest
+    env:
+      BUNDLE_GITHUB__COM: "x-access-token:${{ secrets.CI_READ_COMMON }}"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -24,7 +26,6 @@ jobs:
       - name: Configure Bundler
         run: |
           # Configure bundler with the required GitHub token
-          bundle config set --global github.com x-access-token:${{ secrets.GH_TOKEN }}
           bundle install
 
       - name: Run RSpec Test
