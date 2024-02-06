@@ -17,11 +17,12 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: ruby/setup-ruby@v1
-        run: bundle config github.com ${{ secrets.CI_READ_COMMON }}
         env:
           BUNDLE_GITHUB__COM: x-access-token:${{ secrets.CI_READ_COMMON }}
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+      - run: bundle config github.com ${{ secrets.CI_READ_COMMON }}
 
       - name: Run RSpec Test
         run: bundle exec rspec spec/lib.descope
