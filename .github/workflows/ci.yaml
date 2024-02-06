@@ -16,15 +16,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - uses: ruby/setup-ruby@v1
-        env:
-          BUNDLE_GITHUB__COM: x-access-token:${{ secrets.CI_READ_COMMON }}
-        with:
-          bundler-cache: true
-
       - name: Configure Bundler
         run: |
-          bundle config --global github.com x-access-token:${{secrets.CI_READ_COMMON}}
+          echo "BUNDLE_GITHUB__COM: x-access-token:${{ secrets.CI_READ_COMMON }}" >> $GITHUB_ENV
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
 
       - name: Run RSpec Test
         run: bundle exec rspec spec/lib.descope
