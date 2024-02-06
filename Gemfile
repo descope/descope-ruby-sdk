@@ -18,4 +18,5 @@ group :test do
   gem 'super_diff', require: false
   gem 'factory_bot', require: 'false'
   gem 'mailmock', git: 'git@github.com:descope/mailmock.git', glob: 'sdk/ruby/*.gemspec'
+  gem 'selenium-webdriver', require: false
 end

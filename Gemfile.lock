@@ -142,6 +142,12 @@ GEM
       rubocop-ast (>= 1.30.0, < 2.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
+    rubyzip (2.3.2)
+    selenium-webdriver (4.17.0)
+      base64 (~> 0.2)
+      rexml (~> 3.2, >= 3.2.5)
+      rubyzip (>= 1.2.2, < 3.0)
+      websocket (~> 1.0)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -173,6 +179,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
+    websocket (1.2.10)
     zache (0.13.1)
 
 PLATFORMS
@@ -197,6 +204,7 @@ DEPENDENCIES
   rspec (~> 3.11)
   rubocop
   rubocop-rails
+  selenium-webdriver
   simplecov (~> 0.9)
   simplecov-cobertura
   super_diff

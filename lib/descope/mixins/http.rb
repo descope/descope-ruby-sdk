@@ -52,10 +52,9 @@ module Descope
       end
 
       def encode_uri(uri)
-        # if a base_uri is set then the uri can be encoded as a path
-        path = base_uri ? Addressable::URI.new(path: uri).normalized_path : Addressable::URI.escape(uri)
-        @logger.debug "will call #{url(path)}"
-        url(path)
+        encoded_uri = base_uri ? Addressable::URI.parse(uri).normalize : Addressable::URI.escape(uri)
+        @logger.debug "will call #{url(encoded_uri)}"
+        url(encoded_uri)
       end
 
       def url(path)

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'cgi'
 
 module Descope
   module Api
@@ -10,10 +11,11 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def oauth_start(provider: nil, return_url: nil, login_options: nil, refresh_token: nil)
-            verify_provider(provider)
-            request_params = compose_start_params(provider:, return_url:, login_options:)
-            post(OAUTH_START_PATH, request_params, {}, refresh_token)
+          def oauth_start(provider: nil, return_url: nil, login_options: nil, refresh_token: nil, template_options: nil)
+            body = compose_start_params(login_options:, template_options:)
+            url = "#{OAUTH_START_PATH}?provider=#{provider}"
+            url += "&redirect_uri=#{CGI.escape(return_url)}" if return_url
+            post(url, body, {}, refresh_token)
           end
 
           def oauth_exchange_token(code = nil)
@@ -44,7 +46,7 @@ module Descope
 
           private
 
-          def compose_start_params(provider: nil, return_url: nil, login_options: nil)
+          def compose_start_params(login_options: nil, template_options: nil)
             login_options ||= {}
 
             unless login_options.is_a?(Hash)
@@ -54,13 +56,13 @@ module Descope
               )
             end
 
-            request_params = { provider: }
-            request_params[:returnUrl] = return_url if return_url
-            request_params[:stepup] = login_options.fetch(:stepup, false)
-            request_params[:mfa] = login_options.fetch(:mfa, false)
-            request_params[:customClaims] = login_options.fetch(:custom_claims, {})
-            request_params[:ssoAppId] = login_options.fetch(:sso_app_id, nil)
-            request_params
+            body = {}
+            body[:stepup] = login_options.fetch(:stepup, false)
+            body[:mfa] = login_options.fetch(:mfa, false)
+            body[:customClaims] = login_options.fetch(:custom_claims, {})
+            body[:ssoAppId] = login_options.fetch(:sso_app_id, nil) if login_options.key?(:sso_app_id)
+            body[:templateOptions] = template_options unless template_options.nil?
+            body
           end
         end
       end
