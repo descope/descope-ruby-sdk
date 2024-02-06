@@ -60,7 +60,6 @@ module Descope
       def authorization_header(pswd = nil)
         pswd = @default_pswd if pswd.nil? || pswd.empty?
         bearer = "#{@project_id}:#{pswd}"
-        @logger.debug("setting bearer header #{bearer}")
         add_headers('Authorization' => "Bearer #{bearer}")
       end
 

@@ -76,8 +76,13 @@ module Descope
 
       def request(method, uri, body = {}, extra_headers = {})
         # @headers is getting the authorization header merged in initializer.rb
+        headers_debug = @headers.dup
+        if headers_debug['Authorization']
+          headers_debug['Authorization'] = headers_debug['Authorization'].gsub(/(.{10})\z/, '***********')
+        end
+
         @logger.debug "base url: #{@base_uri}"
-        @logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{@headers}"
+        @logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{headers_debug}"
         result = case method
                  when :get
                    get_headers = @headers.merge({ params: body }).merge(extra_headers)

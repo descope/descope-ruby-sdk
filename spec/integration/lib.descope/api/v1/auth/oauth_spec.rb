@@ -24,7 +24,7 @@ describe Descope::Api::V1::Auth::OAuth do
       # Handle Confirmation page
       begin
         puts "Confirmation page found"
-        @driver.find_element(:name, 'authorize').click
+        @driver.find_element(:id, 'js-oauth-authorize-btn').click
       rescue Selenium::WebDriver::Error::NoSuchElementError
         puts 'could not find confirmation button'
         # Handle case where confirmation page isn't present
