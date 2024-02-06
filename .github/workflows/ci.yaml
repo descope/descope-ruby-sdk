@@ -26,6 +26,7 @@ jobs:
       - name: Configure Bundler
         run: |
           # Configure bundler with the required GitHub token
+          git config --global url."https://x-access-token:${{ secrets.CI_READ_COMMON }}@github.com".insteadOf "https://github.com"
           bundle install
 
       - name: Run RSpec Test
