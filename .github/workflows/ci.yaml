@@ -16,10 +16,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Configure Bundler
-        run: bundle config github.com ${{ secrets.CI_READ_COMMON }}
-          
       - uses: ruby/setup-ruby@v1
+        run: bundle config github.com ${{ secrets.CI_READ_COMMON }}
         env:
           BUNDLE_GITHUB__COM: x-access-token:${{ secrets.CI_READ_COMMON }}
         with:
