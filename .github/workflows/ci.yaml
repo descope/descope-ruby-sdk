@@ -28,6 +28,8 @@ jobs:
           # Configure bundler with the required GitHub token
           git config --global url."https://x-access-token:${{ secrets.CI_READ_COMMON }}@github.com".insteadOf "https://github.com"
           bundle install
+          git clone https://<token>:x-oauth-basic@github.com/descope/mailmock.git
+
 
       - name: Run RSpec Test
         run: bundle exec rspec spec/lib.descope
