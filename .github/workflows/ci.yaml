@@ -24,8 +24,7 @@ jobs:
       - name: Configure Bundler
         run: |
           # Configure bundler with the required GitHub token
-          echo "BUNDLE_GITHUB__COM=${{ secrets.CI_READ_COMMON }}:x-oauth-basic" >> $GITHUB_ENV
-          bundle config set --global github.com ${{ secrets.CI_READ_COMMON }}:x-oauth-basic
+          bundle config set --global github.com x-access-token:${{ secrets.GH_TOKEN }}
           bundle install
 
       - name: Run RSpec Test
