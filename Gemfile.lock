@@ -109,6 +109,7 @@ GEM
       netrc (~> 0.8)
     retryable (3.0.5)
     rexml (3.2.6)
+    rotp (6.3.0)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -201,6 +202,7 @@ DEPENDENCIES
   mailmock!
   rack-test
   rake (~> 13.0)
+  rotp
   rspec (~> 3.11)
   rubocop
   rubocop-rails

@@ -17,9 +17,10 @@ module Descope
             validate_password(password)
             request_params = {
               loginId: login_id,
-              password: password
+              password:
             }
-            request_params[:user] = user unless user.nil?
+
+            request_params[:user] = user_compose_update_body(**user) unless user.nil?
 
             post(SIGN_UP_PASSWORD_PATH, request_params)
           end
@@ -33,7 +34,7 @@ module Descope
             validate_password(password)
             request_params = {
               loginId: login_id,
-              password: password,
+              password:,
               ssoAppId: sso_app_id
             }
             res = post(SIGN_IN_PASSWORD_PATH, request_params)

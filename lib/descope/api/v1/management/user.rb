@@ -441,6 +441,7 @@ module Descope
             post(USER_GENERATE_EMBEDDED_LINK_PATH, request_params)
           end
 
+
           private
 
           def user_create(

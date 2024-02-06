@@ -19,4 +19,5 @@ group :test do
   gem 'factory_bot', require: 'false'
   gem 'mailmock', git: 'git@github.com:descope/mailmock.git', glob: 'sdk/ruby/*.gemspec'
   gem 'selenium-webdriver', require: false
+  gem 'rotp', require: false
 end

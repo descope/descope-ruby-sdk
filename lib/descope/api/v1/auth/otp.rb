@@ -131,7 +131,7 @@ module Descope
             }
 
             unless user.nil?
-              body[:user] = user
+              body[:user] = user_compose_update_body(**user) unless user.empty?
               method_str, val = get_login_id_by_method(method:, user:)
               body[method_str.to_sym] = val
             end
