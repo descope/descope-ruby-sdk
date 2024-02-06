@@ -19,7 +19,7 @@ jobs:
       - name: Configure Bundler
         run: bundle config github.com ${{ secrets.CI_READ_COMMON }}
           
-          - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         env:
           BUNDLE_GITHUB__COM: x-access-token:${{ secrets.CI_READ_COMMON }}
         with:
