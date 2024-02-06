@@ -131,7 +131,7 @@ module Descope
             }
 
             unless user.nil?
-              body[:user] = user_compose_update_body(**user) unless user.empty?
+              body[:user] = otp_user_compose_update_body(**user) unless user.empty?
               method_str, val = get_login_id_by_method(method:, user:)
               body[method_str.to_sym] = val
             end
@@ -164,6 +164,20 @@ module Descope
             body[:loginOptions][:ssoAppId] = login_options.fetch(:sso_app_id, nil)
 
             body
+          end
+
+          private
+          def otp_user_compose_update_body(login_id: nil, name: nil, phone: nil, email: nil, given_name: nil, middle_name: nil, family_name: nil)
+            user = {}
+            user[:loginId] = login_id if login_id
+            user[:name] = name if name
+            user[:phone] = phone if phone
+            user[:email] = email if email
+            user[:givenName] = given_name if given_name
+            user[:middleName] = middle_name if middle_name
+            user[:familyName] = family_name if family_name
+
+            user
           end
         end
       end

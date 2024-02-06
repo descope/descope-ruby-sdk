@@ -56,15 +56,16 @@ describe Descope::Api::V1::Auth::MagicLink do
       puts "token: #{token}"
 
       expect do
-      begin
-        jwt_response = @client.magiclink_verify_token(token)
-        puts "jwt_response #{jwt_response}"
-        my_details = @client.me(jwt_response['refreshJwt'])
-        expect(my_details['email']).to eq(user[:email])
-        puts 'Magiclink Token Verified via sign in!'
-      rescue StandardError => e
-        raise StandardError "Verification failed - Could not verify token: #{e.message}"
-      end.to_not raise_error
+        begin
+          jwt_response = @client.magiclink_verify_token(token)
+          puts "jwt_response #{jwt_response}"
+          my_details = @client.me(jwt_response['refreshJwt'])
+          expect(my_details['email']).to eq(user[:email])
+          puts 'Magiclink Token Verified via sign in!'
+        rescue StandardError => e
+          raise StandardError "Verification failed - Could not verify token: #{e.message}"
+        end.to_not raise_error
+      end
     end
 
     it 'should sign up or in with magiclink' do
@@ -78,15 +79,16 @@ describe Descope::Api::V1::Auth::MagicLink do
       puts "token: #{token}"
 
       expect do
-      begin
-        jwt_response = @client.magiclink_verify_token(token)
-        puts "jwt_response #{jwt_response}"
-        my_details = @client.me(jwt_response['refreshJwt'])
-        expect(my_details['email']).to eq(user[:email])
-        puts 'Magiclink Token Verified via sign up or in!'
-      rescue StandardError => e
-        raise StandardError "Verification failed - Could not verify token: #{e.message}"
-      end.to_not raise_error
+        begin
+          jwt_response = @client.magiclink_verify_token(token)
+          puts "jwt_response #{jwt_response}"
+          my_details = @client.me(jwt_response['refreshJwt'])
+          expect(my_details['email']).to eq(user[:email])
+          puts 'Magiclink Token Verified via sign up or in!'
+        rescue StandardError => e
+          raise StandardError "Verification failed - Could not verify token: #{e.message}"
+        end.to_not raise_error
+      end
     end
 
     it 'should update email on magiclink' do
@@ -104,27 +106,28 @@ describe Descope::Api::V1::Auth::MagicLink do
       puts "token: #{token}"
 
       expect do
-      begin
-        puts 'verifying token from magiclink...'
-        jwt_response = @client.magiclink_verify_token(token)
+        begin
+          puts 'verifying token from magiclink...'
+          jwt_response = @client.magiclink_verify_token(token)
 
-        @mailbox_new = @mailmock.create_mailbox(user[:login_id], 'aws')
-        puts 'Updating email Magiclink with refresh token'
-        @client.magiclink_update_user_email(login_id: user[:login_id], email: @mailbox_new.email, refresh_token: jwt_response['refreshJwt'], uri: 'http://localhost:3000/verify')
+          @mailbox_new = @mailmock.create_mailbox(user[:login_id], 'aws')
+          puts 'Updating email Magiclink with refresh token'
+          @client.magiclink_update_user_email(login_id: user[:login_id], email: @mailbox_new.email, refresh_token: jwt_response['refreshJwt'], uri: 'http://localhost:3000/verify')
 
-        puts 'verifying  magiclink token again after email update...'
-        magiclink_update_response = @mailmock.wait_for_email
-        token = magiclink_update_response.text.match(/^http.+verify\?t=(.+)/)[1]
+          puts 'verifying  magiclink token again after email update...'
+          magiclink_update_response = @mailmock.wait_for_email
+          token = magiclink_update_response.text.match(/^http.+verify\?t=(.+)/)[1]
 
-        magiclink_verify_post_update_response = @client.magiclink_verify_token(token)
+          magiclink_verify_post_update_response = @client.magiclink_verify_token(token)
 
-        puts 'verifying email was updated...'
-        my_details = @client.me(magiclink_verify_post_update_response['refreshJwt'])
-        expect(my_details['email']).to eq(@mailbox_new.email)
-        puts 'Magiclink Token Verified!'
-      rescue StandardError => e
-        raise StandardError "Verification failed - Could not verify token: #{e.message}"
-      end.to_not raise_error
+          puts 'verifying email was updated...'
+          my_details = @client.me(magiclink_verify_post_update_response['refreshJwt'])
+          expect(my_details['email']).to eq(@mailbox_new.email)
+          puts 'Magiclink Token Verified!'
+        rescue StandardError => e
+          raise StandardError "Verification failed - Could not verify token: #{e.message}"
+        end.to_not raise_error
+      end
     end
   end
 end

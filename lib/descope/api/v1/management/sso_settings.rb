@@ -16,7 +16,7 @@ module Descope
             delete(SSO_SETTINGS_PATH, { tenantId: tenant_id })
           end
 
-          def create_sso_oidc_app(id: nil, name : nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
+          def create_sso_oidc_app(id: nil, name: nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
             body = {}
             body[:id] = id if id
             body[:name] = name if name
@@ -27,7 +27,7 @@ module Descope
             post(SSO_OIDC_CREATE_APP_PATH, body)
           end
 
-          def update_sso_oidc_app(id: nil, name : nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
+          def update_sso_oidc_app(id: nil, name: nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
             body = {}
             body[:id] = id if id
             body[:name] = name if name

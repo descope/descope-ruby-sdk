@@ -7,6 +7,7 @@ describe Descope::Api::V1::EnchantedLink do
     dummy_instance = DummyClass.new
     dummy_instance.extend(Descope::Api::V1::Session)
     dummy_instance.extend(Descope::Api::V1::Auth::EnchantedLink)
+    dummy_instance.extend(Descope::Api::V1::Management::User)
     @instance = dummy_instance
   end
 
@@ -70,7 +71,7 @@ describe Descope::Api::V1::EnchantedLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/email',
-        user: { username: 'user1', email: 'dummy@dummy.com' },
+        user: { loginId: 'user1', email: 'dummy@dummy.com' },
         email: 'dummy@dummy.com'
       }
 
@@ -83,7 +84,7 @@ describe Descope::Api::V1::EnchantedLink do
         @instance.enchanted_link_sign_up(
           login_id: 'test',
           uri: 'https://some-uri/email',
-          user: { username: 'user1', email: 'dummy@dummy.com' }
+          user: { login_id: 'user1', email: 'dummy@dummy.com' }
         )
       end.not_to raise_error
     end

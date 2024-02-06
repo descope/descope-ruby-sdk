@@ -7,6 +7,7 @@ describe Descope::Api::V1::MagicLink do
     dummy_instance = DummyClass.new
     dummy_instance.extend(Descope::Api::V1::Session)
     dummy_instance.extend(Descope::Api::V1::Auth::MagicLink)
+    dummy_instance.extend(Descope::Api::V1::Management::User)
     @instance = dummy_instance
   end
 
@@ -101,7 +102,7 @@ describe Descope::Api::V1::MagicLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/email',
-        user: { username: 'user1', email: 'dummy@dummy.com' },
+        user: { loginId: 'user1', email: 'dummy@dummy.com' },
         email: 'dummy@dummy.com'
       }
 
@@ -115,7 +116,7 @@ describe Descope::Api::V1::MagicLink do
           login_id: 'test',
           method: DeliveryMethod::EMAIL,
           uri: 'https://some-uri/email',
-          user: { username: 'user1', email: 'dummy@dummy.com' }
+          user: { login_id: 'user1', email: 'dummy@dummy.com' }
         )
       end.not_to raise_error
     end
@@ -124,7 +125,7 @@ describe Descope::Api::V1::MagicLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/sms',
-        user: { username: 'user1', phone: '+1234567890' },
+        user: { loginId: 'user1', phone: '+1234567890' },
         phone: '+1234567890'
       }
 
@@ -138,7 +139,7 @@ describe Descope::Api::V1::MagicLink do
           login_id: 'test',
           method: DeliveryMethod::SMS,
           uri: 'https://some-uri/sms',
-          user: { username: 'user1', phone: '+1234567890' }
+          user: { login_id: 'user1', phone: '+1234567890' }
         )
       end.not_to raise_error
     end

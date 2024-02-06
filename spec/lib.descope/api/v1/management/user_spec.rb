@@ -32,7 +32,6 @@ describe Descope::Api::V1::Management::User do
           displayName: 'name',
           givenName: 'name',
           familyName: 'Ruby SDK',
-          roleNames: [],
           userTenants: associated_tenants_to_hash_array(user_tenants_args),
           test: false,
           picture: 'https://www.example.com/picture.png',
@@ -78,19 +77,13 @@ describe Descope::Api::V1::Management::User do
       users_params = {
         users: [
           {
-            loginId: 'first@mail.com', email: 'first@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
+            loginId: 'first@mail.com', email: 'first@mail.com', test: false, invite: false
           },
           {
-            loginId: 'second@mail.com', email: 'second@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
+            loginId: 'second@mail.com', email: 'second@mail.com', test: false, invite: false
           },
           {
-            loginId: 'third@mail.com', email: 'third@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
+            loginId: 'third@mail.com', email: 'third@mail.com', test: false, invite: false
           }
         ]
       }
@@ -114,15 +107,7 @@ describe Descope::Api::V1::Management::User do
         USER_CREATE_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
-          phone: nil,
-          displayName: nil,
-          roleNames: [],
-          userTenants: [],
           test: false,
-          picture: nil,
-          customAttributes: nil,
-          additionalIdentifiers: [],
-          ssoAppIds: [],
           invite: true
         }
       )
@@ -148,14 +133,7 @@ describe Descope::Api::V1::Management::User do
           email: 'name@mail.com',
           givenName: 'mister',
           displayName: 'something else',
-          phone: nil,
-          roleNames: [],
-          userTenants: [],
           test: false,
-          picture: nil,
-          customAttributes: nil,
-          additionalIdentifiers: [],
-          ssoAppIds: [],
           invite: false
         }
       )

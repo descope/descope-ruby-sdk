@@ -20,8 +20,7 @@ module Descope
               password:
             }
 
-            request_params[:user] = user_compose_update_body(**user) unless user.nil?
-
+            request_params[:user] = password_user_compose_update_body(**user) unless user.nil?
             post(SIGN_UP_PASSWORD_PATH, request_params)
           end
 
@@ -78,6 +77,20 @@ module Descope
             validate_login_id(login_id)
             post(SEND_RESET_PASSWORD_PATH,
                  loginId: login_id, redirectUrl: redirect_url, providerId: provider_id, templateId: template_id)
+          end
+
+          private
+          def password_user_compose_update_body(login_id: nil, name: nil, phone: nil, email: nil, given_name: nil, middle_name: nil, family_name: nil)
+            user = {}
+            user[:loginId] = login_id if login_id
+            user[:name] = name if name
+            user[:phone] = phone if phone
+            user[:email] = email if email
+            user[:givenName] = given_name if given_name
+            user[:middleName] = middle_name if middle_name
+            user[:familyName] = family_name if family_name
+
+            user
           end
         end
       end

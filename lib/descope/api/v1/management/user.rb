@@ -577,17 +577,6 @@ module Descope
           )
             body = {
               loginId: login_id,
-              email:,
-              phone:,
-              displayName: display_name,
-              roleNames: role_names,
-              userTenants: associated_tenants_to_hash_array(user_tenants),
-              test:,
-              invite:,
-              picture:,
-              customAttributes: custom_attributes,
-              additionalIdentifiers: additional_identifiers,
-              ssoAppIds: sso_app_ids
             }
             if (hashed_password.nil? || hashed_password.empty?) && (!password.nil? && !password.empty?)
               body[:password] = password
@@ -603,6 +592,17 @@ module Descope
               body[:hashedPassword] = hashed_password.to_hash
             end
 
+            body[:email] = email unless email.nil? || email.empty?
+            body[:phone] = phone unless phone.nil? || phone.empty?
+            body[:displayName] = display_name unless display_name.nil? || display_name.empty?
+            body[:roleNames] = role_names unless role_names.nil? || role_names.empty?
+            body[:userTenants] = associated_tenants_to_hash_array(user_tenants) unless user_tenants.nil? || user_tenants.empty?
+            body[:test] = test unless test.nil?
+            body[:invite] = invite unless invite.nil?
+            body[:picture] = picture unless picture.nil? || picture.empty?
+            body[:customAttributes] = custom_attributes unless custom_attributes.nil? || custom_attributes.empty?
+            body[:additionalIdentifiers] = additional_identifiers unless additional_identifiers.nil? || additional_identifiers.empty?
+            body[:ssoAppIds] = sso_app_ids unless sso_app_ids.nil? || sso_app_ids.empty?
             body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.to_s.empty?
             body[:givenName] = given_name unless given_name.nil?
             body[:middleName] = middle_name unless middle_name.nil?
