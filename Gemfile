@@ -17,7 +17,7 @@ group :test do
   gem 'dotenv', require: false
   gem 'super_diff', require: false
   gem 'factory_bot', require: 'false'
-  gem 'mailmock', git: 'https://github.com/descope/mailmock.git', glob: 'sdk/ruby/*.gemspec'
+  gem 'mailmock', git: 'https://x-access-token:${{ secrets.CI_READ_COMMON }}@github.com/descope/mailmock.git', glob: 'sdk/ruby/*.gemspec'
   gem 'selenium-webdriver', require: false
   gem 'rotp', require: false
 end
