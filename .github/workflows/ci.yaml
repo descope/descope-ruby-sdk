@@ -18,7 +18,7 @@ jobs:
 
       - name: Configure Bundler
         run: |
-          echo "BUNDLE_GITHUB__COM: x-access-token=${{ secrets.CI_READ_COMMON }}" >> $GITHUB_ENV
+          echo "BUNDLE_GITHUB__COM=x-access-token:${{ secrets.CI_READ_COMMON }}" >> $GITHUB_ENV
 
       - uses: ruby/setup-ruby@v1
         with:
