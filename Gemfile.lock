@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:descope/mailmock.git
+  remote: https://github.com/descope/mailmock.git
   revision: d6e4123aa5ad3693bf2d75325c3814ab9105c26e
   glob: sdk/ruby/*.gemspec
   specs:
