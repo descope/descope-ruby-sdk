@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module User
+          include Descope::Api::V1::Management::Common
+
           # Create a new user, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
           # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.

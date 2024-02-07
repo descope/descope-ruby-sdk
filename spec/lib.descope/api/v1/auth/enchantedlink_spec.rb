@@ -152,7 +152,7 @@ describe Descope::Api::V1::EnchantedLink do
       allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
 
       expect do
-        @instance.enchanted_link_get_session(pending_ref: 'pendingRef')
+        @instance.enchanted_link_get_session('pendingRef')
       end.not_to raise_error
     end
   end

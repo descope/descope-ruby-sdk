@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module Project
+          include Descope::Api::V1::Management::Common
+
           def rename_project(name)
             # Rename a project.
             post(PROJECT_UPDATE_NAME, { name: })

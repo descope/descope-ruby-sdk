@@ -13,7 +13,7 @@ def poll_for_session(descope_client, pending_ref)
       puts 'waiting 4 seconds for session to be created...'
       sleep(4)
       print '.'
-      jwt_response = descope_client.enchanted_link_get_session(pending_ref:)
+      jwt_response = descope_client.enchanted_link_get_session(pending_ref)
       done = true
     rescue Descope::AuthException, Descope::Unauthorized => e
       puts "Failed pending session, err: #{e}"

@@ -25,6 +25,7 @@ module Descope
         include Descope::Api::V1::Auth::SAML
         include Descope::Api::V1::Auth::TOTP
 
+
         ALGORITHM_KEY = 'alg'
 
         def generate_jwt_response(response_body: nil, refresh_cookie: nil, audience: nil)
@@ -40,8 +41,8 @@ module Descope
           jwt_response
         end
 
-        def exchange_access_key(refresh_token = nil)
-          post(EXCHANGE_AUTH_ACCESS_KEY_PATH, {}, {}, refresh_token)
+        def exchange_access_key(access_key = nil)
+          post(EXCHANGE_AUTH_ACCESS_KEY_PATH, {}, {}, access_key)
         end
 
         def select_tenant(tenant_id: nil, refresh_token: nil)
