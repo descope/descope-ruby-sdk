@@ -13,8 +13,6 @@ require 'descope'
 @client = Descope::Client.new({ project_id: @project_id, management_key: @management_key })
 
 begin
-  @logger.info('Deleting existing authz schema')
-  @client.authz_delete_schema
   @logger.info('Creating test authz schema if different name')
   schema = @client.authz_load_schema
   File.open('./authz_files.json', 'rt') do |f|
