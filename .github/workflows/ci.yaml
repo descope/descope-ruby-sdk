@@ -38,6 +38,8 @@ jobs:
           # Should breaking changes before 1.0.0 produce minor bumps?
           bump-minor-pre-major: true
           version-file: "lib/descope/please/version.rb"
+        if: github.ref == 'refs/heads/main'
+
 
       - name: Publish to RubyGems
         run: |
