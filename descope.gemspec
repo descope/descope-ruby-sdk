@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Descope::VERSION
   s.authors     = ['Descope']
   s.email       = ['support@descope.com']
-  s.homepage    = 'https://github.com/descope/ruby-sdk'
+  s.homepage    = 'https://github.com/descope/descope-ruby-sdk'
   s.summary     = 'Descope API Client'
   s.description = 'Ruby API Client for Descope API https://descope.com'
 
