@@ -19,7 +19,7 @@ begin
   @logger.info("oauth response: #{resp}")
 
   # open the browser with the url
-  link = resp['redirectUrl']
+  link = resp['url']
   Launchy.open(link) # open the browser with the
 
 
@@ -29,6 +29,9 @@ begin
   jwt_response = @client.oauth_exchange_token(code)
   @logger.info('oauth code valid')
   refresh_token = jwt_response['refreshSessionToken']['jwt']
+  my_details = @client.me(refresh_token)
+  @logger.info("my details: #{my_details}")
+
   @client.sign_out(refresh_token)
   @logger.info('User logged out')
 rescue Descope::AuthException => e

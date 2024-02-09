@@ -11,10 +11,11 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def oauth_start(provider: nil, return_url: nil, login_options: nil, refresh_token: nil, template_options: nil)
+          def oauth_start(provider: nil, return_url: nil, prompt: nil, login_options: nil, refresh_token: nil, template_options: nil)
             body = compose_start_params(login_options:, template_options:)
             url = "#{OAUTH_START_PATH}?provider=#{provider}"
-            url += "&redirect_uri=#{CGI.escape(return_url)}" if return_url
+            url += "&redirectUrl=#{CGI.escape(return_url)}" if return_url
+            url += "&prompt=#{prompt}" if prompt
             post(url, body, {}, refresh_token)
           end
 

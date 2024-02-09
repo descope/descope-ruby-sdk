@@ -222,22 +222,28 @@ module Descope
           jwt_response = {}
 
           # validate the session token if sessionJwt is not empty
-          st_jwt = response_body['sessionJwt'] || ''
-          validate_token(st_jwt) if st_jwt != ''
+          st_jwt = response_body.fetch('sessionJwt', '')
+          if st_jwt
+            jwt_response[SESSION_TOKEN_NAME] = validate_token(st_jwt, audience)
+          end
 
           # validate refresh token if refresh_token was passed or if refreshJwt is not empty
-          rt_jwt = response_body['refreshJwt'] || ''
-          jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience) if refresh_token
-          jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, user_jwt) if rt_jwt != ''
+          rt_jwt = response_body.fetch('refreshJwt', '')
+
+          if refresh_token
+            jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
+          elsif rt_jwt
+            jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, audience)
+          end
 
           jwt_response = adjust_properties(jwt_response, user_jwt)
 
           if user_jwt
             jwt_response[COOKIE_DATA_NAME] = {
-              exp: response_body['cookieExpiration'] || 0,
-              maxAge: response_body['cookieMaxAge'] || 0,
-              domain: response_body['cookieDomain'] || '',
-              path: response_body['cookiePath'] || ''
+              exp: response_body.fetch('cookieExpiration', 0),
+              maxAge: response_body.fetch('cookieMaxAge', 0),
+              domain: response_body.fetch('cookieDomain', ''),
+              path: response_body.fetch('cookiePath', '/')
             }
           end
 
@@ -247,31 +253,31 @@ module Descope
         def adjust_properties(jwt_response, user_jwt)
           # Save permissions, roles and tenants info from Session token or from refresh token on the json top level
           if jwt_response[SESSION_TOKEN_NAME]
-            jwt_response['permissions'] = jwt_response[SESSION_TOKEN_NAME]['permissions'] || []
-            jwt_response['roles'] = jwt_response[SESSION_TOKEN_NAME]['roles'] || []
-            jwt_response['tenants'] = jwt_response[SESSION_TOKEN_NAME]['tenants'] || {}
+            jwt_response['permissions'] = jwt_response[SESSION_TOKEN_NAME].fetch('permissions', [])
+            jwt_response['roles'] = jwt_response[SESSION_TOKEN_NAME].fetch('roles', [])
+            jwt_response['tenants'] = jwt_response[SESSION_TOKEN_NAME].fetch('tenants', {})
           elsif jwt_response[REFRESH_SESSION_TOKEN_NAME]
-            jwt_response['permissions'] = jwt_response[REFRESH_SESSION_TOKEN_NAME]['permissions'] || []
-            jwt_response['roles'] = jwt_response[REFRESH_SESSION_TOKEN_NAME]['roles'] || []
-            jwt_response['tenants'] = jwt_response[REFRESH_SESSION_TOKEN_NAME]['tenants'] || {}
+            jwt_response['permissions'] = jwt_response[REFRESH_SESSION_TOKEN_NAME].fetch('permissions', [])
+            jwt_response['roles'] = jwt_response[REFRESH_SESSION_TOKEN_NAME].fetch('roles', [])
+            jwt_response['tenants'] = jwt_response[REFRESH_SESSION_TOKEN_NAME].fetch('tenants', {})
           else
-            jwt_response['permissions'] = []
-            jwt_response['roles'] = []
-            jwt_response['tenants'] = {}
+            jwt_response['permissions'] = jwt_response.fetch('permissions', [])
+            jwt_response['roles'] = jwt_response.fetch('roles', [])
+            jwt_response['tenants'] = jwt_response.fetch('tenants', {})
           end
 
           # Save the projectID also in the dict top level
           issuer =
-            (jwt_response[SESSION_TOKEN_NAME] ? jwt_response[SESSION_TOKEN_NAME]['iss'] : nil) ||
-            (jwt_response[REFRESH_SESSION_TOKEN_NAME] ? jwt_response[REFRESH_SESSION_TOKEN_NAME]['iss'] : nil) ||
-            jwt_response['iss'] || ''
+            jwt_response.fetch(SESSION_TOKEN_NAME, {}).fetch('iss', nil) ||
+            jwt_response.fetch(REFRESH_SESSION_TOKEN_NAME, {}).fetch('iss', nil) ||
+            jwt_response.fetch('iss', '')
 
           jwt_response['projectId'] = issuer.split('/').last # support both url issuer and project ID issuer
 
           sub =
-            (jwt_response[SESSION_TOKEN_NAME] ? jwt_response[SESSION_TOKEN_NAME]['sub'] : nil) ||
-            (jwt_response[REFRESH_SESSION_TOKEN_NAME] ? jwt_response[REFRESH_SESSION_TOKEN_NAME]['sub'] : nil) ||
-            jwt_response['sub'] || ''
+            jwt_response.fetch(SESSION_TOKEN_NAME, {}).fetch('iss', nil) ||
+            jwt_response.fetch(REFRESH_SESSION_TOKEN_NAME, {}).fetch('iss', nil) ||
+            jwt_response.fetch('sub', '')
 
           if user_jwt
             jwt_response['userId'] = sub # Save the userID also in the dict top level

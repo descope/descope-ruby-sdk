@@ -14,7 +14,8 @@ GEM
     http-cookie (1.0.5)
       domain_name (~> 0.5)
     jwt (2.7.1)
-    lunchy (0.10.4)
+    launchy (2.5.2)
+      addressable (~> 2.8)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0206)
@@ -34,7 +35,7 @@ PLATFORMS
 
 DEPENDENCIES
   descope
-  lunchy
+  launchy
 
 BUNDLED WITH
    2.5.5
