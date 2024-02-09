@@ -15,7 +15,7 @@ module Descope
             body = compose_start_params(login_options:, template_options:)
             url = "#{OAUTH_START_PATH}?provider=#{provider}"
             url += "&redirectUrl=#{CGI.escape(return_url)}" if return_url
-            url += "&prompt=#{prompt}" if prompt
+            url += "&prompt=#{CGI.escape(prompt)}" if prompt
             post(url, body, {}, refresh_token)
           end
 
