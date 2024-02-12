@@ -41,7 +41,8 @@ module Descope
 
           def magiclink_verify_token(token = nil)
             validate_token_not_empty(token)
-            post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
+            res = post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
+            generate_jwt_response(response_body: res)
           end
 
           def magiclink_update_user_email(login_id: nil, email: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, refresh_token: nil)
@@ -55,7 +56,7 @@ module Descope
             body[:templateOptions] = template_options if template_options
             uri = UPDATE_USER_EMAIL_MAGICLINK_PATH
             res = post(uri, body, {}, refresh_token)
-            extract_masked_address(res, DeliveryMethod::EMAIL)
+            extract_masked_address(res, Descope::Mixins::Common::DeliveryMethod::EMAIL)
           end
 
           def magiclink_update_user_phone(login_id: nil, phone: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, method: nil, refresh_token: nil)
@@ -69,7 +70,7 @@ module Descope
             body[:templateOptions] = template_options if template_options
             uri = UPDATE_USER_PHONE_MAGICLINK_PATH
             res = post(uri, body, {}, refresh_token)
-            extract_masked_address(res, DeliveryMethod::SMS)
+            extract_masked_address(res, Descope::Mixins::Common::DeliveryMethod::SMS)
           end
 
           private

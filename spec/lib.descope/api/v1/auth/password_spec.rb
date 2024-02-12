@@ -16,18 +16,24 @@ describe Descope::Api::V1::Password do
     end
 
     it 'is expected to sign up with password' do
-      expect(@instance).to receive(:post).with(
-        SIGN_UP_PASSWORD_PATH, { loginId: 'test', password: 's3cr3t',
-                                 user: { loginId: 'admin', email: 'test@domain.com' } }
-      )
+      jwt_response = { 'fake': 'response' }
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
 
-      expect {
+      expect(@instance).to receive(:post).with(
+        SIGN_UP_PASSWORD_PATH, {
+          loginId: 'test',
+          password: 's3cr3t',
+          user: { loginId: 'admin', email: 'test@domain.com' }
+        }
+      ).and_return(jwt_response)
+
+      expect do
         @instance.password_sign_up(
           login_id: 'test',
           password: 's3cr3t',
           user: { login_id: 'admin', email: 'test@domain.com' }
         )
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 
