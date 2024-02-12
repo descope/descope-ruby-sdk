@@ -25,8 +25,14 @@ begin
   puts 'Enter code:'
   code = gets.chomp
   @logger.info("Exchanging code: #{code}")
-  res = @client.saml_exchange_token(code)
-  @logger.info("SAML exchange token response: #{res}")
+  jwt_response = @client.saml_exchange_token(code)
+  refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
+
+  res = @client.me(refresh_token)
+  @logger.info("Me response: #{res}")
+
+  @logger.info('signing out...')
+  @client.sign_out(refresh_token)
 rescue Descope::AuthException => e
   @logger.error("Error: #{e.message}")
 end
