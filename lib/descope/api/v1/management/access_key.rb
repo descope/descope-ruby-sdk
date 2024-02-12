@@ -7,6 +7,7 @@ module Descope
         # Management API calls
         module AccessKey
           include Descope::Mixins::Validation
+          include Descope::Api::V1::Management::Common
 
           def create_access_key(name: nil, expire_time: nil, role_names: nil, key_tenants: nil)
             # Create a new access key.'

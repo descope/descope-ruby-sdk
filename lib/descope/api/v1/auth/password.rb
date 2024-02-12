@@ -21,7 +21,8 @@ module Descope
             }
 
             request_params[:user] = password_user_compose_update_body(**user) unless user.nil?
-            post(SIGN_UP_PASSWORD_PATH, request_params)
+            res = post(SIGN_UP_PASSWORD_PATH, request_params)
+            generate_jwt_response(response_body: res)
           end
 
           def password_sign_in(login_id: nil, password: nil, sso_app_id: nil)

@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module Authz
+          include Descope::Api::V1::Management::Common
+
           def authz_save_schema(schema: nil, upgrade: false)
             #  Create or update the ReBAC schema.
             #  In case of update, will update only given namespaces and will not delete namespaces unless upgrade flag is true.

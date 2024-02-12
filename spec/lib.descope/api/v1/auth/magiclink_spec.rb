@@ -61,7 +61,7 @@ describe Descope::Api::V1::MagicLink do
           customClaims: { 'abc': '123' },
           mfa: false,
           ssoAppId: 'sso-id'
-        },
+        }
       }
       expect(@instance).to receive(:post).with(
         magiclink_compose_signin_url(DeliveryMethod::SMS),
@@ -189,10 +189,13 @@ describe Descope::Api::V1::MagicLink do
     end
 
     it 'is expected to verify token with enchanted link' do
+      jwt_response = { 'fake': 'response' }
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+
       expect(@instance).to receive(:post).with(
         VERIFY_MAGICLINK_AUTH_PATH,
         { token: 'token' }
-      )
+      ).and_return(jwt_response)
 
       expect { @instance.magiclink_verify_token('token') }.not_to raise_error
     end

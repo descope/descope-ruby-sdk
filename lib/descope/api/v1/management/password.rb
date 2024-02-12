@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module Password
+          include Descope::Api::V1::Management::Common
+
           def get_password_settings(tenant_id)
             # Get password settings for the provided tenant id.
             get(PASSWORD_SETTINGS_PATH, { tenantId: tenant_id })

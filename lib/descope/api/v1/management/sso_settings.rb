@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module SSOSettings
+          include Descope::Api::V1::Management::Common
+
           def get_sso_settings(tenant_id)
             # Get SSO settings for the provided tenant id.
             get(SSO_SETTINGS_PATH, { tenantId: tenant_id })

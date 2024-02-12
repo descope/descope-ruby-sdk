@@ -94,7 +94,9 @@ module Descope
                    call(method, encode_uri(uri), timeout, @headers, body.to_json)
                  end
 
-        logger.info "http status code: #{result.code}"
+        raise Descope::Unsupported.new("No response from server", code: 400) unless result && result.respond_to?(:code)
+
+        @logger.info "http status code: #{result.code}"
         case result.code
         when 200...226 then safe_parse_json(result.body)
         when 400       then raise Descope::BadRequest.new(result.body, code: result.code, headers: result.headers)
@@ -102,10 +104,10 @@ module Descope
         when 403       then raise Descope::AccessDenied.new(result.body, code: result.code, headers: result.headers)
         when 404       then raise Descope::NotFound.new(result.body, code: result.code, headers: result.headers)
         when 405       then raise Descope::MethodNotAllowed.new(result.body, code: result.code, headers: result.headers)
-        when 429       then raise Descope::RateLimitException.new(result.body, code: result.code,
-                                                                               headers: result.headers)
+        when 429       then raise Descope::RateLimitException.new(result.body, code: result.code, headers: result.headers)
         when 500       then raise Descope::ServerError.new(result.body, code: result.code, headers: result.headers)
-        else           raise Descope::Unsupported.new(result.body, code: result.code, headers: result.headers)
+        else
+          raise Descope::Unsupported.new(result.body, code: result.code, headers: result.headers)
         end
       end
 

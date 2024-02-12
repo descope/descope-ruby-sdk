@@ -19,7 +19,6 @@ module Descope
         @logger ||= Descope::Mixins::Logging.logger_for(self.class.name, log_level)
 
         @logger.debug("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
-        @logger.debug("Management Key ID: #{@management_key}")
 
         if @public_key.nil?
           @public_keys = {}
@@ -31,6 +30,7 @@ module Descope
         @skip_verify = options[:skip_verify]
         @secure = !@skip_verify
         @management_key = options[:management_key] || ENV['DESCOPE_MANAGEMENT_KEY']
+        @logger.debug("Management Key ID: #{@management_key}")
         @timeout_seconds = options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
         @jwt_validation_leeway = options[:jwt_validation_leeway] || Common::DEFAULT_JWT_VALIDATION_LEEWAY
 
@@ -65,7 +65,7 @@ module Descope
 
       def initialize_api(options)
         initialize_v1(options)
-        @default_pswd = options.fetch(:management_key)
+        @default_pswd = options.fetch(:management_key, ENV['DESCOPE_MANAGEMENT_KEY'])
         authorization_header
       end
 

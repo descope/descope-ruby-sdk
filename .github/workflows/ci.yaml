@@ -12,8 +12,6 @@ jobs:
   build:
     name: Build Ruby SDK
     runs-on: ubuntu-latest
-    env:
-      BUNDLE_GITHUB__COM: "x-access-token:${{ secrets.CI_READ_COMMON }}"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -24,23 +22,24 @@ jobs:
           bundler-cache: false
 
       - name: Install dependencies
-        run: |
-          # Configure bundler with the required GitHub token
-          git config --global url."https://x-access-token:${{ secrets.CI_NPM_READ_ORG }}@github.com".insteadOf "https://github.com"
-          git clone https://${{ secrets.CI_NPM_READ_ORG }}:x-oauth-basic@github.com/descope/mailmock.git
-          
-          echo "Bundle install"
-          ${{ secrets.GITHUB_TOKEN }} bundle install
-
+        run: bundle install
 
       - name: Run RSpec Test
-        run: bundle exec rspec spec/lib.descope
-
-      - name: Run Integration Test
-        run: bundle exec rspec spec/integration
+        run: bundle exec rspec
 
       - name: Build Gem
         run: gem build descope.gemspec && gem install descope-*.gem
+
+      - uses: google-github-actions/release-please-action@v4
+        id: release
+        with:
+          release-type: ruby
+          package-name: descope
+          # Should breaking changes before 1.0.0 produce minor bumps?
+          bump-minor-pre-major: true
+          version-file: "lib/descope/please/version.rb"
+        if: github.ref == 'refs/heads/main'
+
 
       - name: Publish to RubyGems
         run: |
@@ -52,3 +51,4 @@ jobs:
           gem push *.gem
         env:
           GEM_HOST_API_KEY: "${{secrets.RUBYGEMS_AUTH_TOKEN}}"
+        if: ${{ steps.release.outputs.release_created }}

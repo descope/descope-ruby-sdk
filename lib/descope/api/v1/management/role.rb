@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module Role
+          include Descope::Api::V1::Management::Common
+
           def create_role(name: nil, description: nil, permission_names: nil)
             # Create a new role.
             permission_names ||= []

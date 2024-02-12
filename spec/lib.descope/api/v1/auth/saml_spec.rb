@@ -46,6 +46,8 @@ describe Descope::Api::V1::SAML do
 
     it 'is expected to exchange token' do
       jwt_response = { 'fake': 'response' }
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+
       expect(@instance).to receive(:post).with(SAML_EXCHANGE_TOKEN_PATH, { code: '123456' }).and_return(jwt_response)
       expect { @instance.saml_exchange_token('123456') }.not_to raise_error
     end

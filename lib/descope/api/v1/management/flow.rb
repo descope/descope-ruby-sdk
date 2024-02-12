@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module Flow
+          include Descope::Api::V1::Management::Common
+
           #        List all project flows
           # @see https://docs.descope.com/api/openapi/flowmanagement/operation/ListFlows/
           # To list all flows, send an empty body such as: { } or { "ids": [] }.
