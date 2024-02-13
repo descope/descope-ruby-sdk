@@ -30,12 +30,20 @@ jobs:
       # in order  to release use conventional commits
       # $ git commit --allow-empty -m "chore: release 1.0.0" -m "Release-As: 1.0.0" && git push
       # this will open a new PR with the changelog and bump the version
+      # Release Please assumes you are using Conventional Commit messages.
+      #
+      # The most important prefixes you should have in mind are:
+      #
+      # fix: which represents bug fixes, and correlates to a SemVer patch.
+      # feat: which represents a new feature, and correlates to a SemVer minor.
+      # feat!:, or fix!:, refactor!:, etc., which represent a breaking change (indicated by the !) and will result in a SemVer major.
       - uses: google-github-actions/release-please-action@v4
         id: release
         with:
           skip-github-release: true
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          release-type: "ruby"
+          package-name: "descope"
+          version-file: "lib/descope/version.rb"
         if: github.ref == 'refs/heads/main'
 
       - name: Publish to RubyGems
