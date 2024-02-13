@@ -33,7 +33,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         id: release
         with:
-          manifest-file: ./release-please-manifest.json
+          manifest-file: ./.release-please-manifest.json
         if: github.ref == 'refs/heads/main'
 
       - name: Publish to RubyGems
