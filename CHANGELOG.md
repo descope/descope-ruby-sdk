@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.0.4](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.0.0...descope/v1.0.4) (2024-02-13)
+
+
+### Miscellaneous Chores
+
+* Descope Ruby SDK Initial Release. ([d045e0f](https://github.com/descope/descope-ruby-sdk/commit/d045e0fab482789c6579855b9af4d7e8b6928ab4))
+
 ## [1.0.0](https://github.com/descope/descope-ruby-sdk/compare/descope-v1.0.0...descope/v1.0.0) (2024-02-13)
 
 
