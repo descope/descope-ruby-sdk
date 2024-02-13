@@ -27,12 +27,17 @@ jobs:
       - name: Run RSpec Test
         run: bundle exec rspec
 
+      # in order  to release use conventional commits
+      # $ git commit --allow-empty -m "chore: release 1.0.0" -m "Release-As: 1.0.0" && git push
+      # this will open a new PR with the changelog and bump the version
       - uses: google-github-actions/release-please-action@v4
         id: release
         with:
           skip-github-release: true
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+          pull-request-title-pattern: "chore(release): ${version}"
+          pull-request-header: ":robot: Merge this PR to release a new version"
         if: github.ref == 'refs/heads/main'
 
       - name: Publish to RubyGems
