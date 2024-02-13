@@ -36,8 +36,6 @@ jobs:
           skip-github-release: true
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          pull-request-title-pattern: "chore(release): ${version}"
-          pull-request-header: ":robot: Merge this PR to release a new version"
         if: github.ref == 'refs/heads/main'
 
       - name: Publish to RubyGems
