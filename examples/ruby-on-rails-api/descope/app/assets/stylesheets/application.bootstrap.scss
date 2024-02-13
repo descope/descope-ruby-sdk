@@ -1,0 +1,67 @@
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons';
+
+@import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@500&display=swap');
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5vh;
+}
+
+.title {
+  margin-top: 10vh;
+  margin-bottom: 5vh;
+  font-size: 2em;
+}
+
+.link {
+  text-decoration: none;
+  margin-bottom: 5vh;
+}
+
+.btn {
+  border: None;
+  background-color: #00BD67;
+  padding: 15px 25px;
+  color: #fff;
+  font-size: 1.1em;
+  border-radius: 9px;
+  margin-top: 12px;
+  margin-right: 1vh;
+}
+
+.btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
+  color: #fff;
+  background-color: #00b3db;
+  border-color: #285e8e; /*set the color you want here*/
+}
+
+.student {
+  margin-bottom: 5vh;
+}
+
+.students {
+  font-size: 1.5em;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+.logout {
+  position: relative;
+  top: -22px;
+}

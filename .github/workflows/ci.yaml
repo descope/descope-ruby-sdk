@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Ruby SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          # We are not letting this step to run bundle install, we will do it later
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run RSpec Test
+        run: bundle exec rspec
+
+      # in order  to release use conventional commits
+      # $ git commit --allow-empty -m "chore: release 1.0.0" -m "Release-As: 1.0.0" && git push
+      # this will open a new PR with the changelog and bump the version
+      # Release Please assumes you are using Conventional Commit messages.
+      #
+      # The most important prefixes you should have in mind are:
+      #
+      # fix: which represents bug fixes, and correlates to a SemVer patch.
+      # feat: which represents a new feature, and correlates to a SemVer minor.
+      # feat!:, or fix!:, refactor!:, etc., which represent a breaking change (indicated by the !) and will result in a SemVer major.
+      - uses: google-github-actions/release-please-action@v4
+        id: release
+        if: github.ref == 'refs/heads/main'
+
+      - name: Publish to RubyGems
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+          gem build *.gemspec
+          gem push *.gem
+        env:
+          GEM_HOST_API_KEY: "${{secrets.RUBYGEMS_API_KEY}}"
+        if: ${{ steps.release.outputs.release_created }}

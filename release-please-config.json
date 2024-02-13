@@ -1,0 +1,18 @@
+{
+  "packages": {
+    ".": {
+      "package-name": "descope",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "ruby",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false,
+      "version-file": "lib/descope/version.rb",
+      "versioning": "always-bump-minor",
+      "pull-request-title-pattern": "chore: release ${version}",
+      "pull-request-header": "Descope Release: Merge this PR to release ${version}"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
