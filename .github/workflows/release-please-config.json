@@ -1,0 +1,11 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "ruby",
+      "bump-minor-pre-major": true,
+      "skip-github-release": true,
+      "package-name": "descope",
+      "version-file": "lib/descope/version.rb"
+    }
+  }
+}
