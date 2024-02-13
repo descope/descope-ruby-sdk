@@ -27,9 +27,6 @@ jobs:
       - name: Run RSpec Test
         run: bundle exec rspec
 
-      - name: Build Gem
-        run: gem build descope.gemspec && gem install descope-*.gem
-
       - uses: google-github-actions/release-please-action@v4
         id: release
         with:
