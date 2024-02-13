@@ -122,7 +122,7 @@ describe Descope::Api::V1::Management::Authz do
         AUTHZ_RD_SAVE,
         {
           relationDefinition: 'test-relation-definition',
-          namespaceName: 'test-namespace',
+          namespace: 'test-namespace',
           old_name: 'old-relation-definition',
           schemaName: 'schema-name'
         }
@@ -130,7 +130,7 @@ describe Descope::Api::V1::Management::Authz do
       expect do
         @instance.authz_save_relation_definition(
           relation_definition: 'test-relation-definition',
-          namespace_name: 'test-namespace',
+          namespace: 'test-namespace',
           old_name: 'old-relation-definition',
           schema_name: 'schema-name'
         )
@@ -175,25 +175,25 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.authz_create_relations(relations: 'test-relations')
+        @instance.authz_create_relations('test-relations')
       end.not_to raise_error
     end
   end
 
   context '.delete_relation' do
     it 'should respond to .delete_relation' do
-      expect(@instance).to respond_to :authz_delete_relation
+      expect(@instance).to respond_to :authz_delete_relations
     end
 
     it 'is expected to delete the given relation' do
       expect(@instance).to receive(:post).with(
         AUTHZ_RE_DELETE,
-        {
-          relations: 'test-relations'
-        }
+        { relations: [{ resource: 'some-note', relationDefinition: 'owner', namespace: 'note', target: 'some-user' }] }
       )
       expect do
-        @instance.authz_delete_relation(relations: 'test-relations')
+        @instance.authz_delete_relations(
+          [{ resource: 'some-note', relationDefinition: 'owner', namespace: 'note', target: 'some-user' }]
+        )
       end.not_to raise_error
     end
   end
@@ -211,7 +211,7 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.authz_delete_relations_for_resources(resources: 'test-resources')
+        @instance.authz_delete_relations_for_resources('test-resources')
       end.not_to raise_error
     end
   end
@@ -229,7 +229,7 @@ describe Descope::Api::V1::Management::Authz do
         }
       )
       expect do
-        @instance.authz_has_relations?(relation_queries: ['some-query'])
+        @instance.authz_has_relations?(['some-query'])
       end.not_to raise_error
     end
   end

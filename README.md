@@ -170,7 +170,7 @@ def poll_for_session(descope_client, pending_ref)
       puts 'waiting 4 seconds for session to be created...'
       sleep(4)
       print '.'
-      jwt_response = descope_client.enchanted_link_get_session(pending_ref:)
+      jwt_response = descope_client.enchanted_link_get_session(pending_ref)
       done = true
     rescue Descope::AuthException, Descope::Unauthorized => e
       puts 'Failed pending session, err: #{e}'
@@ -580,7 +580,7 @@ descope_client.update_phone(
         verified: true
 )
 
-descope_client.remove_tenant_roles(
+descope_client.user_remove_tenant_roles(
         login_id: 'desmond@descope.com',
         tenant_id: 'my-tenant-id',
         role_names: ['role-name1']
@@ -648,13 +648,13 @@ access_key_resp = descope_client.load_access_key('key-id')
 access_key = access_key_resp['key']
 
 # Search all access keys, optionally according to a tenant filter
-keys_resp = descope_client.search_all_access_keys(tenant_ids: ['my-tenant-id'])
+keys_resp = descope_client.search_all_access_keys(['my-tenant-id'])
 keys = keys_resp['keys']
 keys.each do |key|
-        # Do something
+        # Do something with key
 end
 
-# Update will override all fields as is. Use carefully.
+# Update will rename the access key
 descope_client.update_access_key(
     id: 'key-id',
     name: 'new name'
@@ -766,23 +766,21 @@ You can list your flows and also import and export flows and screens, or the pro
 
 ```ruby
 # List all project flows
-flows_resp = descope_client.list_flows()
+flows_resp = descope_client.list_or_search_flows()
 puts("Total number of flows: #{flows_resp['total']}")
 flows = flows_resp['flows']
 flows.each do |flow|
-    # Do something
+  # Do something
 end
 
 # Export a selected flow by id for the flow and matching screens.
-exported_flow_and_screens = descope_client.export_flow(
-    flow_id: 'sign-up-or-in',
-)
+exported_flow_and_screens = descope_client.export_flow('sign-up-or-in')
 
 # Import a given flow and screens to the flow matching the id provided.
 imported_flow_and_screens = descope_client.import_flow(
-    flow_id: 'sign-up-or-in',
-    flow: {},
-    screens: []
+        flow_id: 'sign-up-or-in',
+        flow: {},
+        screens: []
 )
 
 # Export your project theme.
@@ -880,8 +878,8 @@ audits = descope_client.audit_search(actions: ['LoginSucceed'])
 
 ### Manage ReBAC Authz
 
-Descope supports full relation based access control (ReBAC) using a zanzibar like schema and operations.
-A schema is comprized of namespaces (entities like documents, folders, orgs, etc.) and each namespace has relation definitions to define relations.
+Descope supports full relation based access control (ReBAC) using a [Google Zanzibar](https://research.google/pubs/pub48190/) like schema and operations.
+A schema comprises namespaces (entities like documents, folders, orgs, etc.) and each namespace has relation definitions to define relations.
 Each relation definition can be simple (either you have it or not) or complex (union of nodes).
 
 A simple example for a file system like schema would be:

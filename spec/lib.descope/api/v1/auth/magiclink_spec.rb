@@ -7,6 +7,7 @@ describe Descope::Api::V1::MagicLink do
     dummy_instance = DummyClass.new
     dummy_instance.extend(Descope::Api::V1::Session)
     dummy_instance.extend(Descope::Api::V1::Auth::MagicLink)
+    dummy_instance.extend(Descope::Api::V1::Management::User)
     @instance = dummy_instance
   end
 
@@ -60,7 +61,7 @@ describe Descope::Api::V1::MagicLink do
           customClaims: { 'abc': '123' },
           mfa: false,
           ssoAppId: 'sso-id'
-        },
+        }
       }
       expect(@instance).to receive(:post).with(
         magiclink_compose_signin_url(DeliveryMethod::SMS),
@@ -101,7 +102,7 @@ describe Descope::Api::V1::MagicLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/email',
-        user: { username: 'user1', email: 'dummy@dummy.com' },
+        user: { loginId: 'user1', email: 'dummy@dummy.com' },
         email: 'dummy@dummy.com'
       }
 
@@ -115,7 +116,7 @@ describe Descope::Api::V1::MagicLink do
           login_id: 'test',
           method: DeliveryMethod::EMAIL,
           uri: 'https://some-uri/email',
-          user: { username: 'user1', email: 'dummy@dummy.com' }
+          user: { login_id: 'user1', email: 'dummy@dummy.com' }
         )
       end.not_to raise_error
     end
@@ -124,7 +125,7 @@ describe Descope::Api::V1::MagicLink do
       request_params = {
         loginId: 'test',
         redirectUrl: 'https://some-uri/sms',
-        user: { username: 'user1', phone: '+1234567890' },
+        user: { loginId: 'user1', phone: '+1234567890' },
         phone: '+1234567890'
       }
 
@@ -138,7 +139,7 @@ describe Descope::Api::V1::MagicLink do
           login_id: 'test',
           method: DeliveryMethod::SMS,
           uri: 'https://some-uri/sms',
-          user: { username: 'user1', phone: '+1234567890' }
+          user: { login_id: 'user1', phone: '+1234567890' }
         )
       end.not_to raise_error
     end
@@ -188,10 +189,13 @@ describe Descope::Api::V1::MagicLink do
     end
 
     it 'is expected to verify token with enchanted link' do
+      jwt_response = { 'fake': 'response' }
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+
       expect(@instance).to receive(:post).with(
         VERIFY_MAGICLINK_AUTH_PATH,
         { token: 'token' }
-      )
+      ).and_return(jwt_response)
 
       expect { @instance.magiclink_verify_token('token') }.not_to raise_error
     end
@@ -207,7 +211,8 @@ describe Descope::Api::V1::MagicLink do
         loginId: 'test',
         email: 'dummy@dummy.com',
         addToLoginIDs: true,
-        onMergeUseExisting: true
+        onMergeUseExisting: true,
+        redirectUrl: 'https://some-uri/email'
       }
 
       expect(@instance).to receive(:post).with(
@@ -223,7 +228,8 @@ describe Descope::Api::V1::MagicLink do
           email: 'dummy@dummy.com',
           add_to_login_ids: true,
           on_merge_use_existing: true,
-          refresh_token: 'token'
+          refresh_token: 'token',
+          uri: 'https://some-uri/email'
         )
       end.not_to raise_error
     end
@@ -241,7 +247,11 @@ describe Descope::Api::V1::MagicLink do
         addToLoginIDs: true,
         onMergeUseExisting: true,
         providerId: 'provider-id',
-        templateId: 'template-id'
+        templateId: 'template-id',
+        templateOptions: {
+          'abc': '123'
+        },
+        redirectUrl: 'https://some-uri/sms'
       }
 
       expect(@instance).to receive(:post).with(
@@ -260,7 +270,11 @@ describe Descope::Api::V1::MagicLink do
           refresh_token: 'token',
           method: DeliveryMethod::SMS,
           provider_id: 'provider-id',
-          template_id: 'template-id'
+          template_id: 'template-id',
+          template_options: {
+            'abc': '123'
+          },
+          uri: 'https://some-uri/sms'
         )
       end.not_to raise_error
     end

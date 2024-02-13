@@ -10,14 +10,13 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def totp_sign_in_code(login_id: nil, login_options: nil, code: nil, refresh_token: nil)
+          def totp_sign_in_code(login_id: nil, login_options: nil, code: nil)
             # Sign in by verifying the validity of a TOTP code entered by an end user.
             validate_login_id(login_id)
             validate_code(code)
-            validate_refresh_token_provided(login_options, refresh_token)
             uri = VERIFY_TOTP_PATH
             body = totp_compose_signin_body(login_id, code, login_options)
-            res = post(uri, body, {}, refresh_token)
+            res = post(uri, body, {}, nil)
             generate_jwt_response(response_body: res, refresh_cookie: res.fetch('refreshJwt', {}))
           end
 
@@ -28,9 +27,9 @@ module Descope
             validate_login_id(login_id)
 
             request_params = {
-              loginId: login_id,
+              loginId: login_id
             }
-            request_params[:user] = user unless user.empty?
+            request_params[:user] = user_compose_update_body(**user) unless user.empty?
             request_params[:ssoAppId] = sso_app_id unless sso_app_id.nil?
             post(SIGN_UP_AUTH_TOTP_PATH, request_params)
           end

@@ -7,13 +7,15 @@ module Descope
         # Management API calls
         module Permission
           include Descope::Mixins::Validation
+          include Descope::Api::V1::Management::Common
+
 
           def create_permission(name:, description: nil)
             # Create a new permission.
             # @see https://docs.descope.com/api/openapi/permissionmanagement/operation/CreatePermission/
             request_params = {
-              name: name,
-              description: description
+              name:,
+              description:
             }
             post(PERMISSION_CREATE_PATH, request_params)
           end
@@ -23,16 +25,16 @@ module Descope
             # to the existing permission. Empty fields will override populated fields. Use carefully.
             # @see https://docs.descope.com/api/openapi/permissionmanagement/operation/UpdatePermission/
             request_params = {
-              name: name,
+              name:,
               newName: new_name,
-              description: description
+              description:
             }
             post(PERMISSION_UPDATE_PATH, request_params)
           end
 
-          def delete_permission(name:)
+          def delete_permission(name = nil)
             # Delete an existing permission. IMPORTANT: This action is irreversible. Use carefully.
-            post(PERMISSION_DELETE_PATH, { name: name })
+            post(PERMISSION_DELETE_PATH, { name: })
           end
 
           def load_all_permissions

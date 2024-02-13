@@ -11,11 +11,12 @@ end
 
 group :test do
   gem 'webmock', require: false
-  gem 'vcr', require: false
   gem 'simplecov-cobertura'
   gem 'timecop', require: false
   gem 'rack-test', require: false
   gem 'dotenv', require: false
   gem 'super_diff', require: false
   gem 'factory_bot', require: 'false'
+  gem 'selenium-webdriver', require: false
+  gem 'rotp', require: false
 end

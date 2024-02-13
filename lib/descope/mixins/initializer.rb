@@ -18,8 +18,7 @@ module Descope
         log_level = options[:log_level] || ENV['DESCOPE_LOG_LEVEL'] || 'info'
         @logger ||= Descope::Mixins::Logging.logger_for(self.class.name, log_level)
 
-        logger.debug("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
-        logger.debug("Management Key ID: #{@management_key}")
+        @logger.debug("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
 
         if @public_key.nil?
           @public_keys = {}
@@ -31,6 +30,7 @@ module Descope
         @skip_verify = options[:skip_verify]
         @secure = !@skip_verify
         @management_key = options[:management_key] || ENV['DESCOPE_MANAGEMENT_KEY']
+        @logger.debug("Management Key ID: #{@management_key}")
         @timeout_seconds = options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
         @jwt_validation_leeway = options[:jwt_validation_leeway] || Common::DEFAULT_JWT_VALIDATION_LEEWAY
 
@@ -58,18 +58,15 @@ module Descope
       end
 
       def authorization_header(pswd = nil)
-        bearer = !pswd.nil? && !pswd.empty? ? "#{@project_id}:#{pswd}" : @project_id
-        logger.debug("setting bearer header #{bearer}")
+        pswd = @default_pswd if pswd.nil? || pswd.empty?
+        bearer = "#{@project_id}:#{pswd}"
         add_headers('Authorization' => "Bearer #{bearer}")
       end
 
       def initialize_api(options)
         initialize_v1(options)
-        if options.fetch(:management_key, nil)
-          authorization_header(options[:management_key])
-        else
-          authorization_header
-        end
+        @default_pswd = options.fetch(:management_key, ENV['DESCOPE_MANAGEMENT_KEY'])
+        authorization_header
       end
 
       def initialize_v1(_options)

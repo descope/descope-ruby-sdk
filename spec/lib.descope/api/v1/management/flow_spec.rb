@@ -9,14 +9,14 @@ describe Descope::Api::V1::Management::Flow do
     @instance = dummy_instance
   end
 
-  context '.list_flows' do
-    it 'should respond to .list_flows' do
-      expect(@instance).to respond_to :list_flows
+  context '.list_or_search_flows' do
+    it 'should respond to .list_or_search_flows' do
+      expect(@instance).to respond_to :list_or_search_flows
     end
 
     it 'is expected to get flows' do
-      expect(@instance).to receive(:get).with(FLOW_LIST_PATH)
-      expect { @instance.list_flows }.not_to raise_error
+      expect(@instance).to receive(:post).with(FLOW_LIST_PATH, { ids: %w[123 456] })
+      expect { @instance.list_or_search_flows(%w[123 456]) }.not_to raise_error
     end
   end
 
@@ -26,8 +26,8 @@ describe Descope::Api::V1::Management::Flow do
     end
 
     it 'is expected to export flow' do
-      expect(@instance).to receive(:get).with(FLOW_EXPORT_PATH, { flowId: '123' })
-      expect { @instance.export_flow(flow_id: '123') }.not_to raise_error
+      expect(@instance).to receive(:post).with(FLOW_EXPORT_PATH, { flowId: '123' })
+      expect { @instance.export_flow('123') }.not_to raise_error
     end
   end
 

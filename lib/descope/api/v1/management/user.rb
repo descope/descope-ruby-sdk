@@ -6,17 +6,19 @@ module Descope
       module Management
         # Management API calls
         module User
+          include Descope::Api::V1::Management::Common
+
           # Create a new user, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
           # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.
           def create_user(**args)
-            logger.debug('Creating user...')
+            @logger.debug("Creating user with args: #{args}")
             user_create(**args)
           end
 
           # Batch Create Users, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUsers/
-          def create_batch_users(users: [])
+          def create_batch_users(users = [])
             users_params = []
             users.each do |user|
               users_params.append(user_create(**user.merge(skip_create: true)))
@@ -63,7 +65,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -73,26 +75,32 @@ module Descope
             custom_attributes: nil,
             verified_email: nil,
             verified_phone: nil,
-            additional_login_ids: nil
+            additional_identifiers: [],
+            password: nil,
+            hashed_password: {},
+            sso_app_ids: []
           )
             role_names ||= []
             user_tenants ||= []
             path = Common::USER_UPDATE_PATH
             request_params = user_compose_update_body(
-              login_id: login_id,
-              email: email,
-              phone: phone,
-              display_name: display_name,
-              given_name: given_name,
-              middle_name: middle_name,
-              family_name: family_name,
-              role_names: role_names,
-              user_tenants: user_tenants,
-              picture: picture,
-              custom_attributes: custom_attributes,
-              verified_email: verified_email,
-              verified_phone: verified_phone,
-              additional_login_ids: additional_login_ids,
+              login_id:,
+              email:,
+              phone:,
+              name:,
+              given_name:,
+              middle_name:,
+              family_name:,
+              role_names:,
+              user_tenants:,
+              picture:,
+              custom_attributes:,
+              verified_email:,
+              verified_phone:,
+              additional_identifiers:,
+              password:,
+              hashed_password:,
+              sso_app_ids:
             )
             post(path, request_params)
           end
@@ -116,7 +124,7 @@ module Descope
           # Load a user's data, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/LoadUser/
           def load_user(login_id)
-            logger.debug("Loading user with login_id: #{login_id}")
+            @logger.debug("Loading user with login_id: #{login_id}")
             # Retrieve user information based on the provided Login ID
             validate_login_id(login_id)
 
@@ -254,23 +262,25 @@ module Descope
 
           # Updates an existing user's email, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserEmail/
-          def update_email(login_id: nil, new_email: nil)
+          def update_email(login_id: nil, email: nil, verified: true)
+            @logger.debug("Updating user's email with login_id: #{login_id} to #{email} verified: #{verified}")
             path = Common::USER_UPDATE_EMAIL_PATH
             request_params = {
               loginId: login_id,
-              newEmail: new_email
+              email:,
+              verified:
             }
             post(path, request_params)
           end
 
           # Updates an existing user's phone number, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserPhone/
-          def update_phone(login_id: nil, phone: nil, verified: nil)
+          def update_phone(login_id: nil, phone: nil, verified: true)
             path = Common::USER_UPDATE_PHONE_PATH
             request_params = {
               loginId: login_id,
-              phone: phone,
-              verified: verified
+              phone:,
+              verified:
             }
             post(path, request_params)
           end
@@ -279,13 +289,13 @@ module Descope
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserDisplayName/
           def update_display_name(
             login_id: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil
           )
             body = { loginId: login_id }
-            body[:displayName] = display_name unless display_name.nil?
+            body[:name] = name unless name.nil?
             body[:givenName] = given_name unless given_name.nil?
             body[:middleName] = middle_name unless middle_name.nil?
             body[:familyName] = family_name unless family_name.nil?
@@ -304,41 +314,44 @@ module Descope
 
           # Update an existing user's custom attributes, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserCustomAttribute/
-          def update_custom_attribute(login_id: nil, attribute_key: nil, attribute_val: nil)
+          def update_custom_attribute(login_id: nil, attribute_key: nil, attribute_value: nil)
+            @logger.debug("Updating user's custom attribute with login_id: #{login_id} to #{attribute_key}: #{attribute_value}")
             body = {
               loginId: login_id,
               attributeKey: attribute_key,
-              attributeVal: attribute_val
+              attributeValue: attribute_value
             }
             post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
           end
 
           def update_jwt(jwt: nil, custom_claims: nil)
             body = {
-              jwt: jwt,
+              jwt:,
               customClaims: custom_claims,
             }
             post(Common::UPDATE_JWT_PATH, body)
           end
 
           #
-          def add_roles(login_id: nil, role_names: [])
+          def user_add_roles(login_id: nil, tenant_id: nil, role_names: [])
             body = {
               loginId: login_id,
-              roleNames: role_names
+              roleNames: role_names,
+              tenantId: tenant_id
             }
             post(Common::USER_ADD_ROLE_PATH, body)
           end
 
-          def remove_roles(login_id: nil, role_names: [])
+          def user_remove_roles(login_id: nil, tenant_id:nil, role_names: [])
             body = {
               loginId: login_id,
-              roleNames: role_names
+              roleNames: role_names,
+              tenantId: tenant_id
             }
             post(Common::USER_REMOVE_ROLE_PATH, body)
           end
 
-          def add_tenant(login_id: nil, tenant_id: nil)
+          def user_add_tenant(login_id: nil, tenant_id: nil)
             body = {
               loginId: login_id,
               tenantId: tenant_id
@@ -346,7 +359,7 @@ module Descope
             post(Common::USER_ADD_TENANT_PATH, body)
           end
 
-          def remove_tenant(login_id: nil, tenant_id: nil)
+          def user_remove_tenant(login_id: nil, tenant_id: nil)
             body = {
               loginId: login_id,
               tenantId: tenant_id
@@ -363,7 +376,7 @@ module Descope
             post(Common::USER_ADD_TENANT_PATH, body)
           end
 
-          def remove_tenant_roles(login_id: nil, tenant_id: nil, role_names: [])
+          def user_remove_tenant_roles(login_id: nil, tenant_id: nil, role_names: [])
             body = {
               loginId: login_id,
               tenantId: tenant_id,
@@ -430,26 +443,32 @@ module Descope
             post(USER_GENERATE_EMBEDDED_LINK_PATH, request_params)
           end
 
+
           private
 
           def user_create(
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            verified_email: nil,
+            verified_phone: nil,
+            name: nil,
+            role_names: [],
+            user_tenants: [],
+            invite: false,
+            test: false,
+            custom_attributes: nil,
+            picture: nil,
+            send_mail: nil,
+            send_sms: nil,
+            additional_identifiers: [],
+            invite_url: nil,
+            password: nil,
+            hashed_password: {},
             given_name: nil,
             middle_name: nil,
             family_name: nil,
-            role_names: [],
-            user_tenants: [],
-            picture: nil,
-            custom_attributes: nil,
-            verified_email: nil,
-            verified_phone: nil,
-            invite_url: nil,
-            test: false,
-            invite: false,
-            additional_login_ids: nil,
+            sso_app_ids: [],
             skip_create: false
           )
             role_names ||= []
@@ -459,7 +478,7 @@ module Descope
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -472,9 +491,12 @@ module Descope
               verified_email:,
               verified_phone:,
               invite_url:,
-              send_mail: nil,
-              send_sms: nil,
-              additional_login_ids:
+              send_mail:,
+              send_sms:,
+              additional_identifiers:,
+              password:,
+              hashed_password:,
+              sso_app_ids:
             )
             return request_params if skip_create
 
@@ -485,7 +507,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -500,13 +522,16 @@ module Descope
             invite_url: nil,
             send_mail: nil,
             send_sms: nil,
-            additional_login_ids: nil
+            additional_identifiers: [],
+            password: nil,
+            hashed_password: {},
+            sso_app_ids: []
           )
             body = user_compose_update_body(
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -516,7 +541,10 @@ module Descope
               invite:,
               picture:,
               custom_attributes:,
-              additional_login_ids:
+              additional_identifiers:,
+              password:,
+              hashed_password:,
+              sso_app_ids:
             )
             body[:invite] = invite
             body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
@@ -524,6 +552,7 @@ module Descope
             body[:inviteUrl] = invite_url unless invite_url.nil? || !invite_url.empty?
             body[:sendMail] = send_mail unless send_mail.nil? || !send_mail.empty?
             body[:sendSMS] = send_sms unless send_sms.nil? || !send_sms.empty?
+
             body
           end
 
@@ -531,7 +560,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -543,27 +572,45 @@ module Descope
             custom_attributes: nil,
             verified_email: nil,
             verified_phone: nil,
-            additional_login_ids: nil
+            additional_identifiers: [],
+            password: nil,
+            hashed_password: {},
+            sso_app_ids: []
           )
-            res = {
+            body = {
               loginId: login_id,
-              email:,
-              phone:,
-              displayName: display_name,
-              roleNames: role_names,
-              userTenants: associated_tenants_to_hash_array(user_tenants),
-              test:,
-              invite:,
-              picture:,
-              customAttributes: custom_attributes,
-              additionalLoginIds: additional_login_ids
             }
-            res[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
-            res[:givenName] = given_name unless given_name.nil?
-            res[:middleName] = middle_name unless middle_name.nil?
-            res[:familyName] = family_name unless family_name.nil?
-            res[:verifiedPhone] = verified_phone unless verified_phone.nil?
-            res
+            if (hashed_password.nil? || hashed_password.empty?) && (!password.nil? && !password.empty?)
+              body[:password] = password
+            end
+
+            if password.nil? && (!hashed_password.nil? && !hashed_password.empty?)
+              unless hashed_password.is_a?(Hash)
+                raise Descope::ArgumentException.new(
+                  'Invalid password hash', code: 400
+                )
+              end
+
+              body[:hashedPassword] = hashed_password.to_hash
+            end
+
+            body[:email] = email unless email.nil? || email.empty?
+            body[:phone] = phone unless phone.nil? || phone.empty?
+            body[:name] = name unless name.nil? || name.empty?
+            body[:roleNames] = role_names unless role_names.nil? || role_names.empty?
+            body[:userTenants] = associated_tenants_to_hash_array(user_tenants) unless user_tenants.nil? || user_tenants.empty?
+            body[:test] = test unless test.nil?
+            body[:invite] = invite unless invite.nil?
+            body[:picture] = picture unless picture.nil? || picture.empty?
+            body[:customAttributes] = custom_attributes unless custom_attributes.nil? || custom_attributes.empty?
+            body[:additionalIdentifiers] = additional_identifiers unless additional_identifiers.nil? || additional_identifiers.empty?
+            body[:ssoAppIds] = sso_app_ids unless sso_app_ids.nil? || sso_app_ids.empty?
+            body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.to_s.empty?
+            body[:givenName] = given_name unless given_name.nil?
+            body[:middleName] = middle_name unless middle_name.nil?
+            body[:familyName] = family_name unless family_name.nil?
+            body[:verifiedPhone] = verified_phone unless verified_phone.nil?
+            body
           end
         end
       end

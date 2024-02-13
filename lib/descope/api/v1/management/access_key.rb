@@ -7,6 +7,7 @@ module Descope
         # Management API calls
         module AccessKey
           include Descope::Mixins::Validation
+          include Descope::Api::V1::Management::Common
 
           def create_access_key(name: nil, expire_time: nil, role_names: nil, key_tenants: nil)
             # Create a new access key.'
@@ -20,7 +21,7 @@ module Descope
 
           def access_key_compose_create_body(name, expire_time, role_names, key_tenants)
             {
-              name: name,
+              name:,
               expireTime: expire_time,
               roleNames: role_names,
               keyTenants: associated_tenants_to_hash_array(key_tenants)
@@ -32,10 +33,10 @@ module Descope
             # @param id [string] The access key id.
             # @see https://docs.descope.com/api/openapi/accesskeymanagement/operation/LoadAccessKey/
 
-            get(ACCESS_KEY_LOAD_PATH, { id: id })
+            get(ACCESS_KEY_LOAD_PATH, { id: })
           end
 
-          def search_all_access_keys(tenant_ids: nil)
+          def search_all_access_keys(tenant_ids = nil)
             # Search all access keys.'
             # @see https://docs.descope.com/api/openapi/accesskeymanagement/operation/SearchAccessKeys/
             request_params = {
@@ -45,12 +46,11 @@ module Descope
           end
 
           def update_access_key(id: nil, name: nil)
-            # Update an existing access key with the given various fields. IMPORTANT: All parameters are used as overrides
-            #         to the existing access key. Empty fields will override populated fields. Use carefully.
+            # Update an existing access key name
             # @see https://docs.descope.com/api/openapi/accesskeymanagement/operation/UpdateAccessKey/
             request_params = {
-              id: id,
-              name: name
+              id:,
+              name:
             }
             post(ACCESS_KEY_UPDATE_PATH, request_params)
           end
@@ -59,20 +59,20 @@ module Descope
             # Deactivate an existing access key. IMPORTANT: This deactivated key will not be usable from this stage.
             # It will, however, persist, and can be activated again if needed.
             # @see https://docs.descope.com/api/openapi/accesskeymanagement/operation/DeactivateAccessKey/
-            post(ACCESS_KEY_DEACTIVATE_PATH, { id: id })
+            post(ACCESS_KEY_DEACTIVATE_PATH, { id: })
           end
 
           def activate_access_key(id)
             # Activate an existing access key. IMPORTANT: Only deactivated keys can be activated again,
             # and become usable once more. New access keys are active by default.
             # @see https://docs.descope.com/api/openapi/accesskeymanagement/operation/ActivateAccessKey/
-            post(ACCESS_KEY_ACTIVATE_PATH, { id: id })
+            post(ACCESS_KEY_ACTIVATE_PATH, { id: })
           end
 
           def delete_access_key(id)
             # Delete an existing access key. IMPORTANT: This action is irreversible. Use carefully.
             # @see https://docs.descope.com/api/openapi/accesskeymanagement/operation/DeleteAccessKey/
-            post(ACCESS_KEY_DELETE_PATH, { id: id })
+            post(ACCESS_KEY_DELETE_PATH, { id: })
           end
         end
       end

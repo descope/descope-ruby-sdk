@@ -24,7 +24,7 @@ module Descope
           validate_refresh_token_not_nil(refresh_token)
           validate_token(refresh_token, audience)
           res = post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
-          generate_jwt_response(res, refresh_token, audience)
+          generate_jwt_response(response_body: res, refresh_cookie: refresh_token, audience:)
         end
 
         def me(refresh_token = nil)
@@ -52,13 +52,13 @@ module Descope
             raise Descope::AuthException.new('Session token is required for validation', code: 400)
           end
 
-          logger.debug("Validating session token: #{session_token}")
+          @logger.debug("Validating session token: #{session_token}")
           res = validate_token(session_token, audience)
-          logger.debug("Session token validation response: #{res}")
+          @logger.debug("Session token validation response: #{res}")
           # Duplicate for saving backward compatibility but keep the same structure as the refresh operation response
           res[SESSION_TOKEN_NAME] = deep_copy(res)
           session_props = adjust_properties(res, true)
-          logger.debug("session validation jwt response properties: #{session_props}")
+          @logger.debug("session validation jwt response properties: #{session_props}")
           session_props
         end
 
@@ -71,10 +71,10 @@ module Descope
           raise Descope::AuthException.new('Session token is missing', code: 400) if session_token.nil?
 
           begin
-            logger.debug("Validating session token: #{session_token}")
+            @logger.debug("Validating session token: #{session_token}")
             validate_session(session_token:, audience:)
           rescue Descope::AuthException
-            logger.debug("Session is invalid, refreshing session with refresh token: #{refresh_token}")
+            @logger.debug("Session is invalid, refreshing session with refresh token: #{refresh_token}")
             refresh_session(refresh_token:, audience:)
           end
         end

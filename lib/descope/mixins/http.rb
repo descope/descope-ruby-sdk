@@ -19,9 +19,9 @@ module Descope
       %i[get post post_file post_form put patch delete delete_with_body].each do |method|
         define_method(method) do |uri, body = {}, extra_headers = {}, pswd = nil|
           body = body.delete_if { |_, v| v.nil? }
-          authorization_header(pswd) unless pswd.nil? || pswd.empty?
+          authorization_header(pswd) # This will set the pswd if provided, else default to the @default_pswd
 
-          logger.debug "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
+          @logger.debug "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
           request_with_retry(method, uri, body, extra_headers)
         end
       end
@@ -45,17 +45,16 @@ module Descope
       end
 
       def safe_parse_json(body)
-        logger.debug "response => #{JSON.parse(body.to_s)}"
+        @logger.debug "response => #{JSON.parse(body.to_s)}"
         JSON.parse(body.to_s)
       rescue JSON::ParserError
         body
       end
 
       def encode_uri(uri)
-        # if a base_uri is set then the uri can be encoded as a path
-        path = base_uri ? Addressable::URI.new(path: uri).normalized_path : Addressable::URI.escape(uri)
-        logger.debug "will call #{url(path)}"
-        url(path)
+        encoded_uri = base_uri ? Addressable::URI.parse(uri).normalize : Addressable::URI.escape(uri)
+        @logger.debug "will call #{url(encoded_uri)}"
+        url(encoded_uri)
       end
 
       def url(path)
@@ -77,8 +76,13 @@ module Descope
 
       def request(method, uri, body = {}, extra_headers = {})
         # @headers is getting the authorization header merged in initializer.rb
-        logger.debug "base url: #{@base_uri}"
-        logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{@headers}"
+        headers_debug = @headers.dup
+        if headers_debug['Authorization']
+          headers_debug['Authorization'] = headers_debug['Authorization'].gsub(/(.{10})\z/, '***********')
+        end
+
+        @logger.debug "base url: #{@base_uri}"
+        @logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{headers_debug}"
         result = case method
                  when :get
                    get_headers = @headers.merge({ params: body }).merge(extra_headers)
@@ -90,7 +94,9 @@ module Descope
                    call(method, encode_uri(uri), timeout, @headers, body.to_json)
                  end
 
-        logger.info "http status code: #{result.code}"
+        raise Descope::Unsupported.new("No response from server", code: 400) unless result && result.respond_to?(:code)
+
+        @logger.info "http status code: #{result.code}"
         case result.code
         when 200...226 then safe_parse_json(result.body)
         when 400       then raise Descope::BadRequest.new(result.body, code: result.code, headers: result.headers)
@@ -98,19 +104,19 @@ module Descope
         when 403       then raise Descope::AccessDenied.new(result.body, code: result.code, headers: result.headers)
         when 404       then raise Descope::NotFound.new(result.body, code: result.code, headers: result.headers)
         when 405       then raise Descope::MethodNotAllowed.new(result.body, code: result.code, headers: result.headers)
-        when 429       then raise Descope::RateLimitException.new(result.body, code: result.code,
-                                                                               headers: result.headers)
+        when 429       then raise Descope::RateLimitException.new(result.body, code: result.code, headers: result.headers)
         when 500       then raise Descope::ServerError.new(result.body, code: result.code, headers: result.headers)
-        else           raise Descope::Unsupported.new(result.body, code: result.code, headers: result.headers)
+        else
+          raise Descope::Unsupported.new(result.body, code: result.code, headers: result.headers)
         end
       end
 
       def call(method, url, timeout, headers, body = nil)
         RestClient::Request.execute(
-          method: method,
-          url: url,
-          timeout: timeout,
-          headers: headers,
+          method:,
+          url:,
+          timeout:,
+          headers:,
           payload: body
         )
       rescue RestClient::Exception => e

@@ -41,31 +41,36 @@ module Descope
 
           def magiclink_verify_token(token = nil)
             validate_token_not_empty(token)
-            post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
+            res = post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
+            generate_jwt_response(response_body: res)
           end
 
-          def magiclink_update_user_email(login_id: nil, email: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, refresh_token: nil)
+          def magiclink_update_user_email(login_id: nil, email: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, refresh_token: nil)
             validate_login_id(login_id)
             validate_token_not_empty(refresh_token)
             validate_email(email)
 
-            body = magiclink_compose_update_user_email_body(login_id, email, add_to_login_ids, on_merge_use_existing)
+            body = magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing)
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
+            body[:templateOptions] = template_options if template_options
             uri = UPDATE_USER_EMAIL_MAGICLINK_PATH
             res = post(uri, body, {}, refresh_token)
-            extract_masked_address(res, DeliveryMethod::EMAIL)
+            extract_masked_address(res, Descope::Mixins::Common::DeliveryMethod::EMAIL)
           end
 
-          def magiclink_update_user_phone(login_id: nil, phone: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, refresh_token: nil, method: nil)
+          def magiclink_update_user_phone(login_id: nil, phone: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, method: nil, refresh_token: nil)
             validate_login_id(login_id)
             validate_token_not_empty(refresh_token)
             validate_phone(method, phone)
 
-            body = magiclink_compose_update_user_phone_body(login_id, phone, add_to_login_ids, on_merge_use_existing)
+            body = magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing)
             body[:providerId] = provider_id if provider_id
             body[:templateId] = template_id if template_id
+            body[:templateOptions] = template_options if template_options
             uri = UPDATE_USER_PHONE_MAGICLINK_PATH
             res = post(uri, body, {}, refresh_token)
-            extract_masked_address(res, DeliveryMethod::SMS)
+            extract_masked_address(res, Descope::Mixins::Common::DeliveryMethod::SMS)
           end
 
           private
@@ -92,7 +97,8 @@ module Descope
             }
 
             unless user.nil?
-              body[:user] = user
+              body[:user] = magiclink_user_compose_update_body(**user) unless user.empty?
+
               method_str, val = get_login_id_by_method(method:, user:)
               body[method_str.to_sym] = val
             end
@@ -124,22 +130,38 @@ module Descope
             body
           end
 
-          def magiclink_compose_update_user_email_body(login_id, email, add_to_login_ids, on_merge_use_existing)
+          def magiclink_compose_update_user_email_body(login_id, email, uri, add_to_login_ids, on_merge_use_existing)
             {
               loginId: login_id,
               email:,
+              redirectUrl: uri,
               addToLoginIDs: add_to_login_ids,
               onMergeUseExisting: on_merge_use_existing
             }
           end
 
-          def magiclink_compose_update_user_phone_body(login_id, phone, add_to_login_ids, on_merge_use_existing)
+          def magiclink_compose_update_user_phone_body(login_id, phone, uri, add_to_login_ids, on_merge_use_existing)
             {
               loginId: login_id,
               phone:,
+              redirectUrl: uri,
               addToLoginIDs: add_to_login_ids,
               onMergeUseExisting: on_merge_use_existing
             }
+          end
+
+          private
+          def magiclink_user_compose_update_body(login_id: nil, name: nil, phone: nil, email: nil, given_name: nil, middle_name: nil, family_name: nil)
+            user = {}
+            user[:loginId] = login_id if login_id
+            user[:name] = name if name
+            user[:phone] = phone if phone
+            user[:email] = email if email
+            user[:givenName] = given_name if given_name
+            user[:middleName] = middle_name if middle_name
+            user[:familyName] = family_name if family_name
+
+            user
           end
         end
       end

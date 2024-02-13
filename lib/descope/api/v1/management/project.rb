@@ -6,28 +6,29 @@ module Descope
       module Management
         # Management API calls
         module Project
+          include Descope::Api::V1::Management::Common
+
           def rename_project(name)
             # Rename a project.
             post(PROJECT_UPDATE_NAME, { name: })
           end
 
-          def export_project(format = nil)
-            # Export a project.
-            # The response is the JSON of the project items when the format is string.
-            request_params = {}
-            request_params[:format] = format unless format.nil?
-            res = post(PROJECT_EXPORT_PATH, request_params)
-            if format == 'string'
-              res.to_json
-            else
-              res
-            end
+          def export_project
+            # Exports all settings and configurations for a project and returns the
+            #   raw JSON files response as an object.
+            #    - This action is supported only with a pro license or above.
+            #    - Users, tenants and access keys are not cloned.
+            #    - Secrets, keys and tokens are not stripped from the exported data.
+            #   @returns a HASH containing the exported JSON files payload.
+            post(PROJECT_EXPORT_PATH)
           end
 
-          def import_project(files)
+          def import_project(files: nil, excludes: nil)
             # Import a project.
             # The argument of files should be the output of the export project endpoint
-            post(PROJECT_IMPORT_PATH, { files: })
+            body = { files: }
+            body[:excludes] = excludes unless excludes.nil?
+            post(PROJECT_IMPORT_PATH, body)
           end
 
           def delete_project
@@ -40,8 +41,8 @@ module Descope
             # - This action is supported only with a pro license or above.
             # - Users, tenants and access keys are not cloned.
             request_params = {
-              name: name,
-              tag: tag
+              name:,
+              tag:
             }
             post(PROJECT_CLONE, request_params)
           end

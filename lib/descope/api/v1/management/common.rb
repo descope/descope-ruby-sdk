@@ -55,6 +55,8 @@ module Descope
           # sso
           SSO_SETTINGS_PATH = '/v2/mgmt/sso/settings'
           SSO_OIDC_PATH = '/v1/mgmt/sso/oidc' # configure ssp settings via oidc
+          SSO_OIDC_CREATE_APP_PATH = '/v1/mgmt/sso/idp/app/oidc/create'
+          SSO_OIDC_UPDATE_APP_PATH = '/v1/mgmt/sso/idp/app/oidc/create'
           SSO_SAML_PATH = '/v1/mgmt/sso/saml' # configure ssp settings via saml
           SSO_SAML_METADATA_PATH = '/v1/mgmt/sso/saml/metadata' # configure ssp settings via saml metadata
 
@@ -63,8 +65,6 @@ module Descope
           SCIM_RESOURCE_TYPES_PATH = '/scim/v2/ResourceTypes'
           SCIM_SERVICE_PROVIDER_CONFIG_PATH = '/scim/v2/ServiceProviderConfig'
           SCIM_USERS_PATH = '/scim/v2/Users'
-
-
 
           # jwt
           UPDATE_JWT_PATH = '/v1/mgmt/jwt/update'
@@ -116,18 +116,19 @@ module Descope
           AUTHZ_RE_TARGET_ALL = '/v1/mgmt/authz/re/targetall'
 
           # Project
-          PROJECT_UPDATE_NAME = '/v1/mgmt/project/eupdate/name'
+          PROJECT_UPDATE_NAME = '/v1/mgmt/project/update/name'
           PROJECT_CLONE = '/v1/mgmt/project/clone'
           PROJECT_EXPORT_PATH = '/v1/mgmt/project/export'
           PROJECT_IMPORT_PATH = '/v1/mgmt/project/import'
           PROJECT_DELETE_PATH = '/v1/mgmt/project/delete'
 
-          def associated_tenants_to_hash_array(associated_tenants)
+          def associated_tenants_to_hash_array(associated_tenants = [])
             # Represents a tenant association for a User or Access Key. The tenant_id is required to denote
             # which tenant the user or access key belongs to. The role_names array is an optional list of
             # roles for the user or access key in this specific tenant.
             # @param [Array] associated_tenants - list of associated tenants in the format of
             #  [{tenant_id: 'tenant_id', role_names: ['role_name1', 'role_name2']}]
+            associated_tenants = associated_tenants.nil? ? [] : associated_tenants
             associated_tenant_list = []
             associated_tenants.each do |tenant|
               associated_tenant_list.append(

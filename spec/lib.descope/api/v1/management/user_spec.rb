@@ -29,15 +29,16 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           phone: '+1-212-669-2542',
-          displayName: 'name',
+          name: 'name',
           givenName: 'name',
           familyName: 'Ruby SDK',
-          roleNames: [],
           userTenants: associated_tenants_to_hash_array(user_tenants_args),
           test: false,
           picture: 'https://www.example.com/picture.png',
           customAttributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
-          additionalLoginIds: %w[id-1 id-2],
+          additionalIdentifiers: %w[id-1 id-2],
+          password: 's3cr3t',
+          ssoAppIds: %w[app1 app2],
           invite: false
         }
       )
@@ -47,13 +48,15 @@ describe Descope::Api::V1::Management::User do
           login_id: 'name@mail.com',
           email: 'name@mail.com',
           phone: '+1-212-669-2542',
-          display_name: 'name',
+          name: 'name',
           given_name: 'name',
           family_name: 'Ruby SDK',
           user_tenants: user_tenants_args,
           picture: 'https://www.example.com/picture.png',
           custom_attributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
-          additional_login_ids: %w[id-1 id-2]
+          additional_identifiers: %w[id-1 id-2],
+          password: 's3cr3t',
+          sso_app_ids: %w[app1 app2]
         )
       end.not_to raise_error
     end
@@ -74,19 +77,13 @@ describe Descope::Api::V1::Management::User do
       users_params = {
         users: [
           {
-            loginId: 'first@mail.com', email: 'first@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalLoginIds: nil
+            loginId: 'first@mail.com', email: 'first@mail.com', test: false, invite: false
           },
           {
-            loginId: 'second@mail.com', email: 'second@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalLoginIds: nil
+            loginId: 'second@mail.com', email: 'second@mail.com', test: false, invite: false
           },
           {
-            loginId: 'third@mail.com', email: 'third@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalLoginIds: nil
+            loginId: 'third@mail.com', email: 'third@mail.com', test: false, invite: false
           }
         ]
       }
@@ -95,7 +92,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.create_batch_users(users: users_input)
+        @instance.create_batch_users(users_input)
       end.not_to raise_error
     end
   end
@@ -110,14 +107,7 @@ describe Descope::Api::V1::Management::User do
         USER_CREATE_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
-          phone: nil,
-          displayName: nil,
-          roleNames: [],
-          userTenants: [],
           test: false,
-          picture: nil,
-          customAttributes: nil,
-          additionalLoginIds: nil,
           invite: true
         }
       )
@@ -142,14 +132,8 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           givenName: 'mister',
-          phone: nil,
-          displayName: 'something else',
-          roleNames: [],
-          userTenants: [],
+          name: 'something else',
           test: false,
-          picture: nil,
-          customAttributes: nil,
-          additionalLoginIds: nil,
           invite: false
         }
       )
@@ -159,7 +143,7 @@ describe Descope::Api::V1::Management::User do
           login_id: 'name@mail.com',
           email: 'name@mail.com',
           given_name: 'mister',
-          display_name: 'something else'
+          name: 'something else'
         )
       end.not_to raise_error
     end
@@ -241,10 +225,14 @@ describe Descope::Api::V1::Management::User do
 
       expect(@instance).to receive(:post).with(
         USERS_SEARCH_PATH, {
+          loginId: 'someone@example.com',
           tenantIds: [],
           roleNames: [],
           limit: 10,
           page: 1,
+          ssoAppIds: [],
+          ssoOnly: false,
+          text: 'some text',
           testUsersOnly: false,
           withTestUser: false
         }
@@ -252,10 +240,13 @@ describe Descope::Api::V1::Management::User do
 
       expect do
         @instance.search_all_users(
+          login_id: 'someone@example.com',
           tenant_ids: [],
           role_names: [],
+          text: 'some text',
           limit: 10,
           page: 1,
+          sso_app_ids: [],
           test_users_only: false,
           with_test_user: false
         )
@@ -324,14 +315,16 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_UPDATE_EMAIL_PATH, {
           loginId: 'someone@example.com',
-          newEmail: 'tester@test.com'
+          email: 'tester@test.com',
+          verified: true
         }
       )
 
       expect do
         @instance.update_email(
           login_id: 'someone@example.com',
-          new_email: 'tester@test.com'
+          email: 'tester@test.com',
+          verified: true
         )
       end.not_to raise_error
     end
@@ -366,7 +359,7 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_UPDATE_NAME_PATH, {
           loginId: 'someone@example.com',
-          displayName: 'some guy',
+          name: 'some guy',
           givenName: 'some',
           familyName: 'guy',
           middleName: 'middle'
@@ -376,7 +369,7 @@ describe Descope::Api::V1::Management::User do
       expect do
         @instance.update_display_name(
           login_id: 'someone@example.com',
-          display_name: 'some guy',
+          name: 'some guy',
           given_name: 'some',
           family_name: 'guy',
           middle_name: 'middle'
@@ -413,7 +406,7 @@ describe Descope::Api::V1::Management::User do
         USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, {
           loginId: 'someone@example.com',
           attributeKey: 'OU',
-          attributeVal: 'Engineering'
+          attributeValue: 'Engineering'
         }
       )
 
@@ -421,7 +414,7 @@ describe Descope::Api::V1::Management::User do
         @instance.update_custom_attribute(
           login_id: 'someone@example.com',
           attribute_key: 'OU',
-          attribute_val: 'Engineering'
+          attribute_value: 'Engineering'
         )
       end.not_to raise_error
     end
@@ -429,39 +422,43 @@ describe Descope::Api::V1::Management::User do
 
   context '.add_roles' do
     it 'is expected to respond to a add_roles method' do
-      expect(@instance).to respond_to(:add_roles)
+      expect(@instance).to respond_to(:user_add_roles)
 
       expect(@instance).to receive(:post).with(
         USER_ADD_ROLE_PATH, {
           loginId: 'someone@example.com',
-          roleNames: %w[role1 role2]
+          roleNames: %w[role1 role2],
+          tenantId: 'tenant1'
         }
       )
 
       expect do
-        @instance.add_roles(
+        @instance.user_add_roles(
           login_id: 'someone@example.com',
-          role_names: %w[role1 role2]
+          role_names: %w[role1 role2],
+          tenant_id: 'tenant1'
         )
       end.not_to raise_error
     end
   end
 
-  context '.remove_roles' do
-    it 'is expected to respond to a remove_roles method' do
-      expect(@instance).to respond_to(:remove_roles)
+  context '.user_remove_roles' do
+    it 'is expected to respond to a user_remove_roles method' do
+      expect(@instance).to respond_to(:user_remove_roles)
 
       expect(@instance).to receive(:post).with(
         USER_REMOVE_ROLE_PATH, {
           loginId: 'someone@example.com',
-          roleNames: %w[role1 role2]
+          roleNames: %w[role1 role2],
+          tenantId: 'tenant1'
         }
       )
 
       expect do
-        @instance.remove_roles(
+        @instance.user_remove_roles(
           login_id: 'someone@example.com',
-          role_names: %w[role1 role2]
+          role_names: %w[role1 role2],
+          tenant_id: 'tenant1'
         )
       end.not_to raise_error
     end
@@ -469,7 +466,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.add_tenant' do
     it 'is expected to respond to a add_tenant method' do
-      expect(@instance).to respond_to(:add_tenant)
+      expect(@instance).to respond_to(:user_add_tenant)
 
       expect(@instance).to receive(:post).with(
         USER_ADD_TENANT_PATH, {
@@ -479,7 +476,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.add_tenant(
+        @instance.user_add_tenant(
           login_id: 'someone@example.com',
           tenant_id: 'tenant1'
         )
@@ -489,7 +486,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.remove_tenant' do
     it 'is expected to respond to a remove_tenant method' do
-      expect(@instance).to respond_to(:remove_tenant)
+      expect(@instance).to respond_to(:user_remove_tenant)
 
       expect(@instance).to receive(:post).with(
         USER_REMOVE_TENANT_PATH, {
@@ -499,7 +496,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.remove_tenant(
+        @instance.user_remove_tenant(
           login_id: 'someone@example.com',
           tenant_id: 'tenant1'
         )
@@ -531,7 +528,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.remove_tenant_role' do
     it 'is expected to respond to a remove_tenant_role method' do
-      expect(@instance).to respond_to(:remove_tenant_roles)
+      expect(@instance).to respond_to(:user_remove_tenant_roles)
 
       expect(@instance).to receive(:post).with(
         USER_REMOVE_TENANT_PATH, {
@@ -542,7 +539,7 @@ describe Descope::Api::V1::Management::User do
       )
 
       expect do
-        @instance.remove_tenant_roles(
+        @instance.user_remove_tenant_roles(
           login_id: 'someone@example.com',
           tenant_id: 'tenant1',
           role_names: %w[role1 role2]

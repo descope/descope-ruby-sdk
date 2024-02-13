@@ -28,12 +28,9 @@ describe Descope::Api::V1::Management::Project do
     end
 
     it 'is expected to export the current project' do
-      expect(@instance).to receive(:post).with(
-        PROJECT_EXPORT_PATH, { format: 'string' }
-      )
+      expect(@instance).to receive(:post).with(PROJECT_EXPORT_PATH)
       expect do
-        res = @instance.export_project('string')
-        JSON.parse(res)
+        @instance.export_project
       end.not_to raise_error
     end
   end
@@ -48,7 +45,7 @@ describe Descope::Api::V1::Management::Project do
         PROJECT_IMPORT_PATH, { files: 'files' }
       )
       expect do
-        @instance.import_project('files')
+        @instance.import_project(files: 'files')
       end.not_to raise_error
     end
   end

@@ -10,7 +10,7 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil,  provider_id: nil, 
+          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil,  provider_id: nil,
                           template_id: nil, sso_app_id: nil)
             # Sign in (log in) an existing user with the unique login_id you provide. (See 'sign_up' function for an explanation of the
             # login_id field.) Provide the DeliveryMethod required for this user. If the login_id value cannot be used for the
@@ -131,7 +131,7 @@ module Descope
             }
 
             unless user.nil?
-              body[:user] = user
+              body[:user] = otp_user_compose_update_body(**user) unless user.empty?
               method_str, val = get_login_id_by_method(method:, user:)
               body[method_str.to_sym] = val
             end
@@ -164,6 +164,20 @@ module Descope
             body[:loginOptions][:ssoAppId] = login_options.fetch(:sso_app_id, nil)
 
             body
+          end
+
+          private
+          def otp_user_compose_update_body(login_id: nil, name: nil, phone: nil, email: nil, given_name: nil, middle_name: nil, family_name: nil)
+            user = {}
+            user[:loginId] = login_id if login_id
+            user[:name] = name if name
+            user[:phone] = phone if phone
+            user[:email] = email if email
+            user[:givenName] = given_name if given_name
+            user[:middleName] = middle_name if middle_name
+            user[:familyName] = family_name if family_name
+
+            user
           end
         end
       end
