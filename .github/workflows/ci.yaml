@@ -39,8 +39,6 @@ jobs:
       # feat!:, or fix!:, refactor!:, etc., which represent a breaking change (indicated by the !) and will result in a SemVer major.
       - uses: google-github-actions/release-please-action@v4
         id: release
-        with:
-          skip-github-release: true
         if: github.ref == 'refs/heads/main'
 
       - name: Publish to RubyGems
