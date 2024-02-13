@@ -7,6 +7,8 @@ module Descope
         # Management API calls
         module Tenant
           include Descope::Mixins::Validation
+          include Descope::Api::V1::Management::Common
+
 
           def create_tenant(name: nil, id: nil, self_provisioning_domains: nil, custom_attributes: nil)
             # Create a new tenant with the given name. Tenant IDs are provisioned automatically, but can be provided

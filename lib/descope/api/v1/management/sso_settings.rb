@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module SSOSettings
+          include Descope::Api::V1::Management::Common
+
           def get_sso_settings(tenant_id)
             # Get SSO settings for the provided tenant id.
             get(SSO_SETTINGS_PATH, { tenantId: tenant_id })
@@ -14,6 +16,28 @@ module Descope
           def delete_sso_settings(tenant_id)
             # Delete SSO settings for the provided tenant id.
             delete(SSO_SETTINGS_PATH, { tenantId: tenant_id })
+          end
+
+          def create_sso_oidc_app(id: nil, name: nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
+            body = {}
+            body[:id] = id if id
+            body[:name] = name if name
+            body[:description] = description if description
+            body[:enabled] = enabled if enabled
+            body[:logo] = logo if logo
+            body[:loginPageUrl] = login_page_url if login_page_url
+            post(SSO_OIDC_CREATE_APP_PATH, body)
+          end
+
+          def update_sso_oidc_app(id: nil, name: nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
+            body = {}
+            body[:id] = id if id
+            body[:name] = name if name
+            body[:description] = description if description
+            body[:enabled] = enabled if enabled
+            body[:logo] = logo if logo
+            body[:loginPageUrl] = login_page_url if login_page_url
+            put(SSO_OIDC_UPDATE_APP_PATH, body)
           end
 
           def configure_sso_oidc(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)

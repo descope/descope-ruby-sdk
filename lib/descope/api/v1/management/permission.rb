@@ -7,6 +7,8 @@ module Descope
         # Management API calls
         module Permission
           include Descope::Mixins::Validation
+          include Descope::Api::V1::Management::Common
+
 
           def create_permission(name:, description: nil)
             # Create a new permission.

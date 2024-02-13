@@ -17,15 +17,17 @@ describe Descope::Api::V1::OAuth do
 
     it 'is expected to start oauth' do
       request_params = {
-        provider: 'google-oauth2',
-        returnUrl: 'https://some-uri/email',
         stepup: false,
         customClaims: { 'abc': '123' },
         mfa: false,
         ssoAppId: 'sso-id'
       }
+      url = "#{OAUTH_START_PATH}?provider=github"
+      url += "&redirectUrl=#{CGI.escape('https://some-uri/email')}"
+      url += "&prompt=#{CGI.escape('hello and welcome')}"
+
       expect(@instance).to receive(:post).with(
-        OAUTH_START_PATH,
+        url,
         request_params,
         {},
         'refresh_token'
@@ -33,8 +35,9 @@ describe Descope::Api::V1::OAuth do
 
       expect do
         @instance.oauth_start(
-          provider: 'google-oauth2',
+          provider: 'github',
           return_url: 'https://some-uri/email',
+          prompt: 'hello and welcome',
           login_options: {
             stepup: false,
             custom_claims: { 'abc': '123' },

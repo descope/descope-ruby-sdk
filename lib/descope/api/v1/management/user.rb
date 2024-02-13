@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module User
+          include Descope::Api::V1::Management::Common
+
           # Create a new user, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/CreateUser/
           # Once the user is created, the user can then login utilizing any sign-in api supported. This will then switch the user from invited to active.
@@ -63,7 +65,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -85,7 +87,7 @@ module Descope
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -287,13 +289,13 @@ module Descope
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/UpdateUserDisplayName/
           def update_display_name(
             login_id: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil
           )
             body = { loginId: login_id }
-            body[:displayName] = display_name unless display_name.nil?
+            body[:name] = name unless name.nil?
             body[:givenName] = given_name unless given_name.nil?
             body[:middleName] = middle_name unless middle_name.nil?
             body[:familyName] = family_name unless family_name.nil?
@@ -441,6 +443,7 @@ module Descope
             post(USER_GENERATE_EMBEDDED_LINK_PATH, request_params)
           end
 
+
           private
 
           def user_create(
@@ -449,7 +452,7 @@ module Descope
             phone: nil,
             verified_email: nil,
             verified_phone: nil,
-            display_name: nil,
+            name: nil,
             role_names: [],
             user_tenants: [],
             invite: false,
@@ -475,7 +478,7 @@ module Descope
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -504,7 +507,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -528,7 +531,7 @@ module Descope
               login_id:,
               email:,
               phone:,
-              display_name:,
+              name:,
               given_name:,
               middle_name:,
               family_name:,
@@ -557,7 +560,7 @@ module Descope
             login_id: nil,
             email: nil,
             phone: nil,
-            display_name: nil,
+            name: nil,
             given_name: nil,
             middle_name: nil,
             family_name: nil,
@@ -576,17 +579,6 @@ module Descope
           )
             body = {
               loginId: login_id,
-              email:,
-              phone:,
-              displayName: display_name,
-              roleNames: role_names,
-              userTenants: associated_tenants_to_hash_array(user_tenants),
-              test:,
-              invite:,
-              picture:,
-              customAttributes: custom_attributes,
-              additionalIdentifiers: additional_identifiers,
-              ssoAppIds: sso_app_ids
             }
             if (hashed_password.nil? || hashed_password.empty?) && (!password.nil? && !password.empty?)
               body[:password] = password
@@ -602,6 +594,17 @@ module Descope
               body[:hashedPassword] = hashed_password.to_hash
             end
 
+            body[:email] = email unless email.nil? || email.empty?
+            body[:phone] = phone unless phone.nil? || phone.empty?
+            body[:name] = name unless name.nil? || name.empty?
+            body[:roleNames] = role_names unless role_names.nil? || role_names.empty?
+            body[:userTenants] = associated_tenants_to_hash_array(user_tenants) unless user_tenants.nil? || user_tenants.empty?
+            body[:test] = test unless test.nil?
+            body[:invite] = invite unless invite.nil?
+            body[:picture] = picture unless picture.nil? || picture.empty?
+            body[:customAttributes] = custom_attributes unless custom_attributes.nil? || custom_attributes.empty?
+            body[:additionalIdentifiers] = additional_identifiers unless additional_identifiers.nil? || additional_identifiers.empty?
+            body[:ssoAppIds] = sso_app_ids unless sso_app_ids.nil? || sso_app_ids.empty?
             body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.to_s.empty?
             body[:givenName] = given_name unless given_name.nil?
             body[:middleName] = middle_name unless middle_name.nil?

@@ -8,11 +8,18 @@ module SpecUtils
     uppercase_characters = ('A'..'Z').to_a
     digits = ('0'..'9').to_a
     special_chars = %w[! @ # $ % ^ & *]
-    characters = lowercase_characters + uppercase_characters + digits + special_chars
 
-    password = special_chars.sample # guarantee one non-alphanumeric character
-    password += 7.times.map { characters.sample }.join
-    password + rand(100..999).to_s
+    # Ensure one character from each category
+    password = lowercase_characters.sample +
+      uppercase_characters.sample +
+      digits.sample +
+      special_chars.sample
+
+    # Fill in remaining characters randomly
+    4.times { password += [lowercase_characters, uppercase_characters, digits, special_chars].sample.sample }
+
+    # Randomize the order of characters to make the password less predictable
+    password.split('').shuffle.join
   end
 
   def deep_stringify_keys(hash)

@@ -24,7 +24,7 @@ module Descope
           validate_refresh_token_not_nil(refresh_token)
           validate_token(refresh_token, audience)
           res = post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
-          generate_jwt_response(res, refresh_token, audience)
+          generate_jwt_response(response_body: res, refresh_cookie: refresh_token, audience:)
         end
 
         def me(refresh_token = nil)

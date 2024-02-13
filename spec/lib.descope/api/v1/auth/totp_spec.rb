@@ -28,7 +28,7 @@ describe Descope::Api::V1::OTP do
       }
       jwt_response = { 'fake': 'response' }
       allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
-      expect(@instance).to receive(:post).with(VERIFY_TOTP_PATH, request_params, {}, 'refresh_token').and_return(
+      expect(@instance).to receive(:post).with(VERIFY_TOTP_PATH, request_params, {}, nil).and_return(
         jwt_response
       )
 
@@ -41,8 +41,7 @@ describe Descope::Api::V1::OTP do
             mfa: false,
             sso_app_id: 'sso-id'
           },
-          code: '123456',
-          refresh_token: 'refresh_token'
+          code: '123456'
         )
       end.not_to raise_error
     end

@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module SCIM
+          include Descope::Api::V1::Management::Common
+
           def scim_search_groups(filter: nil, start_index: nil, count: nil, excluded_attributes: nil)
             # Search SCIM Groups
             url = compose_scim_search_groups_url(filter, start_index, count, excluded_attributes)

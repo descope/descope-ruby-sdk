@@ -1,11 +1,3 @@
-GIT
-  remote: git@github.com:descope/mailmock.git
-  revision: d6e4123aa5ad3693bf2d75325c3814ab9105c26e
-  glob: sdk/ruby/*.gemspec
-  specs:
-    mailmock (1.0.0)
-      typhoeus (~> 1.0, >= 1.0.1)
-
 PATH
   remote: .
   specs:
@@ -51,13 +43,10 @@ GEM
     dotenv (2.8.1)
     drb (2.2.0)
       ruby2_keywords
-    ethon (0.16.0)
-      ffi (>= 1.15.0)
     factory_bot (6.4.5)
       activesupport (>= 5.0.0)
     faker (2.23.0)
       i18n (>= 1.8.11, < 2)
-    ffi (1.16.3)
     fuubar (2.5.1)
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
@@ -109,6 +98,7 @@ GEM
       netrc (~> 0.8)
     retryable (3.0.5)
     rexml (3.2.6)
+    rotp (6.3.0)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -170,8 +160,6 @@ GEM
     timecop (0.9.8)
     tins (1.32.1)
       sync
-    typhoeus (1.4.1)
-      ethon (>= 0.9.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
@@ -198,9 +186,9 @@ DEPENDENCIES
   faker (~> 2.0)
   fuubar (~> 2.0)
   irb
-  mailmock!
   rack-test
   rake (~> 13.0)
+  rotp
   rspec (~> 3.11)
   rubocop
   rubocop-rails

@@ -6,6 +6,8 @@ module Descope
       module Management
         # Management API calls
         module Audit
+          include Descope::Api::V1::Management::Common
+
           def audit_search(
             user_ids: nil,
             actions: nil,

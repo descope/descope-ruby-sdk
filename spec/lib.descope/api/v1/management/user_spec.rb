@@ -29,10 +29,9 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           phone: '+1-212-669-2542',
-          displayName: 'name',
+          name: 'name',
           givenName: 'name',
           familyName: 'Ruby SDK',
-          roleNames: [],
           userTenants: associated_tenants_to_hash_array(user_tenants_args),
           test: false,
           picture: 'https://www.example.com/picture.png',
@@ -49,7 +48,7 @@ describe Descope::Api::V1::Management::User do
           login_id: 'name@mail.com',
           email: 'name@mail.com',
           phone: '+1-212-669-2542',
-          display_name: 'name',
+          name: 'name',
           given_name: 'name',
           family_name: 'Ruby SDK',
           user_tenants: user_tenants_args,
@@ -78,19 +77,13 @@ describe Descope::Api::V1::Management::User do
       users_params = {
         users: [
           {
-            loginId: 'first@mail.com', email: 'first@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
+            loginId: 'first@mail.com', email: 'first@mail.com', test: false, invite: false
           },
           {
-            loginId: 'second@mail.com', email: 'second@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
+            loginId: 'second@mail.com', email: 'second@mail.com', test: false, invite: false
           },
           {
-            loginId: 'third@mail.com', email: 'third@mail.com', phone: nil, displayName: nil,
-            roleNames: [], userTenants: [], test: false, invite: false, picture: nil,
-            customAttributes: nil, additionalIdentifiers: [], ssoAppIds: []
+            loginId: 'third@mail.com', email: 'third@mail.com', test: false, invite: false
           }
         ]
       }
@@ -114,15 +107,7 @@ describe Descope::Api::V1::Management::User do
         USER_CREATE_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
-          phone: nil,
-          displayName: nil,
-          roleNames: [],
-          userTenants: [],
           test: false,
-          picture: nil,
-          customAttributes: nil,
-          additionalIdentifiers: [],
-          ssoAppIds: [],
           invite: true
         }
       )
@@ -147,15 +132,8 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           givenName: 'mister',
-          displayName: 'something else',
-          phone: nil,
-          roleNames: [],
-          userTenants: [],
+          name: 'something else',
           test: false,
-          picture: nil,
-          customAttributes: nil,
-          additionalIdentifiers: [],
-          ssoAppIds: [],
           invite: false
         }
       )
@@ -165,7 +143,7 @@ describe Descope::Api::V1::Management::User do
           login_id: 'name@mail.com',
           email: 'name@mail.com',
           given_name: 'mister',
-          display_name: 'something else'
+          name: 'something else'
         )
       end.not_to raise_error
     end
@@ -381,7 +359,7 @@ describe Descope::Api::V1::Management::User do
       expect(@instance).to receive(:post).with(
         USER_UPDATE_NAME_PATH, {
           loginId: 'someone@example.com',
-          displayName: 'some guy',
+          name: 'some guy',
           givenName: 'some',
           familyName: 'guy',
           middleName: 'middle'
@@ -391,7 +369,7 @@ describe Descope::Api::V1::Management::User do
       expect do
         @instance.update_display_name(
           login_id: 'someone@example.com',
-          display_name: 'some guy',
+          name: 'some guy',
           given_name: 'some',
           family_name: 'guy',
           middle_name: 'middle'
