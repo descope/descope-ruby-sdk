@@ -1,0 +1,15 @@
+{
+  "packages": {
+    ".": {
+      "package-name": "descope",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "ruby",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false,
+      "version-file": "lib/descope/version.rb"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
