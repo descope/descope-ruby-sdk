@@ -1,0 +1,9 @@
+default: &default
+  react_app_project_id: <%= ENV["REACT_APP_PROJECT_ID"] %>
+  ruby_sdk_log_level: <%= ENV["LOG_LEVEL"] %>
+
+development:
+  <<: *default
+
+production:
+  <<: *default

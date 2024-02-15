@@ -1,0 +1,41 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.8.6)
+      public_suffix (>= 2.0.2, < 6.0)
+    descope (1.0.2)
+      addressable (~> 2.8)
+      jwt (~> 2.7)
+      rest-client (~> 2.1)
+      retryable (~> 3.0)
+      zache (~> 0.12)
+    domain_name (0.6.20240107)
+    http-accept (1.7.0)
+    http-cookie (1.0.5)
+      domain_name (~> 0.5)
+    jwt (2.7.1)
+    launchy (2.5.2)
+      addressable (~> 2.8)
+    mime-types (3.5.2)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2024.0206)
+    netrc (0.11.0)
+    public_suffix (5.0.4)
+    rest-client (2.1.0)
+      http-accept (>= 1.7.0, < 2.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
+    retryable (3.0.5)
+    zache (0.13.1)
+
+PLATFORMS
+  arm64-darwin-23
+  ruby
+
+DEPENDENCIES
+  descope
+  launchy
+
+BUNDLED WITH
+   2.5.5

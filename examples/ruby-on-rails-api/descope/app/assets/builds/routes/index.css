@@ -1,0 +1,62 @@
+@import "https://fonts.googleapis.com/css2?family=Golos+Text:wght@500&display=swap";
+
+/* app/javascript/App.css */
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5vh;
+}
+.title {
+  margin-top: 10vh;
+  margin-bottom: 5vh;
+  font-size: 2em;
+}
+.link {
+  text-decoration: none;
+  margin-bottom: 5vh;
+}
+.btn {
+  border: None;
+  background-color: #00BD67;
+  padding: 15px 25px;
+  color: #fff;
+  font-size: 1.1em;
+  border-radius: 9px;
+  margin-top: 12px;
+  margin-right: 1vh;
+}
+.student {
+  margin-bottom: 5vh;
+}
+.students {
+  font-size: 1.5em;
+}
+body {
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+code {
+  font-family:
+    source-code-pro,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Courier New",
+    monospace;
+}
+/*# sourceMappingURL=/assets/routes/index.css.map */
