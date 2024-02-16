@@ -1,8 +1,3 @@
-Descope SDK for Ruby
-
-
-The Descope SDK for Ruby provides convenient access to the Descope user management and authentication API for a backend written in Ruby. You can read more on the Descope Website.
-
 # Descope SDK for Ruby
 
 The Descope SDK for Ruby provides convenient access to the Descope user management and authentication API
