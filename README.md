@@ -616,11 +616,18 @@ end
 
 #### Set or Expire User Password
 
-You can set or expire a user's password.
-Note: When setting a password, it will automatically be set as expired.
+You can set (temporary/active) or expire a user's password.
+Note: When using SetTemporaryPassword password will automatically be set as expired.
 The user will not be able log-in using an expired password, and will be required replace it on next login.
 
 ```ruby
+# Set a user's temporary password
+descope_client.set_temporary_password(login_id: '<login-id>', password:  '<some-password>');
+
+# Set a user's password
+descope_client.set_active_password(login_id: '<login-id>', password:  '<some-password>');
+
+# DEPRECATED
 # Set a user's password
 descope_client.set_password(login_id: '<login-id>', password:  '<some-password>');
 
