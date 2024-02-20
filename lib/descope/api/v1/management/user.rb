@@ -385,7 +385,7 @@ module Descope
             post(Common::USER_REMOVE_TENANT_PATH, body)
           end
 
-		  def set_temporary_password(login_id: nil, password: nil)
+          def set_temporary_password(login_id: nil, password: nil)
             body = {
               loginId: login_id,
               password:
@@ -393,7 +393,7 @@ module Descope
             post(Common::USER_SET_TEMPORARY_PASSWORD_PATH, body)
           end
 
-		  def set_active_password(login_id: nil, password: nil)
+          def set_active_password(login_id: nil, password: nil)
             body = {
               loginId: login_id,
               password:
