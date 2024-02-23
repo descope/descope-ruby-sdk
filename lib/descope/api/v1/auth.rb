@@ -41,8 +41,22 @@ module Descope
           jwt_response
         end
 
-        def exchange_access_key(access_key = nil, login_options: nil)
-          post(EXCHANGE_AUTH_ACCESS_KEY_PATH, {loginOptions: login_options}, {}, access_key)
+        def exchange_access_key(access_key: nil, login_options: {}, audience: nil)
+          # Return a new session token for the given access key
+          #   Args:
+          #     access_key (str): The access key
+          #     audience (str|Iterable[str]|nil): Optional recipients that the JWT is intended for
+          #              (must be equal to the 'aud' claim on the provided token)
+          #     login_options (AccessKeyLoginOptions): Optional advanced controls over login parameters
+          #     Return value (Hash): returns the session token from the server together with the expiry and key id
+          #                          (sessionToken:dict, keyId:str, expiration:int)
+          unless (access_key.is_a?(String) || access_key.nil?) && !access_key.to_s.empty?
+            raise Descope::AuthException, 'Access key should be a string!'
+          end
+
+          res = post(EXCHANGE_AUTH_ACCESS_KEY_PATH, { loginOptions: login_options, audience: }, {}, access_key)
+          puts "got res: #{res}"
+          generate_auth_info(res, nil, false, audience)
         end
 
         def select_tenant(tenant_id: nil, refresh_token: nil)
@@ -223,16 +237,18 @@ module Descope
 
           # validate the session token if sessionJwt is not empty
           st_jwt = response_body.fetch('sessionJwt', '')
-          if st_jwt
-            jwt_response[SESSION_TOKEN_NAME] = validate_token(st_jwt, audience)
+          unless st_jwt.empty?
+            @logger.debug "validating session token with refresh_token: #{refresh_token}" if st_jwt
+            jwt_response[SESSION_TOKEN_NAME] = validate_token(st_jwt, audience) if st_jwt
           end
 
           # validate refresh token if refresh_token was passed or if refreshJwt is not empty
           rt_jwt = response_body.fetch('refreshJwt', '')
 
-          if refresh_token
+          if !refresh_token.nil? || !refresh_token.to_s.empty?
+            @logger.debug "validating refresh token: #{refresh_token}" if refresh_token
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
-          elsif rt_jwt
+          elsif !rt_jwt.empty?
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, audience)
           end
 

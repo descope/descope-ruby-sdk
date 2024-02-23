@@ -180,7 +180,9 @@ describe Descope::Api::V1::Auth do
       token = JWT.encode(default_payload.merge(payload), rsa_private, ALGORITHM)
 
       expect do
-        sleep(20)
+        exp_in_seconds = 20
+        puts "Sleeping for #{exp_in_seconds} seconds to test token expiration. Please wait..."
+        sleep(exp_in_seconds)
         @instance.send(:validate_token, token)
       end.to raise_error(
         Descope::AuthException, /Signature has expired/
@@ -367,6 +369,53 @@ describe Descope::Api::V1::Auth do
 
     it 'is expected to return false when jwt response tenants and passed tenant do not match' do
       expect(@instance.validate_tenant_roles(jwt_response: { 'tenants' => { 't1' => { 'roles' => 'Role 1' } } }, tenant: 't2', roles: [])).to be false
+    end
+  end
+
+  context '.exchange_access_key' do
+    it 'is expected to respond to exchange access key' do
+      expect(@instance).to respond_to(:exchange_access_key)
+    end
+
+    it 'is expected to fail when access key is nil' do
+      expect { @instance.exchange_access_key(access_key: nil) }.to raise_error(Descope::AuthException)
+    end
+
+    it 'is expected to fail when access key is empty' do
+      expect { @instance.exchange_access_key(access_key: '') }.to raise_error(Descope::AuthException)
+    end
+
+    it 'is expected to fail when access key is not a string' do
+      expect { @instance.exchange_access_key(access_key: 123) }.to raise_error(Descope::AuthException)
+    end
+
+    it 'is expected to successfully exchange access key without login_options' do
+      jwt_response = { 'fake': 'response' }
+      access_key = 'abc'
+
+      expect(@instance).to receive(:post).with(
+        EXCHANGE_AUTH_ACCESS_KEY_PATH, { loginOptions: {}, audience: 'IT' }, {}, access_key
+      ).and_return(jwt_response)
+
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+
+      expect { @instance.exchange_access_key(access_key:, audience: 'IT') }.not_to raise_error
+    end
+
+    it 'is expected to successfully exchange access key with login_options' do
+      jwt_response = { 'fake': 'response' }
+      access_key = 'abc'
+
+      expect(@instance).to receive(:post).with(
+        EXCHANGE_AUTH_ACCESS_KEY_PATH,
+        { loginOptions: { customClaims: { k1: 'v1' } }, audience: 'IT' },
+        {},
+        access_key
+      ).and_return(jwt_response)
+
+      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+
+      expect { @instance.exchange_access_key(access_key:, login_options: { customClaims: { k1: 'v1' } }, audience: 'IT') }.not_to raise_error
     end
   end
 end
