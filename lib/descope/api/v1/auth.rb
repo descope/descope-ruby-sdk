@@ -41,8 +41,8 @@ module Descope
           jwt_response
         end
 
-        def exchange_access_key(access_key = nil)
-          post(EXCHANGE_AUTH_ACCESS_KEY_PATH, {}, {}, access_key)
+        def exchange_access_key(access_key = nil, login_options: nil)
+          post(EXCHANGE_AUTH_ACCESS_KEY_PATH, {loginOptions: login_options}, {}, access_key)
         end
 
         def select_tenant(tenant_id: nil, refresh_token: nil)

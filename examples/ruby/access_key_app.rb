@@ -23,7 +23,10 @@ begin
   end
 
   begin
-    jwt_response = @client.exchange_access_key(access_key)
+	login_options = {
+		customClaims: {"k1" : "v1"}
+	}
+    jwt_response = @client.exchange_access_key(access_key, login_options)
     @logger.info('exchange access key successfully')
     @logger.info("jwt_response: #{jwt_response}")
 
