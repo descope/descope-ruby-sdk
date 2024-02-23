@@ -548,6 +548,46 @@ describe Descope::Api::V1::Management::User do
     end
   end
 
+  context '.set_temporary_password' do
+    it 'is expected to respond to a set_temporary_password method' do
+      expect(@instance).to respond_to(:set_temporary_password)
+
+      expect(@instance).to receive(:post).with(
+        USER_SET_TEMPORARY_PASSWORD_PATH, {
+          loginId: 'someone@example.com',
+          password: 's3cr3t'
+        }
+      )
+
+      expect do
+        @instance.set_temporary_password(
+          login_id: 'someone@example.com',
+          password: 's3cr3t'
+        )
+      end.not_to raise_error
+    end
+  end
+
+  context '.set_active_password' do
+    it 'is expected to respond to a set_active_password method' do
+      expect(@instance).to respond_to(:set_active_password)
+
+      expect(@instance).to receive(:post).with(
+        USER_SET_ACTIVE_PASSWORD_PATH, {
+          loginId: 'someone@example.com',
+          password: 's3cr3t'
+        }
+      )
+
+      expect do
+        @instance.set_active_password(
+          login_id: 'someone@example.com',
+          password: 's3cr3t'
+        )
+      end.not_to raise_error
+    end
+  end
+
   context '.set_password' do
     it 'is expected to respond to a set_password method' do
       expect(@instance).to respond_to(:set_password)

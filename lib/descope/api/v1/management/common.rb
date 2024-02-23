@@ -34,6 +34,8 @@ module Descope
           USER_UPDATE_CUSTOM_ATTRIBUTE_PATH = '/v1/mgmt/user/update/customAttribute'
           USER_ADD_ROLE_PATH = '/v1/mgmt/user/update/role/add'
           USER_REMOVE_ROLE_PATH = '/v1/mgmt/user/update/role/remove'
+          USER_SET_TEMPORARY_PASSWORD_PATH = '/v1/mgmt/user/password/set/temporary'
+          USER_SET_ACTIVE_PASSWORD_PATH = '/v1/mgmt/user/password/set/active'
           USER_SET_PASSWORD_PATH = '/v1/mgmt/user/password/set'
           USER_EXPIRE_PASSWORD_PATH = '/v1/mgmt/user/password/expire'
           USER_ADD_TENANT_PATH = '/v1/mgmt/user/update/tenant/add'
