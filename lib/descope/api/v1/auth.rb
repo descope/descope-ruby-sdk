@@ -47,7 +47,7 @@ module Descope
           #     access_key (str): The access key
           #     audience (str|Iterable[str]|nil): Optional recipients that the JWT is intended for
           #              (must be equal to the 'aud' claim on the provided token)
-          #     login_options (AccessKeyLoginOptions): Optional advanced controls over login parameters
+          #     login_options (hash): Optional advanced controls over login parameters
           #     Return value (Hash): returns the session token from the server together with the expiry and key id
           #                          (sessionToken:dict, keyId:str, expiration:int)
           unless (access_key.is_a?(String) || access_key.nil?) && !access_key.to_s.empty?
