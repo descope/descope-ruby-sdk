@@ -11,7 +11,6 @@ require 'descope'
 @logger.info("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
 
 @client = Descope::Client.new({ project_id: @project_id, management_key: @management_key })
-
 access_key = nil
 
 begin
@@ -23,7 +22,10 @@ begin
   end
 
   begin
-    jwt_response = @client.exchange_access_key(access_key)
+    login_options = {
+      customClaims: { "k1": 'v1' }
+    }
+    jwt_response = @client.exchange_access_key(access_key:, login_options:)
     @logger.info('exchange access key successfully')
     @logger.info("jwt_response: #{jwt_response}")
 
