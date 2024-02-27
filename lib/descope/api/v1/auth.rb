@@ -49,13 +49,12 @@ module Descope
           #              (must be equal to the 'aud' claim on the provided token)
           #     login_options (hash): Optional advanced controls over login parameters
           #     Return value (Hash): returns the session token from the server together with the expiry and key id
-          #                          (sessionToken:dict, keyId:str, expiration:int)
+          #                          (sessionToken:Hash, keyId:str, expiration:int)
           unless (access_key.is_a?(String) || access_key.nil?) && !access_key.to_s.empty?
             raise Descope::AuthException, 'Access key should be a string!'
           end
 
           res = post(EXCHANGE_AUTH_ACCESS_KEY_PATH, { loginOptions: login_options, audience: }, {}, access_key)
-          puts "got res: #{res}"
           generate_auth_info(res, nil, false, audience)
         end
 

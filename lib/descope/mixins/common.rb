@@ -8,10 +8,8 @@ module Descope
     module Common
       DEFAULT_BASE_URL = 'https://api.descope.com' # pragma: no cover
       DEFAULT_TIMEOUT_SECONDS = 60
-      DEFAULT_DOMAIN = 'descope.com'
-      DEFAULT_URL_PREFIX = 'https://api'
       DEFAULT_JWT_VALIDATION_LEEWAY = 5
-      PHONE_REGEX = %r{^(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[-./ \\]?(?:(?:\(?\d{1,}\)?[-./ \\]?){0,})(?:[-./ \\]?(?:#|ext\.?|extension|x)[-./ \\]?(\d+))?$}.freeze
+      PHONE_REGEX = %r{^(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[-./ \\]?(?:(?:\(?\d{1,}\)?[-./ \\]?){0,})(?:[-./ \\]?(?:#|ext\.?|extension|x)[-./ \\]?(\d+))?$}
 
       SESSION_COOKIE_NAME = 'DS'
       REFRESH_SESSION_COOKIE_NAME = 'DSR'
@@ -52,7 +50,7 @@ module Descope
         VALIDATE_SESSION_PATH = '/v1/auth/validate'
         ME_PATH = '/v1/auth/me'
 
-        # accesskey
+        # access key
         EXCHANGE_AUTH_ACCESS_KEY_PATH = '/v1/auth/accesskey/exchange'
 
         # otp
