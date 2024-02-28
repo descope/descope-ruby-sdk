@@ -8,18 +8,19 @@ module Descope
         module Role
           include Descope::Api::V1::Management::Common
 
-          def create_role(name: nil, description: nil, permission_names: nil)
+          def create_role(name: nil, description: nil, permission_names: nil, tenant_id: nil)
             # Create a new role.
             permission_names ||= []
             request_params = {
               name:,
               description:,
-              permissionNames: permission_names
+              permissionNames: permission_names,
+              tenantId: tenant_id
             }
             post(ROLE_CREATE_PATH, request_params)
           end
 
-          def update_role(name: nil, new_name: nil, description: nil, permission_names: nil)
+          def update_role(name: nil, new_name: nil, description: nil, permission_names: nil, tenant_id: nil)
             # Update an existing role with the given various fields. IMPORTANT: All parameters are used as overrides
             # to the existing role. Empty fields will override populated fields. Use carefully.
             permission_names ||= []
@@ -27,14 +28,15 @@ module Descope
               name:,
               newName: new_name,
               description:,
-              permissionNames: permission_names
+              permissionNames: permission_names,
+              tenantId: tenant_id
             }
             post(ROLE_UPDATE_PATH, request_params)
           end
 
-          def delete_role(name)
+          def delete_role(name: nil, tenant_id: nil)
             # Delete an existing role. IMPORTANT: This action is irreversible. Use carefully.
-            post(ROLE_DELETE_PATH, { name: })
+            post(ROLE_DELETE_PATH, { name:, tenantId: tenant_id })
           end
 
           def load_all_roles
