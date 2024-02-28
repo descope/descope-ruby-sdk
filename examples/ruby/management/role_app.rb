@@ -15,9 +15,13 @@ require 'descope'
 name = 'My Role'
 
 begin
+  @logger.info('Creating a new tenant')
+  puts 'Please insert a new tenant name'
+  tenant_name = gets.chomp
+  tenant = @client.create_tenant(name: tenant_name)
   @logger.info('Going to create a new role')
   @client.create_role(
-    name:, description: 'Allowed to test :)', permission_names: ['SSO Admin']
+    name:, description: 'Allowed to test :)', permission_names: ['SSO Admin'], tenant_id: tenant['id']
   )
 rescue Descope::AuthException => e
   @logger.info("Role creation failed #{e}")
@@ -41,7 +45,8 @@ begin
     name:,
     new_name: 'My Updated Role',
     description: 'New Description',
-    permission_names: ['User Admin']
+    permission_names: ['User Admin'],
+    tenant_id: tenant['id']
   )
 
 rescue Descope::AuthException => e
@@ -50,7 +55,7 @@ end
 
 begin
   @logger.info('Deleting newly created role')
-  @client.delete_role('My Updated Role')
+  @client.delete_role(name: 'My Updated Role', tenant_id: tenant['id'])
 
 rescue Descope::AuthException => e
   @logger.error("Role deletion failed #{e}")

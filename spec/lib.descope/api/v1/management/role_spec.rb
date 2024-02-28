@@ -19,14 +19,16 @@ describe Descope::Api::V1::Management::Role do
         ROLE_CREATE_PATH, {
           name: 'test',
           description: 'test',
-          permissionNames: ['test']
+          permissionNames: ['test'],
+          tenantId: 'test'
         }
       )
       expect do
         @instance.create_role(
           name: 'test',
           description: 'test',
-          permission_names: ['test']
+          permission_names: ['test'],
+          tenant_id: 'test'
         )
       end.not_to raise_error
     end
@@ -43,7 +45,8 @@ describe Descope::Api::V1::Management::Role do
           name: 'test',
           newName: 'production',
           description: 'test',
-          permissionNames: ['test']
+          permissionNames: ['test'],
+          tenantId: 'test'
         }
       )
       expect do
@@ -51,7 +54,8 @@ describe Descope::Api::V1::Management::Role do
           name: 'test',
           new_name: 'production',
           description: 'test',
-          permission_names: ['test']
+          permission_names: ['test'],
+          tenant_id: 'test'
         )
       end.not_to raise_error
     end
@@ -64,10 +68,10 @@ describe Descope::Api::V1::Management::Role do
 
     it 'is expected to delete a role' do
       expect(@instance).to receive(:post).with(
-        ROLE_DELETE_PATH, { name: 'test' }
+        ROLE_DELETE_PATH, { name: 'test', tenantId: 'test' }
       )
       expect do
-        @instance.delete_role('test')
+        @instance.delete_role(name: 'test', tenant_id: 'test')
       end.not_to raise_error
     end
   end
