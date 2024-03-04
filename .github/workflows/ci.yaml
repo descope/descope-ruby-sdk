@@ -7,10 +7,18 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      DESCOPE_LOG_LEVEL:
+        description: "Descope Log Level"
+        default: "info"
+
+env:
+  DESCOPE_LOG_LEVEL: ${{ github.event.inputs.DESCOPE_LOG_LEVEL || 'info' }}
 
 jobs:
-  build:
-    name: Build Ruby SDK
+  ci:
+    name: Descope Ruby SDK CI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -25,12 +33,18 @@ jobs:
         run: bundle install
 
       - name: Run RSpec Test
-        run: bundle exec rspec
+        run: bundle exec rspec spec/lib.descope
+
+      - name: Run RSpec Integration Tests
+        env:
+          DESCOPE_MANAGEMENT_KEY: ${{ secrets.DESCOPE_MANAGEMENT_KEY }}
+          DESCOPE_PROJECT_ID: ${{ secrets.DESCOPE_PROJECT_ID }}
+        run: bundle exec rspec spec/integration
 
       # in order  to release use conventional commits
       # $ git commit --allow-empty -m "chore: release 1.0.0" -m "Release-As: 1.0.0" && git push
       # this will open a new PR with the changelog and bump the version
-      # Release Please assumes you are using Conventional Commit messages.
+      # Release Please will assume that you are using Conventional Commit messages.
       #
       # The most important prefixes you should have in mind are:
       #

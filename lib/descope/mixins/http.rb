@@ -96,7 +96,7 @@ module Descope
 
         raise Descope::Unsupported.new("No response from server", code: 400) unless result && result.respond_to?(:code)
 
-        @logger.info "http status code: #{result.code}"
+        @logger.info("API Request: [#{method}] #{uri} - Response Code: #{result.code}")
         case result.code
         when 200...226 then safe_parse_json(result.body)
         when 400       then raise Descope::BadRequest.new(result.body, code: result.code, headers: result.headers)

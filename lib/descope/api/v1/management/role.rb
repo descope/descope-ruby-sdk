@@ -36,7 +36,9 @@ module Descope
 
           def delete_role(name: nil, tenant_id: nil)
             # Delete an existing role. IMPORTANT: This action is irreversible. Use carefully.
-            post(ROLE_DELETE_PATH, { name:, tenantId: tenant_id })
+            request_params = { name: }
+            request_params[:tenantId] = tenant_id if tenant_id
+            post(ROLE_DELETE_PATH, request_params)
           end
 
           def load_all_roles
