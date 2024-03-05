@@ -22,7 +22,8 @@ describe Descope::Api::V1::Management::AccessKey do
           roleNames: ['test'],
           keyTenants: [
             { tenantId: 'test', roleNames: %w[test test2] }
-          ]
+          ],
+          customClaims: {'k1': 'v1'}
         }
       )
       expect do
@@ -32,7 +33,8 @@ describe Descope::Api::V1::Management::AccessKey do
           role_names: ['test'],
           key_tenants: [
             { tenant_id: 'test', role_names: %w[test test2] }
-          ]
+          ],
+          custom_claims: {'k1': 'v1'}
         )
       end.not_to raise_error
     end
