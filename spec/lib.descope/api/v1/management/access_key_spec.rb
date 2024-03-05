@@ -23,7 +23,7 @@ describe Descope::Api::V1::Management::AccessKey do
           keyTenants: [
             { tenantId: 'test', roleNames: %w[test test2] }
           ],
-          customClaims: {'k1', 'v1'}
+          customClaims: {'k1': 'v1'}
         }
       )
       expect do
