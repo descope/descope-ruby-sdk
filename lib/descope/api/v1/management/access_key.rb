@@ -19,7 +19,7 @@ module Descope
             post(ACCESS_KEY_CREATE_PATH, access_key_compose_create_body(name, expire_time, role_names, key_tenants, custom_claims))
           end
 
-          def access_key_compose_create_body(name, expire_time, role_names, key_tenants)
+          def access_key_compose_create_body(name, expire_time, role_names, key_tenants, custom_claims)
             {
               name:,
               expireTime: expire_time,
