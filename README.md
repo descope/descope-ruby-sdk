@@ -637,12 +637,14 @@ You can create, update, delete or load access keys, as well as search according 
 ```ruby
 # An access key must have a name and expiration, other fields are optional.
 # Roles should be set directly if no tenants exist, otherwise set
-# on a per-tenant basis.
+# on a per-tenant basis. If custom_claims supplied they will be presented on the jwt.
+# If customClaims is supplied, then those claims will be present in the JWT returned by calls to ExchangeAccessKey.
 associated_tenants = [{ tenant_id: 'tenant_id1', role_names: %w[role_name1 role_name2] }]
 create_resp = descope_client.create_access_key(
     name: 'name',
     expire_time: 1677844931,
-    key_tenants: associated_tenants
+    key_tenants: associated_tenants,
+	custom_claims: {'k1': 'v1'}
 )
 key = create_resp['key']
 cleartext = create_resp['cleartext'] # make sure to save the returned cleartext securely. It will not be returned again.

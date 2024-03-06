@@ -9,22 +9,23 @@ module Descope
           include Descope::Mixins::Validation
           include Descope::Api::V1::Management::Common
 
-          def create_access_key(name: nil, expire_time: nil, role_names: nil, key_tenants: nil)
+          def create_access_key(name: nil, expire_time: nil, role_names: nil, key_tenants: nil, custom_claims: nil)
             # Create a new access key.'
             # @see https://docs.descope.com/api/openapi/accesskeymanagement/operation/CreateAccessKey/
 
             role_names ||= []
             key_tenants ||= []
             validate_tenants(key_tenants)
-            post(ACCESS_KEY_CREATE_PATH, access_key_compose_create_body(name, expire_time, role_names, key_tenants))
+            post(ACCESS_KEY_CREATE_PATH, access_key_compose_create_body(name, expire_time, role_names, key_tenants, custom_claims))
           end
 
-          def access_key_compose_create_body(name, expire_time, role_names, key_tenants)
+          def access_key_compose_create_body(name, expire_time, role_names, key_tenants, custom_claims)
             {
               name:,
               expireTime: expire_time,
               roleNames: role_names,
-              keyTenants: associated_tenants_to_hash_array(key_tenants)
+              keyTenants: associated_tenants_to_hash_array(key_tenants),
+              customClaims: custom_claims
             }
           end
 
