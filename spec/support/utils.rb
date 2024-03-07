@@ -16,7 +16,7 @@ module SpecUtils
       special_chars.sample
 
     # Fill in remaining characters randomly
-    4.times { password += [lowercase_characters, uppercase_characters, digits, special_chars].sample.sample }
+    5.times { password += [lowercase_characters, uppercase_characters, digits, special_chars].sample.sample }
 
     # Randomize the order of characters to make the password less predictable
     password.split('').shuffle.join
