@@ -5,6 +5,7 @@ class DummyClass
   include Descope::Mixins::Headers
   include Descope::Mixins::Common
   include Descope::Mixins::Common::EndpointsV1
+  include Descope::Mixins::Common::EndpointsV2
   include Descope::Api::V1::Management::Common
   include Descope::Api::V1::Auth
 

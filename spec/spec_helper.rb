@@ -7,22 +7,26 @@ require 'base64'
 require 'descope'
 require 'super_diff/rspec'
 require 'factory_bot'
+require 'simplecov'
+require 'simplecov-html'
 require 'rspec'
-
 
 $LOAD_PATH.unshift File.expand_path('..', __FILE__)
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-
-Dir['./lib/*.rb'].each { |f| require f }
-Dir['./lib/api/**/*.rb'].each { |f| require f }
-Dir['./spec/support/**/*.rb'].each { |f| require f }
-Dir['./spec/support/*.rb'].each { |f| require f }
 
 include Descope::Api::V1::Management::Common
 include Descope::Mixins::Common
 include Descope::Mixins::Common::EndpointsV1
 include Descope::Mixins::Common::EndpointsV2
 include Descope::Api::V1::Auth
+
+Dir['./lib/*.rb'].each { |f| require f }
+Dir['./lib/api/**/*.rb'].each { |f| require f }
+Dir['./spec/support/**/*.rb'].each { |f| require f }
+Dir['./spec/support/*.rb'].each { |f| require f }
+
+SimpleCov.start
+SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
 
 RSpec.configure do |config|
   config.filter_run focus: true
