@@ -36,6 +36,8 @@ module Descope
 
           def delete_role(name: nil, tenant_id: nil)
             # Delete an existing role. IMPORTANT: This action is irreversible. Use carefully.
+            raise Descope::ArgumentError, 'name is required' if name.nil? || name.empty?
+
             request_params = { name: }
             request_params[:tenantId] = tenant_id if tenant_id
             post(ROLE_DELETE_PATH, request_params)
@@ -44,6 +46,16 @@ module Descope
           def load_all_roles
             # Load all roles.
             get(ROLE_LOAD_ALL_PATH)
+          end
+
+          def search_roles(role_names: nil, tenant_ids: nil, role_name_like: nil, permission_names: nil)
+            # Search for roles using the given parameters.
+            request_params = {}
+            request_params[:roleNames] = role_names if role_names
+            request_params[:tenantIds] = tenant_ids if tenant_ids
+            request_params[:roleNameLike] = role_name_like if role_name_like
+            request_params[:permissionNames] = permission_names if permission_names
+            post(ROLE_SEARCH_PATH, request_params)
           end
         end
       end

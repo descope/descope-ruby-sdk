@@ -86,4 +86,29 @@ describe Descope::Api::V1::Management::Role do
       expect { @instance.load_all_roles }.not_to raise_error
     end
   end
+
+  context '.search_roles' do
+    it 'should respond to .search_roles' do
+      expect(@instance).to respond_to :search_roles
+    end
+
+    it 'is expected to search roles' do
+      expect(@instance).to receive(:post).with(
+        ROLE_SEARCH_PATH, {
+          roleNames: %w[tester test2],
+          tenantIds: %w[t1 t2],
+          roleNameLike: 'test',
+          permissionNames: %w[perm1 perm2]
+        }
+      )
+      expect do
+        @instance.search_roles(
+          role_names: %w[tester test2],
+          tenant_ids: %w[t1 t2],
+          role_name_like: 'test',
+          permission_names: %w[perm1 perm2]
+        )
+      end.not_to raise_error
+    end
+  end
 end

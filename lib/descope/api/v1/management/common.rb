@@ -15,7 +15,7 @@ module Descope
           TENANT_SEARCH_ALL_PATH = '/v1/mgmt/tenant/search'
           PASSWORD_SETTINGS_PATH = '/v1/mgmt/password/settings'
 
-          # userUSER_CREATE_PATH
+          # user
           USER_CREATE_PATH = '/v1/mgmt/user/create'
           USER_CREATE_BATCH_PATH = '/v1/mgmt/user/create/batch'
           USER_UPDATE_PATH = '/v1/mgmt/user/update'
@@ -82,6 +82,7 @@ module Descope
           ROLE_UPDATE_PATH = '/v1/mgmt/role/update'
           ROLE_DELETE_PATH = '/v1/mgmt/role/delete'
           ROLE_LOAD_ALL_PATH = '/v1/mgmt/role/all'
+          ROLE_SEARCH_PATH = '/v1/mgmt/role/search'
 
           # flow
           FLOW_LIST_PATH = '/v1/mgmt/flow/list'
