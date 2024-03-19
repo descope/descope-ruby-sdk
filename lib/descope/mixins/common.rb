@@ -114,16 +114,6 @@ module Descope
       module EndpointsV2
         PUBLIC_KEY_PATH = '/v2/keys'
       end
-
-      module LoginOptions
-        attr_accessor :stepup, :mfa, :custom_claims
-
-        def initialize
-          @stepup = stepup || false
-          @mfa ||= false
-          @custom_claims ||= {}
-        end
-      end
     end
   end
 end
