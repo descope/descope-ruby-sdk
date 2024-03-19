@@ -768,6 +768,20 @@ roles = roles_resp['roles']
 # 
 ```
 
+# Search roles
+roles_resp = descope_client.search_roles(
+    names: ['role1', 'role2'], # Search for roles with the names 'role1' and 'role2'
+    role_name_like: 'role', # Search for roles that contain the string 'role'
+    tenant_ids: ['tenant1', 'tenant2'], # Search for roles that are associated with the tenants 'tenant1' and 'tenant2'
+    permission_names: ['permission1', 'permission2'] # Search for roles that have the permissions 'permission1' and 'permission2'
+)
+
+roles = roles_resp['roles']
+roles.each do |role|
+  # Do something
+end
+```
+
 ### Manage Flows and Theme
 
 You can list your flows and also import and export flows and screens, or the project theme:
