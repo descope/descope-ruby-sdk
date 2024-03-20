@@ -1,11 +1,12 @@
 # -*- encoding: utf-8 -*-
 $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 require 'descope/version'
+version = Descope::VERSION
 
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = "descope"
-  s.version     = Descope::VERSION
+  s.version     = version
   s.summary     = "Descope Ruby API Client"
   s.description = "Ruby API Client for Descope API https://descope.com"
 
@@ -25,10 +26,9 @@ Gem::Specification.new do |s|
 
   s.metadata = {
     "bug_tracker_uri"   => "https://github.com/descope/descope-ruby-sdk/issues",
-    "changelog_uri"     => "https://github.com/descope/descope-ruby-sdk/releases/tag/v#{version}",
+    "changelog_uri"     => "https://github.com/descope/descope-ruby-sdk/releases/tag/#{version}",
     "documentation_uri" => "https://docs.descope.com",
     "source_code_uri" => "https://github.com/descope/descope-ruby-sdk/tree/#{version}",
-    "rubygems_mfa_required" => 'true',
   }
 
   s.add_runtime_dependency 'rest-client', '~> 2.1'

@@ -136,7 +136,7 @@ PLATFORMS
   arm64-darwin-23
 
 DEPENDENCIES
-  bundler
+  bundler (>= 2.5)
   concurrent-ruby (~> 1.1)
   descope!
   factory_bot (= 6.4.6)
