@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.description = "Ruby API Client for Descope API https://descope.com"
 
   s.required_ruby_version     = ">= 3.3.0"
-  s.required_rubygems_version = ">= 3.5.6"
+  s.required_rubygems_version = ">= 3.5"
 
   s.author      = "Descope Inc."
   s.email       = "support@descope.com"
@@ -31,18 +31,9 @@ Gem::Specification.new do |s|
     "source_code_uri" => "https://github.com/descope/descope-ruby-sdk/tree/#{version}",
   }
 
-  s.add_runtime_dependency 'rest-client', '~> 2.1'
-  s.add_runtime_dependency 'jwt', '~> 2.7'
-  s.add_runtime_dependency 'zache', '~> 0.12'
   s.add_runtime_dependency 'addressable', '~> 2.8'
+  s.add_runtime_dependency 'jwt', '~> 2.7'
+  s.add_runtime_dependency 'rest-client', '~> 2.1'
   s.add_runtime_dependency 'retryable', '~> 3.0'
-
-  s.add_development_dependency 'bundler', '>= 2.5'
-  s.add_development_dependency 'rake', '~> 13.0'
-  s.add_development_dependency 'fuubar', '~> 2.0'
-  s.add_development_dependency 'rspec', '~> 3.11'
-  s.add_development_dependency 'simplecov', '~> 0.9'
-  s.add_development_dependency 'faker', '~> 2.0'
-  s.add_development_dependency 'super_diff', '~> 1.0'
-  s.add_development_dependency 'concurrent-ruby', '~> 1.1'
+  s.add_runtime_dependency 'zache', '~> 0.12'
 end
