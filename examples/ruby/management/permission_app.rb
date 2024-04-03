@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative '../version_check'
 require 'descope'
 
 @logger = Logger.new($stdout)
@@ -15,7 +16,7 @@ require 'descope'
 begin
   @logger.info('Going to create a new permission')
   name = 'My Permission'
-  @client.create_permission(name:, description: 'Allowed to test')
+  @client.create_permission(name: name, description: 'Allowed to test')
 
 rescue Descope::AuthException => e
   @logger.info("Permission creation failed #{e}")
@@ -39,7 +40,7 @@ begin
   # we mean to update.
   name = 'My Permission'
   @client.update_permission(
-    name:, new_name: 'My Updated Permission', description: 'New Description'
+    name: name, new_name: 'My Updated Permission', description: 'New Description'
   )
 
 rescue Descope::AuthException => e

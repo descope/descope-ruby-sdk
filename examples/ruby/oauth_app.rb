@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative './version_check'
 require 'descope'
 require 'launchy'
 
