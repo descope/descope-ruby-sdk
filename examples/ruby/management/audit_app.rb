@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative '../version_check'
 require 'descope'
 
 @logger = Logger.new($stdout)
@@ -18,7 +19,7 @@ begin
   text = ARGV[0] if ARGV.length > 1
   from_ts = nil
   from_ts = DateTime.iso8601(ARGV[1]) if ARGV.length > 2
-  res = @client.audit_search(text:, from_ts:)
+  res = @client.audit_search(text: text, from_ts: from_ts)
   @logger.info("Audit search result: #{res}")
 rescue Descope::AuthException => e
   @logger.error("Audit search failed #{e}")
