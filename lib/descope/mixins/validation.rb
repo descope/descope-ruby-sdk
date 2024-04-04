@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require 'descope/mixins/common'
+
 module Descope
   module Mixins
     # Module to provide validation for specific data structures.
     module Validation
+      include Descope::Mixins::Common
       def validate_tenants(key_tenants)
         raise ArgumentError, 'key_tenants should be an Array of hashes' unless key_tenants.is_a? Array
 
@@ -58,7 +61,6 @@ module Descope
           valid_methods_names = valid_methods.map { |m| "DeliveryMethod::#{DeliveryMethod.constants[valid_methods.index(m)]}" }.join(', ')
           raise AuthException.new("Delivery method should be one of the following: #{valid_methods_names}", code: 400)
         end
-
       end
 
       def verify_provider(oauth_provider)

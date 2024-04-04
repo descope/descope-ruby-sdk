@@ -10,10 +10,11 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil,  provider_id: nil,
+          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil, provider_id: nil,
                           template_id: nil, sso_app_id: nil)
-            # Sign in (log in) an existing user with the unique login_id you provide. (See 'sign_up' function for an explanation of the
-            # login_id field.) Provide the DeliveryMethod required for this user. If the login_id value cannot be used for the
+            # Sign in (log in) an existing user with the unique login_id you provide.
+            # (See 'sign_up' function for an explanation of the login_id field.)
+            # Provide the DeliveryMethod required for this user. If the login_id value cannot be used for the
             # DeliverMethod selected (for example, 'login_id = 4567qq445km' and 'DeliveryMethod = email')
             validate_login_id(login_id)
             uri = otp_compose_signin_url(method)
@@ -22,18 +23,18 @@ module Descope
             extract_masked_address(res, method)
           end
 
-          def otp_sign_up(method: nil, login_id: nil, user: {}, provider_id: nil, template_id: nil)
+          def otp_sign_up(method: nil, login_id: nil, user: {}, phone: nil, provider_id: nil, template_id: nil)
             #  Sign up (create) a new user using their email or phone number. Choose a delivery method for OTP
             #  verification, for example email, SMS, or WhatsApp.
             #  (optional) Include additional user metadata that you wish to preserve.
             user ||= {}
 
-            unless adjust_and_verify_delivery_method(method, login_id, user)
-              raise Descope::AuthException.new('Could not verify delivery method')
+            unless adjust_and_verify_delivery_method(method, login_id, user, phone)
+              raise Descope::AuthException.new('Could not verify delivery method', code: 500)
             end
 
             uri = otp_compose_signup_url(method)
-            body = otp_compose_signup_body(method, login_id, user, provider_id, template_id)
+            body = otp_compose_signup_body(method, login_id, user, provider_id, template_id, phone)
             res = post(uri, body)
             extract_masked_address(res, method)
           end
@@ -83,7 +84,7 @@ module Descope
             method: nil, login_id: nil, phone: nil, refresh_token: nil, add_to_login_ids: false,
             on_merge_use_existing: false, provider_id: nil, template_id: nil
           )
-            # Update the phone number of an existing end user, after verifying the authenticity of the end user using OTP.
+            # Update the phone number of an existing end user, after verifying the authenticity of the end user using OTP
             validate_login_id(login_id)
             validate_phone(method, phone)
 
@@ -128,7 +129,7 @@ module Descope
           end
 
           # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-          def otp_compose_signup_body(method, login_id, user, provider_id, template_id)
+          def otp_compose_signup_body(method, login_id, user, provider_id, template_id, phone)
             body = {
               loginId: login_id
             }
@@ -139,6 +140,7 @@ module Descope
               body[method_str.to_sym] = val
             end
 
+            body[:phone] = phone
             body[:provider_id] = provider_id if provider_id
             body[:template_id] = template_id if template_id
 
@@ -179,7 +181,6 @@ module Descope
             user[:givenName] = given_name if given_name
             user[:middleName] = middle_name if middle_name
             user[:familyName] = family_name if family_name
-
             user
           end
         end

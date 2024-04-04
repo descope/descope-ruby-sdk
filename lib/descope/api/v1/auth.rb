@@ -416,7 +416,8 @@ module Descope
           login_id
         end
 
-        def adjust_and_verify_delivery_method(method, login_id, user)
+        def adjust_and_verify_delivery_method(method, login_id, user, phone)
+          @logger.debug("adjust_and_verify_delivery_method:  method: #{method}, login_id: #{login_id}, user: #{user}")
           raise AuthException.new("Could not verify delivery method for method: #{method}", code: 400) if method.nil?
           raise AuthException.new('Could not verify delivery method without login_id', code: 400) if login_id.nil?
 
@@ -424,31 +425,19 @@ module Descope
             raise AuthException.new('Could not verify delivery method, user is not a Hash', code: 400)
           end
 
-          # rubocop:disable Layout/LineLength
-          unless [DeliveryMethod::EMAIL, DeliveryMethod::SMS, DeliveryMethod::WHATSAPP, DeliveryMethod::VOICE].include?(method)
-            raise AuthException.new('Delivery method should be one of the following strings: ' \
-                                      'DeliveryMethod::EMAIL, DeliveryMethod::SMS, ' \
-                                      'DeliveryMethod::WHATSAPP, DeliveryMethod::VOICE',
-                                    code: 400)
-          end
-
           case method
           when DeliveryMethod::EMAIL
             user[:email] ||= login_id
-            begin
-              validate_email(user[:email])
-              return true
-            rescue AuthException
-              return false
-            end
+            validate_email(user[:email])
+            @logger.debug("email: #{user[:email]} is valid")
+            true
           when DeliveryMethod::SMS, DeliveryMethod::WHATSAPP, DeliveryMethod::VOICE
-            user[:phone] ||= login_id
-            return false unless /^#{PHONE_REGEX}$/.match(user[:phone])
+            validate_phone(method, phone)
+            @logger.debug("phone number: #{phone} is valid")
+            true
           else
-            return false
+            false
           end
-
-          true
         end
 
         def extract_masked_address(response, method)
