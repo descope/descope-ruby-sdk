@@ -49,7 +49,7 @@ module Descope
       end
 
       def validate_phone(method, phone)
-        phone_number_is_invalid = !phone.match?(PHONE_REGEX)
+        phone_number_is_invalid = !phone.nil? && !phone.match?(PHONE_REGEX)
 
         raise AuthException.new('Phone number cannot be empty', code: 400) unless phone.is_a?(String) && !phone.empty?
         raise AuthException.new('Invalid pattern for phone number', code: 400) if phone_number_is_invalid

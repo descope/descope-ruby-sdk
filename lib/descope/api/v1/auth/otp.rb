@@ -28,6 +28,7 @@ module Descope
             #  verification, for example email, SMS, or WhatsApp.
             #  (optional) Include additional user metadata that you wish to preserve.
             user ||= {}
+            phone = user[:phone] if phone.nil? && user[:phone]
 
             unless adjust_and_verify_delivery_method(method, login_id, user, phone)
               raise Descope::AuthException.new('Could not verify delivery method', code: 500)
@@ -140,7 +141,7 @@ module Descope
               body[method_str.to_sym] = val
             end
 
-            body[:phone] = phone
+            body[:phone] = phone if phone
             body[:provider_id] = provider_id if provider_id
             body[:template_id] = template_id if template_id
 

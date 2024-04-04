@@ -416,7 +416,7 @@ module Descope
           login_id
         end
 
-        def adjust_and_verify_delivery_method(method, login_id, user, phone)
+        def adjust_and_verify_delivery_method(method, login_id, user, phone=nil)
           @logger.debug("adjust_and_verify_delivery_method:  method: #{method}, login_id: #{login_id}, user: #{user}")
           raise AuthException.new("Could not verify delivery method for method: #{method}", code: 400) if method.nil?
           raise AuthException.new('Could not verify delivery method without login_id', code: 400) if login_id.nil?
