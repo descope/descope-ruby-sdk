@@ -9,7 +9,8 @@ module Descope
       DEFAULT_BASE_URL = 'https://api.descope.com' # pragma: no cover
       DEFAULT_TIMEOUT_SECONDS = 60
       DEFAULT_JWT_VALIDATION_LEEWAY = 5
-      PHONE_REGEX = %r{^(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[-./ \\]?(?:(?:\(?\d{1,}\)?[-./ \\]?){0,})(?:[-./ \\]?(?:#|ext\.?|extension|x)[-./ \\]?(\d+))?$}
+      # Using E164 format,\A and \z are start and end of string respectively, to prevent multiline matching
+      PHONE_REGEX = /\A\+[1-9]\d{1,14}\z/
 
       SESSION_COOKIE_NAME = 'DS'
       REFRESH_SESSION_COOKIE_NAME = 'DSR'
