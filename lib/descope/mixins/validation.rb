@@ -49,10 +49,10 @@ module Descope
       end
 
       def validate_phone(method, phone)
-        phone_number_is_invalid = !phone.nil? && !phone.match?(PHONE_REGEX)
+        phone_number_is_invalid = !phone.match?(PHONE_REGEX) unless phone.nil?
 
         raise AuthException.new('Phone number cannot be empty', code: 400) unless phone.is_a?(String) && !phone.empty?
-        raise AuthException.new('Invalid pattern for phone number', code: 400) if phone_number_is_invalid
+        raise AuthException.new("Invalid pattern for phone number: #{phone}", code: 400) if phone_number_is_invalid
 
         valid_methods = DeliveryMethod.constants.map { |constant| DeliveryMethod.const_get(constant) }
 
