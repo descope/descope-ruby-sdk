@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative '../version_check'
 require 'descope'
 
 @logger = Logger.new($stdout)
@@ -21,7 +22,7 @@ begin
   tenant = @client.create_tenant(name: tenant_name)
   @logger.info('Going to create a new role')
   @client.create_role(
-    name:, description: 'Allowed to test :)', permission_names: ['SSO Admin'], tenant_id: tenant['id']
+    name: name, description: 'Allowed to test :)', permission_names: ['SSO Admin'], tenant_id: tenant['id']
   )
 rescue Descope::AuthException => e
   @logger.info("Role creation failed #{e}")
@@ -42,7 +43,7 @@ end
 begin
   @logger.info('Updating newly created role')
   @client.update_role(
-    name:,
+    name: name,
     new_name: 'My Updated Role',
     description: 'New Description',
     permission_names: ['User Admin'],

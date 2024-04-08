@@ -51,7 +51,7 @@ module Descope
           #     Return value (Hash): returns the session token from the server together with the expiry and key id
           #                          (sessionToken:Hash, keyId:str, expiration:int)
           unless (access_key.is_a?(String) || access_key.nil?) && !access_key.to_s.empty?
-            raise Descope::AuthException, 'Access key should be a string!'
+            raise AuthException.new('Access key should be a string!', code: 400)
           end
 
           res = post(EXCHANGE_AUTH_ACCESS_KEY_PATH, { loginOptions: login_options, audience: }, {}, access_key)
@@ -407,6 +407,7 @@ module Descope
           login_id = {
             DeliveryMethod::WHATSAPP => ['whatsapp', user.fetch(:phone, '')],
             DeliveryMethod::SMS => ['phone', user.fetch(:phone, '')],
+            DeliveryMethod::VOICE => ['phone', user.fetch(:phone, '')],
             DeliveryMethod::EMAIL => ['email', user.fetch(:email, '')]
           }[method]
 
@@ -416,34 +417,30 @@ module Descope
         end
 
         def adjust_and_verify_delivery_method(method, login_id, user)
-          return false if login_id.nil?
+          @logger.debug("adjust_and_verify_delivery_method:  method: #{method}, login_id: #{login_id}, user: #{user}")
+          raise AuthException.new("Could not verify delivery method for method: #{method}", code: 400) if method.nil?
+          raise AuthException.new('Could not verify delivery method without login_id', code: 400) if login_id.nil?
 
-          return false unless user.is_a?(Hash)
+          unless user.is_a?(Hash)
+            raise AuthException.new('Could not verify delivery method, user is not a Hash', code: 400)
+          end
 
           case method
           when DeliveryMethod::EMAIL
-            user[:email] ||= login_id
-            begin
-              validate_email(user[:email])
-              return true
-            rescue AuthException
-              return false
-            end
-          when DeliveryMethod::SMS
-            user[:phone] ||= login_id
-            return false unless /^#{PHONE_REGEX}$/.match(user[:phone])
-          when DeliveryMethod::WHATSAPP
-            user[:phone] ||= login_id
-            return false unless /^#{PHONE_REGEX}$/.match(user[:phone])
+            validate_email(login_id)
+            @logger.debug("email: #{login_id} is valid")
+            true
+          when DeliveryMethod::SMS, DeliveryMethod::WHATSAPP, DeliveryMethod::VOICE
+            validate_phone(method, login_id)
+            @logger.debug("phone number (login_id): #{login_id} is valid")
+            true
           else
-            return false
+            false
           end
-
-          true
         end
 
         def extract_masked_address(response, method)
-          if [DeliveryMethod::SMS, DeliveryMethod::WHATSAPP].include?(method)
+          if [DeliveryMethod::SMS, DeliveryMethod::WHATSAPP, DeliveryMethod::VOICE].include?(method)
             response['maskedPhone']
           elsif method == DeliveryMethod::EMAIL
             response['maskedEmail']

@@ -7,25 +7,51 @@ require 'descope'
 
 @project_id = ENV['DESCOPE_PROJECT_ID']
 @management_key = ENV['DESCOPE_MANAGEMENT_KEY']
-
-@logger.info("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
-
 @client = Descope::Client.new({ project_id: @project_id, management_key: @management_key })
+@logger.info("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@client.base_uri}")
 
 begin
   @logger.info('Going to signup or in using OTP...')
-  puts 'Please insert email to signup or in:\n'
-  email = gets.chomp
-  masked_email = @client.otp_sign_up_or_in(
-    method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: email
-  )
 
-  puts "Please insert the code you received by email to #{masked_email}:\n"
+  puts "Please select OTP method: [email, sms, voice]:\n"
+  method = gets.chomp
+
+  case method
+  when 'email'
+    requested_method = Descope::Mixins::Common::DeliveryMethod::EMAIL
+    puts "Please insert the email address you want to use:\n"
+    email = gets.chomp
+    requested_params = { login_id: email }
+  when 'sms'
+    requested_method = Descope::Mixins::Common::DeliveryMethod::SMS
+    @logger.info('Once signed up, we will use the update phone number')
+    puts "Please insert the phone number you want to use:\n"
+    phone = gets.chomp
+    requested_params = { login_id: phone }
+  when 'voice'
+    requested_method = Descope::Mixins::Common::DeliveryMethod::VOICE
+    @logger.info('Once signed up, we will use the update phone number')
+    puts "Please insert the phone number you want to use:\n"
+    phone = gets.chomp
+    requested_params = { login_id: phone }
+  else
+    raise 'Invalid method'
+  end
+
+  @logger.info("Signing up using OTP with #{method}...")
+  if method == 'email'
+    user = { login_id: email, name: 'John Doe', email: email, phone: phone }
+    login_id = email
+    masked_method = @client.otp_sign_up(method: requested_method, user: user, login_id: email, phone: phone)
+  else
+    login_id = phone
+    masked_method = @client.otp_sign_up_or_in(method: requested_method, login_id: phone)
+  end
+
+  puts "Please insert the code you received by #{method} to #{masked_method}:\n"
   value = gets.chomp
 
-  jwt_response = @client.otp_verify_code(
-    method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: email, code: value
-  )
+  jwt_response = @client.otp_verify_code(method: requested_method, login_id: login_id, code: value)
   @logger.info('Code is valid')
   puts "jwt_response: #{jwt_response}"
   session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')

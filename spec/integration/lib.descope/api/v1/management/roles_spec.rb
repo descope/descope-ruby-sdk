@@ -96,7 +96,7 @@ describe Descope::Api::V1::Management::Role do
     expect(all_roles.map { |role| role['name'] }).to include('Ruby-SDK-test-admin')
 
     @client.logger.info('searching for roles with tenant ids...')
-    all_roles = @client.search_roles(tenant_ids: %w[Ruby-SDK-test])['roles']
+    all_roles = @client.search_roles(role_name_like: 'Ruby-SDK-test', tenant_ids: [tenant_id])['roles']
     expect(all_roles.map { |role| role['name'] }).to include('Ruby-SDK-test-admin')
 
     @client.logger.info('deleting permission')
