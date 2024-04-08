@@ -10,10 +10,11 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil,  provider_id: nil,
+          def otp_sign_in(method: nil, login_id: nil, login_options: nil, refresh_token: nil, provider_id: nil,
                           template_id: nil, sso_app_id: nil)
-            # Sign in (log in) an existing user with the unique login_id you provide. (See 'sign_up' function for an explanation of the
-            # login_id field.) Provide the DeliveryMethod required for this user. If the login_id value cannot be used for the
+            # Sign in (log in) an existing user with the unique login_id you provide.
+            # The login_id field is used to identify the user. It can be an email address or a phone number.
+            # Provide the DeliveryMethod required for this user. If the login_id value cannot be used for the
             # DeliverMethod selected (for example, 'login_id = 4567qq445km' and 'DeliveryMethod = email')
             validate_login_id(login_id)
             uri = otp_compose_signin_url(method)
@@ -23,12 +24,15 @@ module Descope
           end
 
           def otp_sign_up(method: nil, login_id: nil, user: {}, provider_id: nil, template_id: nil)
-            #  Sign up (create) a new user using their email or phone number. Choose a delivery method for OTP
-            #  verification, for example email, SMS, or WhatsApp.
+            #  Sign up (create) a new user using their email or phone number.
+            #  The login_id field is used to identify the user. It can be an email address or a phone number.
+            #  Choose a delivery method for OTP verification, for example email, SMS, or Voice.
             #  (optional) Include additional user metadata that you wish to preserve.
-            user ||= {}
+            validate_login_id(login_id)
 
-            raise AuthException unless adjust_and_verify_delivery_method(method, login_id, user)
+            unless adjust_and_verify_delivery_method(method, login_id, user)
+              raise Descope::AuthException.new('Could not verify delivery method', code: 400)
+            end
 
             uri = otp_compose_signup_url(method)
             body = otp_compose_signup_body(method, login_id, user, provider_id, template_id)
@@ -38,9 +42,11 @@ module Descope
 
           def otp_sign_up_or_in(method: nil, login_id: nil, login_options: nil, provider_id: nil, template_id: nil,
                                 sso_app_id: nil)
-            #  Sign_up_or_in lets you handle both sign up and sign in with a single call. Sign-up_or_in will first
-            #  determine if login_id is a new or existing end user. If login_id is new, a new end user user will be
-            #  created and then authenticated using the OTP DeliveryMethod specified.
+            #  Sign_up_or_in lets you handle both sign up and sign in with a single call.
+            #  The login_id field is used to identify the user. It can be an email address or a phone number.
+            #  Sign-up_or_in will first determine if login_id is a new or existing end user.
+            #  If login_id is new, a new end user user will be created and then authenticated using the
+            #  OTP DeliveryMethod specified.
             #  If login_id exists, the end user will be authenticated using the OTP DeliveryMethod specified.
             validate_login_id(login_id)
             uri = otp_compose_sign_up_or_in_url(method)
@@ -81,9 +87,10 @@ module Descope
             method: nil, login_id: nil, phone: nil, refresh_token: nil, add_to_login_ids: false,
             on_merge_use_existing: false, provider_id: nil, template_id: nil
           )
-            # Update the phone number of an existing end user, after verifying the authenticity of the end user using OTP.
+            # Update the phone number of an existing end user, after verifying the authenticity of the end user using OTP
             validate_login_id(login_id)
             validate_phone(method, phone)
+
             uri = otp_compose_update_phone_url(method)
             request_params = {
               loginId: login_id,
@@ -127,7 +134,7 @@ module Descope
           # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
           def otp_compose_signup_body(method, login_id, user, provider_id, template_id)
             body = {
-              loginId: login_id,
+              loginId: login_id
             }
 
             unless user.nil?
@@ -167,7 +174,8 @@ module Descope
           end
 
           private
-          def otp_user_compose_update_body(login_id: nil, name: nil, phone: nil, email: nil, given_name: nil, middle_name: nil, family_name: nil)
+          def otp_user_compose_update_body(login_id: nil, name: nil, phone: nil, email: nil, given_name: nil,
+                                           middle_name: nil, family_name: nil)
             user = {}
             user[:loginId] = login_id if login_id
             user[:name] = name if name
@@ -176,7 +184,6 @@ module Descope
             user[:givenName] = given_name if given_name
             user[:middleName] = middle_name if middle_name
             user[:familyName] = family_name if family_name
-
             user
           end
         end

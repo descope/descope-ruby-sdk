@@ -24,13 +24,15 @@ module Descope
         WHATSAPP = 1
         SMS = 2
         EMAIL = 3
+        VOICE = 4
       end
 
       def get_method_string(method)
         name = {
           DeliveryMethod::WHATSAPP => 'whatsapp',
           DeliveryMethod::SMS => 'sms',
-          DeliveryMethod::EMAIL => 'email'
+          DeliveryMethod::EMAIL => 'email',
+          DeliveryMethod::VOICE => 'voice'
         }[method]
 
         raise ArgumentException, "Unknown delivery method: #{method}" if name.nil?

@@ -79,7 +79,7 @@ For rate limiting information, please confer to the [API Rate Limits](#api-rate-
 
 ### OTP Authentication
 
-Send a user a one-time password (OTP) using your preferred delivery method (email/SMS). An email address or phone number must be provided accordingly.
+Send a user a one-time password (OTP) using your preferred delivery method (email/SMS/Voice call). An email address or phone number must be provided accordingly.
 
 The user can either `sign up`, `sign in` or `sign up or in`
 
