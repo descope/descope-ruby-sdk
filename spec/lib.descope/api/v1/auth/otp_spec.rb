@@ -215,6 +215,28 @@ describe Descope::Api::V1::OTP do
       expect(@instance).to respond_to(:otp_update_user_email)
     end
 
+    it 'raises a validation error' do
+      expect { OTP.otp_update_user_phone(login_id: nil) }
+        .to raise_error('login_id cannot be empty')
+    end
+
+    it 'raises a validation error' do
+      expect { OTP.otp_update_user_phone(login_id: 'someone', phone: nil) }
+        .to raise_error('Phone number cannot be empty')
+    end
+
+    it 'raises a delivery method error with invalid method' do
+      expect do
+        OTP.otp_update_user_phone(login_id: 'abc', phone: '+12124332222', method: 0)
+      end.to raise_error(Descope::AuthException, /Delivery method should be one of the following/)
+    end
+
+    it 'raises a validation error when phone number doesnt match patter' do
+      expect do
+        OTP.otp_update_user_phone(login_id: 'abc', phone: '-1212a$', method: DeliveryMethod::SMS)
+      end.to raise_error(Descope::AuthException, /Invalid pattern for phone number/)
+    end
+
     it 'is expected to update email with otp' do
       request_params = {
         loginId: 'test',

@@ -46,11 +46,19 @@ module Descope
       end
 
       def validate_phone(method, phone)
+        phone_number_is_invalid = !phone.match?(PHONE_REGEX)
+
         raise AuthException.new('Phone number cannot be empty', code: 400) unless phone.is_a?(String) && !phone.empty?
-        raise AuthException.new('Invalid phone number', code: 400) unless phone.match?(PHONE_REGEX)
-        raise AuthException.new('Invalid delivery method', code: 400) unless [
-          DeliveryMethod::WHATSAPP, DeliveryMethod::SMS
-        ].include?(method)
+        raise AuthException.new('Invalid pattern for phone number', code: 400) if phone_number_is_invalid
+
+        valid_methods = DeliveryMethod.constants.map { |constant| DeliveryMethod.const_get(constant) }
+
+        # rubocop:disable Style/LineLength
+        unless valid_methods.include?(method)
+          valid_methods_names = valid_methods.map { |m| "DeliveryMethod::#{DeliveryMethod.constants[valid_methods.index(m)]}" }.join(', ')
+          raise AuthException.new("Delivery method should be one of the following: #{valid_methods_names}", code: 400)
+        end
+
       end
 
       def verify_provider(oauth_provider)
@@ -64,7 +72,9 @@ module Descope
       end
 
       def validate_redirect_url(return_url)
-        raise AuthException.new('Return_url cannot be empty', code: 400) unless return_url.is_a?(String) && !return_url.empty?
+        return if return_url.is_a?(String) && !return_url.empty?
+
+        raise AuthException.new('Return_url cannot be empty', code: 400)
       end
 
       def validate_code(code)
@@ -72,7 +82,10 @@ module Descope
       end
 
       def validate_scim_group_id(group_id)
-        raise AuthException.new('SCIM Group ID cannot be empty', code: 400) unless group_id.is_a?(String) && !group_id.empty?
+        return if group_id.is_a?(String) && !group_id.empty?
+
+        raise AuthException.new('SCIM Group ID cannot be empty', code: 400)
+
       end
     end
   end

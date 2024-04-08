@@ -28,7 +28,9 @@ module Descope
             #  (optional) Include additional user metadata that you wish to preserve.
             user ||= {}
 
-            raise AuthException unless adjust_and_verify_delivery_method(method, login_id, user)
+            unless adjust_and_verify_delivery_method(method, login_id, user)
+              raise Descope::AuthException.new('Could not verify delivery method')
+            end
 
             uri = otp_compose_signup_url(method)
             body = otp_compose_signup_body(method, login_id, user, provider_id, template_id)
@@ -84,6 +86,7 @@ module Descope
             # Update the phone number of an existing end user, after verifying the authenticity of the end user using OTP.
             validate_login_id(login_id)
             validate_phone(method, phone)
+
             uri = otp_compose_update_phone_url(method)
             request_params = {
               loginId: login_id,
@@ -127,7 +130,7 @@ module Descope
           # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
           def otp_compose_signup_body(method, login_id, user, provider_id, template_id)
             body = {
-              loginId: login_id,
+              loginId: login_id
             }
 
             unless user.nil?
