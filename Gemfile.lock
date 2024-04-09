@@ -111,7 +111,7 @@ GEM
       rubocop-ast (>= 1.30.0, < 2.0)
     ruby-progressbar (1.13.0)
     rubyzip (2.3.2)
-    selenium-webdriver (4.17.0)
+    selenium-webdriver (4.18.1)
       base64 (~> 0.2)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
@@ -135,6 +135,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-23
+  x86_64-linux
 
 DEPENDENCIES
   descope!
@@ -146,7 +147,7 @@ DEPENDENCIES
   rspec (= 3.13.0)
   rubocop (= 1.60.2)
   rubocop-rails (= 2.23.1)
-  selenium-webdriver (= 4.17.0)
+  selenium-webdriver (= 4.18.1)
   simplecov (= 0.22.0)
   super_diff (= 0.11.0)
 
