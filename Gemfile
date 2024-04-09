@@ -5,7 +5,7 @@ gemspec
 
 group :development do
   gem 'rubocop', '1.62.1', require: false
-  gem 'rubocop-rails', '2.23.1', require: false
+  gem 'rubocop-rails', '2.24.0', require: false
   gem "rdoc", ">= 6.6.3.1", require: false
 end
 
