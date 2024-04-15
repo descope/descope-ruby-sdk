@@ -28135,19 +28135,6 @@ var routes_default = /* @__PURE__ */ import_react9.default.createElement(Browser
 // app/javascript/components/App.jsx
 var App_default = (props) => /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, routes_default);
 
-// app/javascript/reportWebVitals.js
-var reportWebVitals = (onPerfEntry) => {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
-    Promise.resolve().then(() => (init_web_vitals(), web_vitals_exports)).then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(onPerfEntry);
-      getFID(onPerfEntry);
-      getFCP(onPerfEntry);
-      getLCP(onPerfEntry);
-      getTTFB(onPerfEntry);
-    });
-  }
-};
-var reportWebVitals_default = reportWebVitals;
 
 // app/javascript/components/index.jsx
 console.log("index component");
