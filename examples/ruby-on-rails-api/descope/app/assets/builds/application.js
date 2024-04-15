@@ -40266,7 +40266,6 @@ document.addEventListener("turbo:load", () => {
   root.render(
     /* @__PURE__ */ import_react11.default.createElement(import_react11.default.StrictMode, null, /* @__PURE__ */ import_react11.default.createElement(U5, { projectId: "P2aVGmQvQzSLJwP3ttcxO12tmQXk" }, /* @__PURE__ */ import_react11.default.createElement(App_default, null)))
   );
-  console.log("blah");
 });
 reportWebVitals_default();
 
