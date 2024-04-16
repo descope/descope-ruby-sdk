@@ -100,6 +100,7 @@ module Descope
 
           # Audit
           AUDIT_SEARCH = '/v1/mgmt/audit/search'
+          AUDIT_CREATE_EVENT = '/v1/mgmt/audit/event'
 
           # Authz ReBAC
           AUTHZ_SCHEMA_SAVE = '/v1/mgmt/authz/schema/save'

@@ -58,6 +58,31 @@ module Descope
             { 'audits' => res['audits'].map { |audit| convert_audit_record(audit) } }
           end
 
+          def audit_create_event(action: nil, type: nil, data: nil, user_id: nil, actor_id: nil, tenant_id: nil)
+            # Create an audit event
+            unless %w[info warn error].include?(type)
+              raise Descope::AuthException, 'type must be either info, warn or error'
+            end
+
+            # validate data
+            raise Descope::AuthException, 'data must be provided (Hash)' unless data.is_a?(Hash)
+            raise Descope::AuthException, 'data must not be empty' if data.empty?
+
+            # validate tenant_id
+            raise Descope::AuthException, 'tenant_id must be provided' if tenant_id.nil?
+
+            request_params = {
+              action:,
+              tenantId: tenant_id,
+              type:,
+              actorId: actor_id,
+              data:
+            }
+            request_params[:userId] = user_id unless user_id.nil?
+
+            post(AUDIT_CREATE_EVENT, request_params)
+          end
+
           private
 
           def convert_audit_record(audit)

@@ -67,7 +67,7 @@ These sections show how to use the SDK to perform permission and user management
 8. [Manage Flows](#manage-flows-and-theme)
 9. [Manage JWTs](#manage-jwts)
 10. [Embedded links](#embedded-links)
-11. [Search Audit](#search-audit)
+11. [Audit](#audit)
 12. [Manage ReBAC Authz](#manage-rebac-authz)
 13. [Manage Project](#manage-project)
 
@@ -871,7 +871,7 @@ This token can then be verified using the magic link 'verify' function, either d
 token = descope_client.generate_embedded_link(login_id: 'desmond@descope.com', custom_claims: {'key1':'value1'})
 ```
 
-### Search Audit
+### Audit
 
 You can perform an audit search for either specific values or full-text across the fields. Audit search is limited to the last 30 days.
 Below are some examples. For a full list of available search criteria options, see the function documentation.
@@ -896,6 +896,21 @@ audits = descope_client.audit_search(
 
 # Search successful logins in the last 30 days
 audits = descope_client.audit_search(actions: ['LoginSucceed'])
+```
+
+You can also create audit event with data
+
+```ruby
+descope_client.audit_create_event(
+  action: "pencil.created",
+  type: "info", # either: info/warn/error
+  actor_id: "UXXX", # for example a user ID
+  tenant_id: "tenant-id", # required
+  data: {
+        pencil_id: "PXXX",
+        pencil_name: "Pencil Name"
+  }
+)
 ```
 
 ### Manage ReBAC Authz
