@@ -9,7 +9,7 @@ permissions:
   pull-requests: read # to detect changes files
 
 jobs:
-  publish-gem:
+  release:
     name: Publish Ruby Gem
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +23,28 @@ jobs:
 
       - name: Install dependencies
         run: bundle install
+
+      - name: Bump version
+        run: |
+          NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//') # strip the 'v' from the tag if present
+          sed -i -r "s/VERSION = \".+\"/^VERSION = \"${NEW_VERSION}\"/" ./lib/descope/version.rb
+
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git commit -am "Bump version to $NEW_VERSION"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Repoint the tag to latest commit
+        run: |
+          git tag -fa ${{ github.event.release.tag_name }} -m "Release $NEW_VERSION"
+          git push origin :${{ github.event.release.tag_name }}
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to RubyGems
         run: |
