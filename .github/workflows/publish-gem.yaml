@@ -33,6 +33,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
+          git add lib/descope/version.rb
           git commit -am "Bump version to $NEW_VERSION"
           git push
         env:
@@ -40,7 +41,8 @@ jobs:
 
       - name: Repoint the tag to latest commit
         run: |
-          git tag -fa ${{ github.event.release.tag_name }} -m "Release $NEW_VERSION"
+          git tag -d ${{ github.event.release.tag_name }}
+          git tag ${{ github.event.release.tag_name }} -m "Release $NEW_VERSION"
           git push origin :${{ github.event.release.tag_name }}
           git push
         env:
