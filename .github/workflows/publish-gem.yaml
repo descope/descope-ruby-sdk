@@ -28,7 +28,7 @@ jobs:
         run: |
           NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//') # strip the 'v' from the tag if present
           echo "New version: ${NEW_VERSION}"
-          sed -i -r "s/VERSION = \".+\"/^VERSION = \"${NEW_VERSION}\"/" ./lib/descope/version.rb
+          sed -i -r "s/(VERSION = \").+(\")/\\1${NEW_VERSION}\\2/" ./lib/descope/version.rb
           cat ./lib/descope/version.rb
           git status
 
