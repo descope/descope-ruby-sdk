@@ -27,8 +27,8 @@ jobs:
       - name: Bump version
         run: |
           NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//') # strip the 'v' from the tag if present
-          sed -i "s/VERSION = '1.0.6'/VERSION = '${NEW_VERSION}'/g" version.rb
-          cat ./lib/descope/version.rb
+          sed -i "s/VERSION = '1.0.6'/VERSION = '${NEW_VERSION}'/g" lib/descope/version.rb
+          cat lib/descope/version.rb
           git status
 
       - name: Commit changes
