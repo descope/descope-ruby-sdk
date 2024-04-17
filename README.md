@@ -97,8 +97,8 @@ The user will receive a code using the selected delivery method. Verify that cod
 jwt_response = descope_client.otp_verify_code(
     method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: 'someone@example.com', code: '123456'
 )
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -123,8 +123,8 @@ To verify a magic link, your redirect page must call the validation function on 
 
 ```ruby
 jwt_response = descope_client.magiclink_verify_token('token-here')
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -228,8 +228,8 @@ The user will authenticate with the authentication provider, and will be redirec
 
 ```ruby
 jwt_response = descope_client.oauth_exchange_token(code)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -251,8 +251,8 @@ The user will authenticate with the authentication provider configured for that 
 
 ```ruby
 jwt_response = descope_client.saml_exchange_token(code)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -289,8 +289,8 @@ jwt_response = descope_client.totp_sign_in_code(
     login_id: 'someone@example.com',
     code: '123456' # Code from authenticator app
 )
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -311,16 +311,16 @@ user = {
     email: login_id,
 }
 jwt_response = descope_client.password_sign_up(login_id:, password:, user:)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The user can later sign in using the same login_id and password.
 
 ```ruby
 jwt_response = descope_client.password_sign_in(login_id:, password:)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -357,8 +357,8 @@ Alternatively, it is also possible to replace an existing active password with a
 ```ruby
 # Replaces the user's current password with a new one
 jwt_response = descope_client.password_replace(login_id: 'login', old_password: '1234', new_password: '4567')
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 ### Session Validation
