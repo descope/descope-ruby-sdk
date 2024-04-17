@@ -24,12 +24,14 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
+      - name: Checkout main branch
+        run: git checkout main
+
       - name: Bump version
         run: |
           NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//') # strip the 'v' from the tag if present
           sed -i "s/^  VERSION = '.*'/  VERSION = '${NEW_VERSION}'/g" lib/descope/version.rb
-          echo "Updated version file"
-          cat lib/descope/version.rb
+          echo -e "Updated version file:\n $(cat lib/descope/version.rb)"
 
       - name: Commit changes
         run: |
