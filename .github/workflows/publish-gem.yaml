@@ -27,13 +27,16 @@ jobs:
       - name: Bump version
         run: |
           NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//') # strip the 'v' from the tag if present
+          echo "New version: ${NEW_VERSION}"
           sed -i -r "s/VERSION = \".+\"/^VERSION = \"${NEW_VERSION}\"/" ./lib/descope/version.rb
+          cat ./lib/descope/version.rb
+          git status
 
       - name: Commit changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add lib/descope/version.rb
+          git add ./lib/descope/version.rb
           git commit -am "Bump version to $NEW_VERSION"
           git push
         env:
