@@ -4,10 +4,6 @@ on:
   release:
     types: [published]
 
-permissions:
-  contents: read
-  pull-requests: read # to detect changes files
-
 jobs:
   release:
     name: Publish Ruby Gem
