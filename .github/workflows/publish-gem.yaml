@@ -23,6 +23,13 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
+      - name: Get token
+        id: get_token
+        uses: tibdex/github-app-token@v2
+        with:
+          private_key: ${{ secrets.RELEASE_APP_PEM }}
+          app_id: ${{ secrets.RELEASE_APP_ID }}
+          
       - name: Bump version
         run: |
           NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//') # strip the 'v' from the tag if present
@@ -38,7 +45,7 @@ jobs:
           git commit -m "Bump version to $NEW_VERSION"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
 
       - name: Repoint the tag to latest commit
         run: |
