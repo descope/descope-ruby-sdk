@@ -5,7 +5,7 @@ for a backend written in Ruby. You can read more on the [Descope Website](https:
 
 ## Requirements
 
-The SDK supports Ruby 3.2 and above.
+The SDK supports Ruby 3.3.0 and above.
 
 ## Installing the SDK
 
@@ -51,7 +51,7 @@ These sections show how to use the SDK to perform various authentication/authori
 8. [Session Validation](#session-validation)
 9. [Roles & Permission Validation](#roles-permission-validation)
 10. [Tenant selection](#tenant-selection)
-11. [Logging Out](#logging-out)
+11. [Signing Out](#signing-out)
 
 ## API Management Function
 
@@ -60,10 +60,10 @@ These sections show how to use the SDK to perform permission and user management
 1. [Manage Tenants](#manage-tenants)
 2. [Manage Users](#manage-users)
 3. [Manage Access Keys](#manage-access-keys)
-4. [Manage SSO Setting](#manage-sso-setting)
+4. [Manage SSO Setting](#manage-sso-saml-settings)
 5. [Manage Permissions](#manage-permissions)
 6. [Manage Roles](#manage-roles)
-7. [Query SSO Groups](#query-sso-groups)
+7. [Search Roles](#search-roles)
 8. [Manage Flows](#manage-flows-and-theme)
 9. [Manage JWTs](#manage-jwts)
 10. [Embedded links](#embedded-links)
@@ -79,7 +79,7 @@ For rate limiting information, please confer to the [API Rate Limits](#api-rate-
 
 ### OTP Authentication
 
-Send a user a one-time password (OTP) using your preferred delivery method (email/SMS/Voice call). An email address or phone number must be provided accordingly.
+Send a user a one-time password (OTP) using your preferred delivery method (Email/SMS/Voice call). An email address or phone number must be provided accordingly.
 
 The user can either `sign up`, `sign in` or `sign up or in`
 
@@ -88,32 +88,32 @@ The user can either `sign up`, `sign in` or `sign up or in`
 # For sign up either phone or email is required
 email = 'desmond@descope.com'
 user = {'name': 'Desmond Copeland', 'phone': '212-555-1234', 'email': email}
-masked_address = descope_client.otp_sign_up(method: DeliveryMethod.EMAIL, login_id: 'someone@example.com', user: user)
+masked_address = descope_client.otp_sign_up(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: 'someone@example.com', user: user)
 ```
 
 The user will receive a code using the selected delivery method. Verify that code using:
 
 ```ruby
 jwt_response = descope_client.otp_verify_code(
-    method: DeliveryMethod.EMAIL, login_id: 'someone@example.com', code: '123456'
+    method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: 'someone@example.com', code: '123456'
 )
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
 
 ### Magic Link
 
-Send a user a Magic Link using your preferred delivery method (_email / SMS_).
-The Magic Link will redirect the user to page where the its token needs to be verified.
+Send a user a Magic Link using your preferred delivery method (Email / SMS).
+The Magic Link will redirect the user to page where the token needs to be verified.
 This redirection can be configured in code, or generally in the [Descope Console](https://app.descope.com/settings/authentication/magiclink)
 
 The user can either `sign up`, `sign in` or `sign up or in`
 
 ```ruby
 masked_address = descope_client.magiclink_sign_up_or_in(
-    method: DeliveryMethod.EMAIL,
+    method: Descope::Mixins::Common::DeliveryMethod::EMAIL,
     login_id: 'desmond@descope.com',
     uri: 'https://myapp.com/verify-magic-link', # Set redirect URI here or via console
 )
@@ -123,8 +123,8 @@ To verify a magic link, your redirect page must call the validation function on 
 
 ```ruby
 jwt_response = descope_client.magiclink_verify_token('token-here')
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -143,7 +143,7 @@ This method is similar to [Magic Link](#magic-link) but differs in two major way
 - This supports cross-device clicking, meaning the user can try to log in on one device,
   like a computer, while clicking the link on another device, for instance a mobile phone.
 
-The Enchanted Link will redirect the user to page where the its token needs to be verified.
+The Enchanted Link will redirect the user to page where the token needs to be verified.
 This redirection can be configured in code per request, or set globally in the [Descope Console](https://app.descope.com/settings/authentication/enchantedlink).
 
 The user can either `sign up`, `sign in` or `sign up or in`
@@ -162,6 +162,9 @@ After sending the link, you must poll to receive a valid session using the `pend
 the previous step. A valid session will be returned only after the user clicks the right link.
 
 ```ruby
+
+pending_ref = res['pendingRef']
+
 def poll_for_session(descope_client, pending_ref)
   max_tries = 15
   i = 0
@@ -175,15 +178,15 @@ def poll_for_session(descope_client, pending_ref)
       jwt_response = descope_client.enchanted_link_get_session(pending_ref)
       done = true
     rescue Descope::AuthException, Descope::Unauthorized => e
-      puts 'Failed pending session, err: #{e}'
+      puts "Failed pending session, err: #{e}"
       nil
     end
 
     if jwt_response
-      puts 'jwt_response: #{jwt_response}'
+      puts "jwt_response: #{jwt_response}"
       refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME]['jwt']
 
-      puts 'refresh_token: #{refresh_token}'
+      puts "refresh_token: #{refresh_token}"
       puts :'Done logging out!'
       descope_client.sign_out(refresh_token)
       puts 'User logged out'
@@ -202,7 +205,8 @@ begin
     descope_client.enchanted_link_verify_token(token=token)
     # Token is valid
 rescue AuthException => e
-    # Token is invalid
+  # Token is invalid
+  puts "Failed to verify token, err: #{e}"
 end
 ```
 
@@ -224,8 +228,8 @@ The user will authenticate with the authentication provider, and will be redirec
 
 ```ruby
 jwt_response = descope_client.oauth_exchange_token(code)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -247,8 +251,8 @@ The user will authenticate with the authentication provider configured for that 
 
 ```ruby
 jwt_response = descope_client.saml_exchange_token(code)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -256,7 +260,7 @@ The session and refresh JWTs should be returned to the caller, and passed with e
 ### TOTP Authentication
 
 The user can authenticate using an authenticator app, such as Google Authenticator.
-Sign up like you would using any other authentication method. The sign up response
+Sign up like you would use any other authentication method. The sign-up response
 will then contain a QR code `image` that can be displayed to the user to scan using
 their mobile device camera app, or the user can enter the `key` manually or click
 on the link provided by the `provisioning_url`.
@@ -267,7 +271,7 @@ Existing users can add TOTP using the `update` function.
 # Every user must have a login ID. All other user information is optional
 email = 'desmond@descope.com'
 user = {name: 'Desmond Copeland', phone: '212-555-1234', email: 'someone@example.com'}
-totp_response = descope_client.totp_sign_up(method: DeliveryMethod.EMAIL, login_id: 'someone@example.com', user: user)
+totp_response = descope_client.totp_sign_up(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: 'someone@example.com', user: user)
 
 # Use one of the provided options to have the user add their credentials to the authenticator
 provisioning_url = totp_response['provisioningURL']
@@ -285,8 +289,8 @@ jwt_response = descope_client.totp_sign_in_code(
     login_id: 'someone@example.com',
     code: '123456' # Code from authenticator app
 )
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -307,16 +311,16 @@ user = {
     email: login_id,
 }
 jwt_response = descope_client.password_sign_up(login_id:, password:, user:)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The user can later sign in using the same login_id and password.
 
 ```ruby
 jwt_response = descope_client.password_sign_in(login_id:, password:)
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
@@ -325,7 +329,7 @@ In case the user needs to update their password, one of two methods are availabl
 
 **Changing Passwords**
 
-_NOTE: send_reset will only work if the user has a validated email address. Otherwise password reset prompts cannot be sent._
+_NOTE: send_reset will only work if the user has a validated email address. Otherwise, password reset prompts cannot be sent._
 
 In the [password authentication method](https://app.descope.com/settings/authentication/password) in the Descope console, it is possible to define which alternative authentication method can be used in order to authenticate the user, in order to reset and update their password.
 
@@ -353,8 +357,8 @@ Alternatively, it is also possible to replace an existing active password with a
 ```ruby
 # Replaces the user's current password with a new one
 jwt_response = descope_client.password_replace(login_id: 'login', old_password: '1234', new_password: '4567')
-session_token = jwt_response['sessionJwt']
-refresh_token = jwt_response['refreshJwt']
+session_token = jwt_response[Descope::Mixins::Common::SESSION_TOKEN_NAME].fetch('jwt')
+refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME].fetch('jwt')
 ```
 
 ### Session Validation
@@ -380,19 +384,19 @@ jwt_response = descope_client.validate_and_refresh_session('session_token', 'ref
 
 Choose the right session validation and refresh combination that suits your needs.
 
-Note: all those validation apis can receive an optional 'audience' parameter that should be provided when using jwt that has the 'aud' claim)
+Note: all those validation apis can receive an optional 'audience' parameter that should be provided when using jwt that has the 'aud' claim.
 
 Refreshed sessions return the same response as is returned when users first sign up / log in,
-containing the session and refresh tokens, as well as all of the JWT claims.
+containing the session and refresh tokens, as well as all the JWT claims.
 Make sure to return the tokens from the response to the client, or updated the cookie if you're using it.
 
 Usually, the tokens can be passed in and out via HTTP headers or via a cookie.
 The implementation can defer according to your framework of choice. See our [examples](#code-examples) for a few examples.
 
-If Roles & Permissions are used, validate them immediately after validating the session. See the [next section](#roles--permission-validation)
+If Roles & Permissions are used, validate them immediately after validating the session. See the [next section](#roles-permission-validation)
 for more information.
 
-### Roles & Permission Validation
+### Roles Permission Validation
 
 When using Roles & Permission, it's important to validate the user has the required
 authorization immediately after making sure the session is valid. Taking the `jwt_response`
@@ -459,7 +463,7 @@ After calling this function, you must invalidate or remove any cookies you have 
 descope_client.sign_out('refresh_token')
 ```
 
-It is also possible to sign the user out of all the devices they are currently signed-in with. Calling `logout_all` will
+It is also possible to sign the user out of all the devices they are currently signed in with. Calling `logout_all` will
 invalidate all user's refresh tokens. After calling this function, you must invalidate or remove any cookies you have created.
 
 ```ruby
@@ -760,7 +764,7 @@ descope_client.update_role(
 descope_client.delete_role(name: 'My Updated Role',  tenant_id: 'The tenant ID to which this role is associated, leave empty, if role is a global one')
 
 # Load all roles
-roles_resp = descope_client.load_all_roles()
+roles_resp = descope_client.load_all_roles
 roles = roles_resp['roles']
     roles.each do |role|
       # Do something
@@ -769,11 +773,13 @@ roles = roles_resp['roles']
 ```
 
 # Search roles
+
+```ruby
 roles_resp = descope_client.search_roles(
-    names: ['role1', 'role2'], # Search for roles with the names 'role1' and 'role2'
-    role_name_like: 'role', # Search for roles that contain the string 'role'
-    tenant_ids: ['tenant1', 'tenant2'], # Search for roles that are associated with the tenants 'tenant1' and 'tenant2'
-    permission_names: ['permission1', 'permission2'] # Search for roles that have the permissions 'permission1' and 'permission2'
+  names: %w[role1 role2], # Search for roles with the names 'role1' and 'role2'
+  role_name_like: 'role', # Search for roles that contain the string 'role'
+  tenant_ids: %w[tenant1 tenant2], # Search for roles that are associated with the tenants 'tenant1' and 'tenant2'
+  permission_names: %w[permission1 permission2] # Search for roles that have the permissions 'permission1' and 'permission2'
 )
 
 roles = roles_resp['roles']
@@ -1131,14 +1137,14 @@ descope_client.delete_all_test_users
 
 # OTP code can be generated for test user, for example:
 resp = descope_client.generate_otp_for_test_user(
-        method: DeliveryMethod.EMAIL, login_id: 'login-id'
+        method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: 'login-id'
 )
 code = resp['code']
 # Now you can verify the code is valid (using descope_client.*.verify for example)
 
 # Same as OTP, magic link can be generated for test user, for example:
 resp = descope_client.generate_magic_link_for_test_user(
-        method: DeliveryMethod.EMAIL, 
+        method: Descope::Mixins::Common::DeliveryMethod::EMAIL,
         login_id: 'login-id',
 )
 link = resp['link']
@@ -1158,7 +1164,7 @@ Handle API rate limits by comparing the exception to the APIRateLimitExceeded ex
 ```ruby
 begin
     descope_client.magiclink_sign_up_or_in(
-        method: DeliveryMethod.EMAIL,
+        method: Descope::Mixins::Common::DeliveryMethod::EMAIL,
         login_id: 'desmond@descope.com',
         uri: 'https://myapp.com/verify-magic-link',
     )
