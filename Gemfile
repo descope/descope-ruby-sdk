@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'rubocop', '1.63.0', require: false
+  gem 'rubocop', '1.63.2', require: false
 end
 
 group :test do
