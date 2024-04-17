@@ -64,11 +64,10 @@ module Descope
               raise Descope::AuthException, 'type must be either info, warn or error'
             end
 
-            # validate data
-            raise Descope::AuthException, 'data must be provided (Hash)' unless data.is_a?(Hash)
-            raise Descope::AuthException, 'data must not be empty' if data.empty?
-
-            # validate tenant_id
+            # validation
+            raise Descope::AuthException, 'data must be provided as a key, value Hash' unless data.is_a?(Hash)
+            raise Descope::AuthException, 'action must be provided' if action.nil?
+            raise Descope::AuthException, 'actor_id must be provided' if actor_id.nil?
             raise Descope::AuthException, 'tenant_id must be provided' if tenant_id.nil?
 
             request_params = {

@@ -902,14 +902,14 @@ You can also create audit event with data
 
 ```ruby
 descope_client.audit_create_event(
-  action: "pencil.created",
-  type: "info", # either: info/warn/error
-  actor_id: "UXXX", # for example a user ID
+  actor_id: "UXXX", # required, for example a user ID
   tenant_id: "tenant-id", # required
+  action: "pencil.created", # required
+  type: "info", # either: info/warn/error # required
   data: {
         pencil_id: "PXXX",
         pencil_name: "Pencil Name"
-  }
+  } # optional
 )
 ```
 

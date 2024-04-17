@@ -80,6 +80,7 @@ describe Descope::Api::V1::Management::Audit do
     it 'should respond to .audit_create_event' do
       expect(@instance).to respond_to :audit_create_event
     end
+
     it 'should raise an error if type is not info, warn or error' do
       expect do
         @instance.audit_create_event(
@@ -103,20 +104,31 @@ describe Descope::Api::V1::Management::Audit do
           actor_id: 'actor_id',
           tenant_id: 'tenant_id'
         )
-      end.to raise_error(Descope::AuthException, 'data must be provided (Hash)')
+      end.to raise_error(Descope::AuthException, 'data must be provided as a key, value Hash')
     end
 
-    it 'should raise an error if data is an empty hash' do
+    it 'should raise an error if action is not provided' do
       expect do
         @instance.audit_create_event(
-          action: 'get',
           type: 'info',
-          data: {},
+          data: { key: 'value' },
           user_id: 'user_id',
           actor_id: 'actor_id',
           tenant_id: 'tenant_id'
         )
-      end.to raise_error(Descope::AuthException, 'data must not be empty')
+      end.to raise_error(Descope::AuthException, 'action must be provided')
+    end
+
+    it 'should raise an error if actor is not provided' do
+      expect do
+        @instance.audit_create_event(
+          action: 'get',
+          type: 'info',
+          data: { key: 'value' },
+          user_id: 'user_id',
+          tenant_id: 'tenant_id'
+        )
+      end.to raise_error(Descope::AuthException, 'actor_id must be provided')
     end
 
     it 'should raise an error if tenant_id is not provided' do
