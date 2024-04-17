@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -23,9 +26,6 @@ jobs:
 
       - name: Install dependencies
         run: bundle install
-
-      - name: Checkout main branch
-        run: git checkout main
 
       - name: Bump version
         run: |
