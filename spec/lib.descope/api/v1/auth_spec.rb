@@ -181,7 +181,7 @@ describe Descope::Api::V1::Auth do
 
       expect do
         exp_in_seconds = 20
-        puts "Sleeping for #{exp_in_seconds} seconds to test token expiration. Please wait..."
+        puts "\nAuthSpec.validate_token::Sleeping for #{exp_in_seconds} seconds to test token expiration. Please wait...\n"
         sleep(exp_in_seconds)
         @instance.send(:validate_token, token)
       end.to raise_error(

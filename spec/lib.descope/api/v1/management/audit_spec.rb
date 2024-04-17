@@ -75,4 +75,96 @@ describe Descope::Api::V1::Management::Audit do
       expect(res['audits'][0]['projectId']).to eq('abc')
     end
   end
+
+  context '.create_event' do
+    it 'should respond to .audit_create_event' do
+      expect(@instance).to respond_to :audit_create_event
+    end
+
+    it 'should raise an error if type is not info, warn or error' do
+      expect do
+        @instance.audit_create_event(
+          action: 'get',
+          type: 'debug',
+          data: { key: 'value' },
+          user_id: 'user_id',
+          actor_id: 'actor_id',
+          tenant_id: 'tenant_id'
+        )
+      end.to raise_error(Descope::AuthException, 'type must be either info, warn or error')
+    end
+
+    it 'should raise an error if data is not a hash' do
+      expect do
+        @instance.audit_create_event(
+          action: 'get',
+          type: 'info',
+          data: 'data',
+          user_id: 'user_id',
+          actor_id: 'actor_id',
+          tenant_id: 'tenant_id'
+        )
+      end.to raise_error(Descope::AuthException, 'data must be provided as a key, value Hash')
+    end
+
+    it 'should raise an error if action is not provided' do
+      expect do
+        @instance.audit_create_event(
+          type: 'info',
+          data: { key: 'value' },
+          user_id: 'user_id',
+          actor_id: 'actor_id',
+          tenant_id: 'tenant_id'
+        )
+      end.to raise_error(Descope::AuthException, 'action must be provided')
+    end
+
+    it 'should raise an error if actor is not provided' do
+      expect do
+        @instance.audit_create_event(
+          action: 'get',
+          type: 'info',
+          data: { key: 'value' },
+          user_id: 'user_id',
+          tenant_id: 'tenant_id'
+        )
+      end.to raise_error(Descope::AuthException, 'actor_id must be provided')
+    end
+
+    it 'should raise an error if tenant_id is not provided' do
+      expect do
+        @instance.audit_create_event(
+          action: 'get',
+          type: 'info',
+          data: { key: 'value' },
+          user_id: 'user_id',
+          actor_id: 'actor_id'
+        )
+      end.to raise_error(Descope::AuthException, 'tenant_id must be provided')
+    end
+
+    it 'is expected to create an audit event' do
+      expect(@instance).to receive(:post).with(
+        '/v1/mgmt/audit/event',
+        {
+          action: 'get',
+          type: 'info',
+          actorId: 'actor_id',
+          data: { key: 'value' },
+          tenantId: 'tenant_id',
+          userId: 'user_id'
+        }
+      )
+      expect do
+        @instance.audit_create_event(
+          action: 'get',
+          type: 'info',
+          data: { key: 'value' },
+          user_id: 'user_id',
+          actor_id: 'actor_id',
+          tenant_id: 'tenant_id'
+        )
+      end.not_to raise_error
+    end
+  end
 end
