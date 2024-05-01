@@ -38,7 +38,7 @@ describe Descope::Api::V1::Management::Flow do
   it 'should import the current project theme' do
     export_theme = @client.export_theme
     export_theme_current_version = export_theme['theme']['version']
-    imported_theme = @client.import_theme(export_theme)
+    imported_theme = @client.import_theme(export_theme['theme'])
     expect(imported_theme['theme']['version']).to be(export_theme_current_version + 1)
   end
 end
