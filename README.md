@@ -45,6 +45,7 @@ These sections show how to use the SDK to perform various authentication/authori
 2. [Magic Link](#magic-link)
 3. [Enchanted Link](#enchanted-link)
 4. [OAuth](#oauth)
+5. [NOTP (WhatsApp)] (#notp-whatsapp)
 5. [SSO/SAML](#ssosaml)
 6. [TOTP Authentication](#totp-authentication)
 7. [Passwords](#passwords)
@@ -234,6 +235,62 @@ refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
 
+### NOTP (WhatsApp)
+
+Using the NOTP (WhatsApp) APIs enables users to log in using their WhatsApp account, according to the following process:
+a. The user will be redirected to WhatsApp (with a QR Code or link) with a pre-filled message containing a 16-character alphanumeric code.
+b. The user will send the message to the WhatsApp Application associated with the Descope project.
+c. Descope will receive the message, validate the code, and send an approval message back to the user.
+d. The user will be logged in after receiving the approval message.
+
+Note: The NOTP (WhatsApp) authentication method should be configured in the Descope Console before using it
+
+The user can either `sign up`, `sign in`, or `sign up or in`:
+
+```ruby
+login_id = "" # OR phone number
+res = descope_client.notp_sign_in(
+        login_id: '<login_id or phone number>',
+)
+
+
+# The URL to redirect the user to initiate a conversation in the WhatsApp Web Application with the pre-filled message containing the code
+res.RedirectURL
+# A QR code image that can be displayed to the user to scan using their mobile device camera app to start the WhatsApp conversation
+res.Image
+# Used to poll for a valid session
+res.PendingRef
+```
+
+After sending the link, you must poll to receive a valid session using the `PendingRef` from the previous step. A valid session will be returned only after the user sends the message to the WhatsApp Application associated with the Project with the code
+
+TODO: change to ruby
+
+```go
+// Poll for a certain number of tries / time frame
+for i := retriesCount; i > 0; i-- {
+    authInfo, err := descopeClient.Auth.NOTP().GetSession(context.Background(), res.PendingRef, w)
+    if err == nil {
+        // The user successfully authenticated
+        // The optional `w http.ResponseWriter` adds the session and refresh cookies to the response automatically.
+        // Otherwise they're available via authInfo
+        break
+    }
+    if errors.Is(err, descope.ErrNOTPUnauthorized) && i > 1 {
+        // poll again after X seconds
+        time.Sleep(time.Second * time.Duration(retryInterval))
+        continue
+    }
+    if err != nil {
+        // handle error
+        break
+    }
+}
+```
+
+The verification process is conducted using the WhatsApp application by the user sending a message with the token included in the link. After sending the message, the user will receive an approval message back, and the session polling will then receive a valid response
+
+The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
 ### SSO/SAML
 
 Users can authenticate to a specific tenant using SAML or Single Sign On. Configure your SSO/SAML settings on the [Descope console](https://app.descope.com/settings/authentication/sso). To start a flow call:

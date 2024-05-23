@@ -64,6 +64,12 @@ module Descope
         UPDATE_USER_EMAIL_OTP_PATH = '/v1/auth/otp/update/email'
         UPDATE_USER_PHONE_OTP_PATH = '/v1/auth/otp/update/phone'
 
+        # nOTP
+        SIGN_UP_AUTH_NOTP_PATH = '/v1/auth/notp/signup'
+        SIGN_IN_AUTH_NOTP_PATH = '/v1/auth/notp/signin'
+        SIGN_UP_OR_IN_AUTH_NOTP_PATH = '/v1/auth/notp/signup-in'
+        GET_NOTP_SESSION_PATH = '/v1/auth/notp/pending-session'
+
         # magiclink
         SIGN_UP_AUTH_MAGICLINK_PATH = '/v1/auth/magiclink/signup'
         SIGN_IN_AUTH_MAGICLINK_PATH = '/v1/auth/magiclink/signin'

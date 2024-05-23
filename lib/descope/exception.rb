@@ -47,4 +47,7 @@ module Descope
   class AccessDenied < Descope::HTTPError; end
   class RateLimitException < Descope::HTTPError; end
   class RequestTimeout < Descope::HTTPError; end
+
+  # exception for nOTP authorization
+  class ErrNOTPUnauthorized < Descope::AuthException; end
 end
