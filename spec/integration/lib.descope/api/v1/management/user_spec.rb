@@ -58,6 +58,41 @@ describe Descope::Api::V1::Management::User do
     expect(updated_user['first_name']).to eq(created_user[updated_first_name])
   end
 
+  it 'should patch a user' do
+    user = build(:user)
+    role_name = 'some-new-role'
+
+    # ensure no roles exist with that name
+    all_roles = @client.load_all_roles
+    all_roles['roles'].each do |role|
+      @client.delete_role(name: role['name']) if role['name'] == role_name
+    end
+
+    @client.create_role(name: role_name)
+    @client.create_user(**user)['user']
+    updated_first_name = 'new name'
+    updated_given_name = 'new given name'
+    update_phone_number = "+1#{Faker::Number.number(digits: 10)}"
+    updated_role_names = [role_name]
+    updated_middle_name = 'new middle name'
+    updated_user = @client.patch_user(
+      **user,
+      name: updated_first_name,
+      given_name: updated_given_name,
+      phone: update_phone_number,
+      role_names: updated_role_names,
+      middle_name: updated_middle_name
+    )['user']
+
+    puts "updated_user #{updated_user}"
+
+    expect(updated_user['name']).to eq(updated_first_name)
+    expect(updated_user['givenName']).to eq(updated_given_name)
+    expect(updated_user['phone']).to eq(update_phone_number)
+    expect(updated_user['roleNames']).to eq(updated_role_names)
+    expect(updated_user['middleName']).to eq(updated_middle_name)
+  end
+
   it 'should delete a user' do
     user = build(:user)
     created_user = @client.create_user(**user)['user']
