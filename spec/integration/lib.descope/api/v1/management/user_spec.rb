@@ -226,8 +226,8 @@ describe Descope::Api::V1::Management::User do
       new_password = SpecUtils.generate_password
       @client.set_password(login_id: user['loginIds'][0], password: new_password)
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
-    rescue Descope::ServerError => e
-      expect(e.message).to match(/"errorCode":"E062903"/)
+    rescue Descope::Unauthorized => e
+      expect(e.message).to match(/"errorDescription":"Invalid signin credentials"/)
     end
   end
 
