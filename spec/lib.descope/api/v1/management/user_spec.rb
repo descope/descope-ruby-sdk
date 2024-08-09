@@ -704,4 +704,32 @@ describe Descope::Api::V1::Management::User do
       end.not_to raise_error
     end
   end
+
+  context '.patch_user' do
+    it 'is expected to respond to a patch user method' do
+      expect(@instance).to respond_to(:patch_user)
+    end
+
+    it 'is expected to respond to a user patch method' do
+      expect(@instance).to receive(:patch).with(
+        USER_PATCH_PATH, {
+          loginId: 'name@mail.com',
+          email: 'name@mail.com',
+          givenName: 'mister',
+          name: 'something else',
+          test: false,
+          invite: false
+        }
+      )
+
+      expect do
+        @instance.patch_user(
+          login_id: 'name@mail.com',
+          email: 'name@mail.com',
+          given_name: 'mister',
+          name: 'something else'
+        )
+      end.not_to raise_error
+    end
+  end
 end

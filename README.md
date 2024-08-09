@@ -574,6 +574,16 @@ descope_client.update_user(
         user_tenants: client.associated_tenants_to_hash_array(associated_tenants)
 )
 
+# Patch all user attribute in one api call
+descope_client.patch_user(
+        login_id: 'desmond@descope.com',
+        email: 'desmond@descope.com',
+        given_name: 'Desmond',
+        family_name: 'Copeland',
+        display_name: 'Desmond Copeland',
+        user_tenants: client.associated_tenants_to_hash_array(associated_tenants)
+)
+
 # Update explicit data for a user rather than overriding all fields
 descope_client.update_login_id(
         login_id: 'desmond@descope.com',
