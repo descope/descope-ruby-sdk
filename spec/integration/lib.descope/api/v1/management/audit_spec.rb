@@ -40,6 +40,7 @@ describe Descope::Api::V1::Management::Audit do
 
     expect do
       res = @client.audit_create_event(
+        user_id: created_user['loginId'],
         action: 'pencil.created',
         type: 'info',
         tenant_id:,
