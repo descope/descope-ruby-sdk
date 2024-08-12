@@ -324,6 +324,51 @@ module Descope
             post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
           end
 
+          def patch_user(
+            login_id: nil,
+            email: nil,
+            phone: nil,
+            name: nil,
+            given_name: nil,
+            middle_name: nil,
+            family_name: nil,
+            role_names: [],
+            user_tenants: [],
+            picture: nil,
+            custom_attributes: nil,
+            verified_email: nil,
+            verified_phone: nil,
+            additional_identifiers: [],
+            password: nil,
+            hashed_password: {},
+            sso_app_ids: []
+          )
+            validate_login_id(login_id)
+            role_names ||= []
+            user_tenants ||= []
+            path = Common::USER_PATCH_PATH
+            request_params = user_compose_update_body(
+              login_id:,
+              email:,
+              phone:,
+              name:,
+              given_name:,
+              middle_name:,
+              family_name:,
+              role_names:,
+              user_tenants:,
+              picture:,
+              custom_attributes:,
+              verified_email:,
+              verified_phone:,
+              additional_identifiers:,
+              password:,
+              hashed_password:,
+              sso_app_ids:
+            )
+            patch(path, request_params)
+          end
+
           def update_jwt(jwt: nil, custom_claims: nil)
             body = {
               jwt:,

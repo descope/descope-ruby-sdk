@@ -44,6 +44,7 @@ module Descope
           USER_GENERATE_MAGIC_LINK_FOR_TEST_PATH = '/v1/mgmt/tests/generate/magiclink'
           USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH = '/v1/mgmt/tests/generate/enchantedlink'
           USER_GENERATE_EMBEDDED_LINK_PATH = '/v1/mgmt/user/signin/embeddedlink'
+          USER_PATCH_PATH = '/v1/mgmt/user/patch'
 
           # access key
           ACCESS_KEY_CREATE_PATH = '/v1/mgmt/accesskey/create'
