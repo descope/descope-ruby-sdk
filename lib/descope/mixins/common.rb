@@ -52,6 +52,7 @@ module Descope
         LOGOUT_ALL_PATH = '/v1/auth/logoutall'
         VALIDATE_SESSION_PATH = '/v1/auth/validate'
         ME_PATH = '/v1/auth/me'
+        HISTORY_PATH = '/v1/auth/me/history'
 
         # access key
         EXCHANGE_AUTH_ACCESS_KEY_PATH = '/v1/auth/accesskey/exchange'
