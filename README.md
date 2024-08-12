@@ -1180,6 +1180,80 @@ link = resp['link']
 pending_ref = resp['pendingRef']
 ```
 
+### Manage SSO Applications
+
+You can create, update, delete or load SSO applications:
+
+```ruby
+descope_client.create_sso_oidc_app(
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+  id: "my-custom-id", # this is optional
+)
+
+# Create SAML sso application
+descope_client.create_saml_application(
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+  id: "my-custom-id", # this is optional
+  use_metadata_info: true,
+  metadata_url: "https://dummy.com/metadata",
+  default_relay_state: "relayState",
+  force_authentication: false,
+  logout_redirect_url: "https://dummy.com/logout",
+)
+```
+
+# Update OIDC sso application
+# Update will override all fields as is. Use carefully.
+
+```ruby
+descope_client.update_sso_oidc_app(
+  id: "my-custom-id",
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+)
+````
+
+# Update SAML sso application
+# Update will override all fields as is. Use carefully.
+
+```ruby
+descope_client.update_saml_application(
+  id: "my-custom-id",
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+  use_metadata_info: false,
+  entity_id: "ent1234",
+  acs_url: "https://dummy.com/acs",
+  certificate: "my cert"
+)
+```
+
+# SSO application deletion cannot be undone. Use carefully.
+
+```ruby
+descope_client.delete_sso_app('my-custom-id')
+```
+
+# Load SSO application by id
+
+```ruby
+descope_client.load_sso_app('my-custom-id')
+```
+
+# Load all SSO applications
+
+```ruby
+resp = descope_client.load_all_sso_apps
+resp["apps"].each do |app|
+  # Do something
+end
+```
+
+STOPPPED AT UTILS!!!!!
+
+
 ## API Rate Limits
 
 Handle API rate limits by comparing the exception to the APIRateLimitExceeded exception, which includes the RateLimitParameters map with the key 'Retry-After.' This key indicates how many seconds until the next valid API call can take place.
