@@ -47,9 +47,11 @@ module Descope
             # but can be provided explicitly if needed. Both the name and ID must be unique per project.
 
             if use_metadata_info
-              raise 'metadata_url argument must be set' unless metadata_url
+              raise Descope::ArgumentException.new('metadata_url argument must be set', code: 400) unless metadata_url
             else
-              raise 'entity_id, acs_url, certificate arguments must be set' unless entity_id && acs_url && certificate
+              unless entity_id && acs_url && certificate
+                raise Descope::ArgumentException.new('entity_id, acs_url, certificate arguments must be set', code: 400)
+              end
             end
 
             attribute_mapping ||= []

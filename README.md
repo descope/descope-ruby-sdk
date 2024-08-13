@@ -1251,8 +1251,6 @@ resp["apps"].each do |app|
 end
 ```
 
-STOPPPED AT UTILS!!!!!
-
 
 ## API Rate Limits
 
