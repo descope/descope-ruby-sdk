@@ -18,28 +18,6 @@ module Descope
             delete(SSO_SETTINGS_PATH, { tenantId: tenant_id })
           end
 
-          def create_sso_oidc_app(id: nil, name: nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
-            body = {}
-            body[:id] = id if id
-            body[:name] = name if name
-            body[:description] = description if description
-            body[:enabled] = enabled if enabled
-            body[:logo] = logo if logo
-            body[:loginPageUrl] = login_page_url if login_page_url
-            post(SSO_OIDC_CREATE_APP_PATH, body)
-          end
-
-          def update_sso_oidc_app(id: nil, name: nil, description: nil, enabled: nil, logo: nil, login_page_url: nil)
-            body = {}
-            body[:id] = id if id
-            body[:name] = name if name
-            body[:description] = description if description
-            body[:enabled] = enabled if enabled
-            body[:logo] = logo if logo
-            body[:loginPageUrl] = login_page_url if login_page_url
-            put(SSO_OIDC_UPDATE_APP_PATH, body)
-          end
-
           def configure_sso_oidc(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
             raise Descope::ArgumentException.new('SSO settings must be a Hash', code: 400) unless settings.is_a?(Hash)
 
@@ -63,12 +41,12 @@ module Descope
               redirectUrl: redirect_url,
               domain:
             }
-            post(SSO_SAML_PATH, request_params)
+            post(SSO_SETTINGS_PATH, request_params)
           end
 
           def configure_sso_saml_metadata(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
             # Configure tenant SSO SAML Metadata, using a valid management key.
-            post(SSO_SAML_METADATA_PATH, compose_metadata_body(tenant_id, settings, redirect_url, domain))
+            post(SSO_METADATA_PATH, compose_metadata_body(tenant_id, settings, redirect_url, domain))
           end
 
           private

@@ -55,13 +55,24 @@ module Descope
           ACCESS_KEY_ACTIVATE_PATH = '/v1/mgmt/accesskey/activate'
           ACCESS_KEY_DELETE_PATH = '/v1/mgmt/accesskey/delete'
 
-          # sso
+          # sso application
+          SSO_APPLICATION_OIDC_CREATE_PATH = '/v1/mgmt/sso/idp/app/oidc/create'
+          SSO_APPLICATION_SAML_CREATE_PATH = '/v1/mgmt/sso/idp/app/saml/create'
+          SSO_APPLICATION_OIDC_UPDATE_PATH = '/v1/mgmt/sso/idp/app/oidc/update'
+          SSO_APPLICATION_SAML_UPDATE_PATH = '/v1/mgmt/sso/idp/app/saml/update'
+          SSO_APPLICATION_DELETE_PATH = '/v1/mgmt/sso/idp/app/delete'
+          SSO_APPLICATION_LOAD_PATH = '/v1/mgmt/sso/idp/app/load'
+          SSO_APPLICATION_LOAD_ALL_PATH = '/v1/mgmt/sso/idp/apps/load'
+
+          # sso settings
           SSO_SETTINGS_PATH = '/v2/mgmt/sso/settings'
+          SSO_METADATA_PATH = '/v1/mgmt/sso/metadata'
+          SSO_MAPPING_PATH = '/v1/mgmt/sso/mapping'
+          SSO_LOAD_SETTINGS_PATH = '/v2/mgmt/sso/settings' # v2 only
           SSO_OIDC_PATH = '/v1/mgmt/sso/oidc' # configure ssp settings via oidc
-          SSO_OIDC_CREATE_APP_PATH = '/v1/mgmt/sso/idp/app/oidc/create'
-          SSO_OIDC_UPDATE_APP_PATH = '/v1/mgmt/sso/idp/app/oidc/create'
-          SSO_SAML_PATH = '/v1/mgmt/sso/saml' # configure ssp settings via saml
-          SSO_SAML_METADATA_PATH = '/v1/mgmt/sso/saml/metadata' # configure ssp settings via saml metadata
+          SSO_CONFIGURE_OIDC_SETTINGS_PATH = '/v1/mgmt/sso/oidc'
+          SSO_CONFIGURE_SAML_SETTINGS_PATH = '/v1/mgmt/sso/saml'
+          SSO_CONFIGURE_SAML_METADATA_PATH = '/v1/mgmt/sso/saml/metadata'
 
           # SCIM
           SCIM_GROUPS_PATH = '/scim/v2/Groups'

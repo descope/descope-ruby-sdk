@@ -87,7 +87,7 @@ describe Descope::Api::V1::Management::SSOSettings do
 
     it 'is expected to configure SSO settings' do
       expect(@instance).to receive(:post).with(
-        SSO_SAML_PATH, {
+        SSO_SETTINGS_PATH, {
           tenantId: '123',
           settings: {
             name: 'test',
@@ -132,7 +132,7 @@ describe Descope::Api::V1::Management::SSOSettings do
 
     it 'is expected to configure SAML metadata' do
       expect(@instance).to receive(:post).with(
-        SSO_SAML_METADATA_PATH, {
+        SSO_METADATA_PATH, {
           tenantId: '123',
           settings: {
             name: 'test',

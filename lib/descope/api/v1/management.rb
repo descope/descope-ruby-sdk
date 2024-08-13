@@ -10,6 +10,7 @@ require 'descope/api/v1/management/role'
 require 'descope/api/v1/management/project'
 require 'descope/api/v1/management/authz'
 require 'descope/api/v1/management/audit'
+require 'descope/api/v1/management/sso_application'
 require 'descope/api/v1/management/sso_settings'
 require 'descope/api/v1/management/scim'
 require 'descope/api/v1/management/password'
@@ -29,6 +30,7 @@ module Descope
         include Descope::Api::V1::Management::Project
         include Descope::Api::V1::Management::Authz
         include Descope::Api::V1::Management::Audit
+        include Descope::Api::V1::Management::SSOApplication
         include Descope::Api::V1::Management::SSOSettings
         include Descope::Api::V1::Management::SCIM
         include Descope::Api::V1::Management::Password

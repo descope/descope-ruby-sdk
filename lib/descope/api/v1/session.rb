@@ -78,6 +78,22 @@ module Descope
             refresh_session(refresh_token:, audience:)
           end
         end
+
+        def history(refresh_token = nil)
+          # Retrieve user authentication history for the refresh token
+          # Return List in the format
+          #              [
+          #                 {
+          #                     "userId": "User's ID",
+          #                     "loginTime": "User'sLogin time",
+          #                     "city": "User's city",
+          #                     "country": "User's country",
+          #                     "ip": User's IP
+          #                 }
+          #             ]
+          validate_refresh_token_not_nil(refresh_token)
+          get(HISTORY_PATH, {}, {}, refresh_token)
+        end
       end
     end
   end

@@ -45,13 +45,14 @@ These sections show how to use the SDK to perform various authentication/authori
 2. [Magic Link](#magic-link)
 3. [Enchanted Link](#enchanted-link)
 4. [OAuth](#oauth)
-5. [SSO/SAML](#ssosaml)
+5. [SSO (SAML / OIDC)](#sso-saml-oidc)
 6. [TOTP Authentication](#totp-authentication)
 7. [Passwords](#passwords)
 8. [Session Validation](#session-validation)
 9. [Roles & Permission Validation](#roles-permission-validation)
 10. [Tenant selection](#tenant-selection)
 11. [Signing Out](#signing-out)
+12. [History](#history)
 
 ## API Management Function
 
@@ -60,16 +61,18 @@ These sections show how to use the SDK to perform permission and user management
 1. [Manage Tenants](#manage-tenants)
 2. [Manage Users](#manage-users)
 3. [Manage Access Keys](#manage-access-keys)
-4. [Manage SSO Setting](#manage-sso-saml-settings)
+4. [Manage SSO Setting](#manage-sso-setting)
 5. [Manage Permissions](#manage-permissions)
 6. [Manage Roles](#manage-roles)
-7. [Search Roles](#search-roles)
+7. [Query SSO Groups](#query-sso-groups)
 8. [Manage Flows](#manage-flows-and-theme)
 9. [Manage JWTs](#manage-jwts)
-10. [Embedded links](#embedded-links)
-11. [Audit](#audit)
-12. [Manage ReBAC Authz](#manage-rebac-authz)
-13. [Manage Project](#manage-project)
+10. [Impersonate](#impersonate)
+11. [Embedded links](#embedded-links)
+12. [Audit](#audit)
+13. [Manage ReBAC Authz](#manage-rebac-authz)
+14. [Manage Project](#manage-project)
+15. [Manage SSO Applications](#manage-sso-applications)
 
 If you wish to run any of our code examples and play with them, check out our [Code Examples](#code-examples) section.
 
@@ -143,7 +146,7 @@ This method is similar to [Magic Link](#magic-link) but differs in two major way
 - This supports cross-device clicking, meaning the user can try to log in on one device,
   like a computer, while clicking the link on another device, for instance a mobile phone.
 
-The Enchanted Link will redirect the user to page where the token needs to be verified.
+The Enchanted Link will redirect the user to a page where the token needs to be verified.
 This redirection can be configured in code per request, or set globally in the [Descope Console](https://app.descope.com/settings/authentication/enchantedlink).
 
 The user can either `sign up`, `sign in` or `sign up or in`
@@ -234,7 +237,7 @@ refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME
 
 The session and refresh JWTs should be returned to the caller, and passed with every request in the session. Read more on [session validation](#session-validation)
 
-### SSO/SAML
+### SSO (SAML / OIDC)
 
 Users can authenticate to a specific tenant using SAML or Single Sign On. Configure your SSO/SAML settings on the [Descope console](https://app.descope.com/settings/authentication/sso). To start a flow call:
 
@@ -468,6 +471,16 @@ invalidate all user's refresh tokens. After calling this function, you must inva
 
 ```ruby
 descope_client.sign_out_all('refresh_token')
+```
+
+### History
+You can get the current session user history.
+The request requires a valid refresh token.
+
+```ruby
+users_history_resp = descope_client.history(refresh_token)
+for user_history in users_history_resp:
+    # Do something
 ```
 
 ## Management API
@@ -1166,6 +1179,78 @@ resp = descope_client.generate_enchanted_link_for_test_user(
 link = resp['link']
 pending_ref = resp['pendingRef']
 ```
+
+### Manage SSO Applications
+
+You can create, update, delete or load SSO applications:
+
+```ruby
+descope_client.create_sso_oidc_app(
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+  id: "my-custom-id", # this is optional
+)
+
+# Create SAML sso application
+descope_client.create_saml_application(
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+  id: "my-custom-id", # this is optional
+  use_metadata_info: true,
+  metadata_url: "https://dummy.com/metadata",
+  default_relay_state: "relayState",
+  force_authentication: false,
+  logout_redirect_url: "https://dummy.com/logout",
+)
+```
+
+# Update OIDC sso application
+# Update will override all fields as is. Use carefully.
+
+```ruby
+descope_client.update_sso_oidc_app(
+  id: "my-custom-id",
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+)
+````
+
+# Update SAML sso application
+# Update will override all fields as is. Use carefully.
+
+```ruby
+descope_client.update_saml_application(
+  id: "my-custom-id",
+  name: "My First sso app",
+  login_page_url: "https://dummy.com/login",
+  use_metadata_info: false,
+  entity_id: "ent1234",
+  acs_url: "https://dummy.com/acs",
+  certificate: "my cert"
+)
+```
+
+# SSO application deletion cannot be undone. Use carefully.
+
+```ruby
+descope_client.delete_sso_app('my-custom-id')
+```
+
+# Load SSO application by id
+
+```ruby
+descope_client.load_sso_app('my-custom-id')
+```
+
+# Load all SSO applications
+
+```ruby
+resp = descope_client.load_all_sso_apps
+resp["apps"].each do |app|
+  # Do something
+end
+```
+
 
 ## API Rate Limits
 
