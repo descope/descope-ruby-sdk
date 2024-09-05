@@ -212,7 +212,7 @@ describe Descope::Api::V1::Management::User do
       @client.expire_password(user['loginIds'][0])
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
     rescue Descope::ServerError => e
-      expect(e.message).to match(/"errorCode":"E062903"/)
+      expect(e.message).to match(/"errorCode":"E062909"/)
     end
   end
 
@@ -227,7 +227,7 @@ describe Descope::Api::V1::Management::User do
       @client.set_password(login_id: user['loginIds'][0], password: new_password)
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
     rescue Descope::ServerError => e
-      expect(e.message).to match(/"errorDescription":"Password signin failed"/)
+      expect(e.message).to match(/"Password expired"/)
     end
   end
 

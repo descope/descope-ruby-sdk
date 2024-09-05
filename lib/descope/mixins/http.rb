@@ -44,10 +44,15 @@ module Descope
         }
       end
 
-      def safe_parse_json(body, cookies: nil)
+      def safe_parse_json(body, cookies: {})
         @logger.debug "response => #{JSON.parse(body.to_s)}"
         res = JSON.parse(body.to_s)
-        res['cookies'] = cookies unless cookies.nil?
+        cookies.each do |cookie_name, cookie_value|
+          if cookie_name == REFRESH_SESSION_COOKIE_NAME
+            res['cookies'] ||= {}
+            res['cookies'][cookie_name] = cookie_value
+          end
+        end
         res
       rescue JSON::ParserError
         body
