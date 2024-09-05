@@ -245,11 +245,11 @@ module Descope
           # validate refresh token if refresh_token was passed or if refreshJwt is not empty
           rt_jwt = response_body.fetch('refreshJwt', '')
 
-          # if refresh_token is in response body (local storage)
-          if refresh_token && !refresh_token.empty?
-            jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
-          elsif !rt_jwt.empty?
+          if !rt_jwt.empty?
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, audience)
+          elsif refresh_token && !refresh_token.empty?
+            # if refresh_token is in response body (local storage)
+            jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
           else
             cookies = response_body.fetch('cookies', {})
             # else if refresh token is in response cookie
