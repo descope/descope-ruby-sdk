@@ -39,7 +39,7 @@ describe Descope::Api::V1::Management::Audit do
     created_user = @client.create_user(**user)['user']
 
     expect do
-      res = @client.audit_create_event(
+      @client.audit_create_event(
         user_id: created_user['loginId'],
         action: 'pencil.created',
         type: 'info',
