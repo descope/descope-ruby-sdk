@@ -4,6 +4,8 @@ require 'spec_helper'
 
 describe Descope::Api::V1::Management::Audit do
   before(:all) do
+    raise 'DESCOPE_MANAGEMENT_KEY is not set' if ENV['DESCOPE_MANAGEMENT_KEY'].nil?
+
     @client = DescopeClient.new(Configuration.config)
     @client.logger.info('Deleting all tenants for Ruby SDK...')
     @client.search_all_tenants(names: ['Ruby-SDK-test'])['tenants'].each do |tenant|

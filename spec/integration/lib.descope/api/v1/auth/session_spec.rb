@@ -30,14 +30,17 @@ describe Descope::Api::V1::Session do
 
       @client.logger.info('2. Sign in with password')
       login_res = @client.password_sign_in(login_id: user[:login_id], password: @password)
-      @client.logger.info("login_res: #{login_res}")
+      @client.logger.info("sign_in res: #{login_res}")
 
       @client.logger.info('3. sleep 1 second before calling refresh_session')
       sleep(1)
 
       @client.logger.info('4. Refresh session')
-      login_res = @client.refresh_session(refresh_token: login_res[REFRESH_SESSION_TOKEN_NAME]['jwt'])
-      new_refresh_token = login_res['refreshSessionToken']['jwt']
+      refresh_session_res = @client.refresh_session(refresh_token: login_res[REFRESH_SESSION_TOKEN_NAME]['jwt'])
+      @client.logger.info("refresh_session_res: #{refresh_session_res}")
+
+      new_refresh_token = refresh_session_res[REFRESH_SESSION_TOKEN_NAME]['jwt']
+      @client.logger.info("new_refresh_token: #{new_refresh_token}")
 
       @client.logger.info('5. Check new refresh token is not the same as the original one')
       expect(original_refresh_token).not_to eq(new_refresh_token)

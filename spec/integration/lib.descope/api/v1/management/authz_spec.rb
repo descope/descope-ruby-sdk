@@ -4,6 +4,8 @@ require 'spec_helper'
 
 describe Descope::Api::V1::Management::Authz do
   before(:all) do
+    raise 'DESCOPE_MANAGEMENT_KEY is not set' if ENV['DESCOPE_MANAGEMENT_KEY'].nil?
+
     @client = DescopeClient.new(Configuration.config)
     puts 'authz schema delete'
   end

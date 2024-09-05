@@ -246,9 +246,13 @@ module Descope
           rt_jwt = response_body.fetch('refreshJwt', '')
 
           if !rt_jwt.empty?
+            @logger.debug 'found refreshJwt in response body, adding to jwt_response'
+            @logger.debug 'validating refreshJwt token...'
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, audience)
           elsif refresh_token && !refresh_token.empty?
             # if refresh_token is in response body (local storage)
+            @logger.debug 'refreshJwt is empty, but refresh_token was passed, adding to jwt_response'
+            @logger.debug 'validating passed-in refresh token...'
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
           else
             cookies = response_body.fetch('cookies', {})
@@ -261,7 +265,8 @@ module Descope
           end
 
           if jwt_response[REFRESH_SESSION_TOKEN_NAME].nil?
-            raise Descope::AuthException.new('Unable to validate refresh token', code: 500)
+            @logger.debug "Error: Could not find refreshJwt in response body: #{response_body} / cookies: #{cookies} / passed in refresh_token ->#{refresh_token}<-"
+            raise Descope::AuthException.new('Could not find refreshJwt in response body / cookies / passed in refresh_token', code: 500)
           end
 
           jwt_response = adjust_properties(jwt_response, user_jwt)

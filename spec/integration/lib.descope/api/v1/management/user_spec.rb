@@ -4,10 +4,14 @@ require 'spec_helper'
 
 describe Descope::Api::V1::Management::User do
   before(:all) do
+    raise 'DESCOPE_MANAGEMENT_KEY is not set' if ENV['DESCOPE_MANAGEMENT_KEY'].nil?
+
+    @client = DescopeClient.new(Configuration.config)
+
     @password = SpecUtils.generate_password
     @new_password = SpecUtils.generate_password
     @user = build(:user)
-    @client = DescopeClient.new(Configuration.config)
+
     include Descope::Mixins::Common::DeliveryMethod
   end
 

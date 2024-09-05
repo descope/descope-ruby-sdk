@@ -47,12 +47,13 @@ module Descope
       def safe_parse_json(body, cookies: {})
         @logger.debug "response => #{JSON.parse(body.to_s)}"
         res = JSON.parse(body.to_s)
-        cookies.each do |cookie_name, cookie_value|
-          if cookie_name == REFRESH_SESSION_COOKIE_NAME
-            res['cookies'] ||= {}
-            res['cookies'][cookie_name] = cookie_value
-          end
+
+        # Handle DSR cookie in response.
+        if cookies.key?(REFRESH_SESSION_COOKIE_NAME)
+          res['cookies'] = {}
+          res['cookies'][REFRESH_SESSION_COOKIE_NAME] = cookies[REFRESH_SESSION_COOKIE_NAME]
         end
+
         res
       rescue JSON::ParserError
         body
