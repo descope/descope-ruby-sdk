@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "addressable/uri"
+require 'addressable/uri'
 require 'retryable'
 require_relative '../exception'
 
@@ -96,9 +96,9 @@ module Descope
                    call(method, encode_uri(uri), timeout, @headers, body.to_json)
                  end
 
-        raise Descope::Unsupported.new("No response from server", code: 400) unless result && result.respond_to?(:code)
+        raise Descope::Unsupported.new('No response from server', code: 400) unless result.respond_to?(:code)
 
-        @logger.info("API Request: [#{method}] #{uri} - Response Code: #{result.code} - Cookies: #{result.cookies}")
+        @logger.info("API Request: [#{method}] #{uri} - Response Code: #{result.code}")
 
         case result.code
         when 200...226 then safe_parse_json(result.body, cookies: result.cookies)

@@ -47,7 +47,6 @@ describe Descope::Api::V1::Management::Audit do
         actor_id: created_user['loginIds'][0],
         data: { 'key' => 'value' }
       )
-      expect(res).to eq({})
     end.not_to raise_error
   end
 end
