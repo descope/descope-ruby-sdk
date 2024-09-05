@@ -34,7 +34,6 @@ module Descope
           end
 
           jwt_response = generate_auth_info(response_body, refresh_cookie, true, audience)
-          @logger.debug "jwt_response: #{jwt_response}"
           jwt_response['user'] = response_body.key?('user') ? response_body['user'] : {}
           jwt_response['firstSeen'] = response_body.key?('firstSeen') ? response_body['firstSeen'] : true
 
@@ -62,6 +61,8 @@ module Descope
           validate_refresh_token_not_nil(refresh_token)
           res = post(SELECT_TENANT_PATH, { tenantId: tenant_id }, {}, refresh_token)
           @logger.debug "select_tenant response: #{res}"
+          cookies = res.fetch('cookies')
+          generate_jwt_response(response_body: res, refresh_cookie: cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil))
           generate_jwt_response(
             response_body: res,
             refresh_cookie: res['refreshJwt']
@@ -231,24 +232,36 @@ module Descope
         private
 
         def generate_auth_info(response_body, refresh_token, user_jwt, audience = nil)
-          @logger.debug "generating auth info: #{response_body}, #{refresh_token}, #{user_jwt}, #{audience}"
+          @logger.debug "generating auth info: response_body: #{response_body}, refresh_token: #{refresh_token}, user_jwt: #{user_jwt}, audience: #{audience}"
           jwt_response = {}
 
           # validate the session token if sessionJwt is not empty
           st_jwt = response_body.fetch('sessionJwt', '')
           unless st_jwt.empty?
-            @logger.debug "validating session token with refresh_token: #{refresh_token}" if st_jwt
-            jwt_response[SESSION_TOKEN_NAME] = validate_token(st_jwt, audience) if st_jwt
+            @logger.debug 'found sessionJwt in response body, adding to jwt_response'
+            jwt_response[SESSION_TOKEN_NAME] = validate_token(st_jwt, audience)
           end
 
           # validate refresh token if refresh_token was passed or if refreshJwt is not empty
           rt_jwt = response_body.fetch('refreshJwt', '')
 
-          if !refresh_token.nil? || !refresh_token.to_s.empty?
-            @logger.debug "validating refresh token: #{refresh_token}" if refresh_token
+          # if refresh_token is in response body (local storage)
+          if refresh_token && !refresh_token.empty?
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
           elsif !rt_jwt.empty?
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, audience)
+          else
+            cookies = response_body.fetch('cookies', {})
+            # else if refresh token is in response cookie
+            cookies.each do |cookie_name, cookie_value|
+              if cookie_name == REFRESH_SESSION_COOKIE_NAME
+                jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(cookie_value, audience)
+              end
+            end
+          end
+
+          if jwt_response[REFRESH_SESSION_TOKEN_NAME].nil?
+            raise Descope::AuthException.new('Unable to validate refresh token', code: 500)
           end
 
           jwt_response = adjust_properties(jwt_response, user_jwt)

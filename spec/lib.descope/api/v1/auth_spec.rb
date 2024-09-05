@@ -249,7 +249,13 @@ describe Descope::Api::V1::Auth do
     end
 
     it 'is expected to select tenant' do
-      jwt_response = { 'fake': 'response' }
+      jwt_response = {
+        'sessionJwt' => 'fake_session_jwt',
+        'refreshJwt' => 'fake_refresh_jwt',
+        'cookies' => {
+          'refresh_token' => 'fake_refresh_cookie'
+        }
+      }
 
       expect(@instance).to receive(:post).with(
         SELECT_TENANT_PATH, { tenantId: 'tenant123' }, {}, 'refresh-token'
@@ -390,20 +396,26 @@ describe Descope::Api::V1::Auth do
     end
 
     it 'is expected to successfully exchange access key without login_options' do
-      jwt_response = { 'fake': 'response' }
+      jwt_response = {
+        'sessionJwt' => 'fake_session_jwt',
+        'refreshJwt' => 'fake_refresh_jwt'
+      }
       access_key = 'abc'
 
       expect(@instance).to receive(:post).with(
         EXCHANGE_AUTH_ACCESS_KEY_PATH, { loginOptions: {}, audience: 'IT' }, {}, access_key
       ).and_return(jwt_response)
 
-      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+      allow(@instance).to receive(:generate_auth_info).and_return(jwt_response)
 
       expect { @instance.exchange_access_key(access_key:, audience: 'IT') }.not_to raise_error
     end
 
     it 'is expected to successfully exchange access key with login_options' do
-      jwt_response = { 'fake': 'response' }
+      jwt_response = {
+        'sessionJwt' => 'fake_session_jwt',
+        'refreshJwt' => 'fake_refresh_jwt'
+      }
       access_key = 'abc'
 
       expect(@instance).to receive(:post).with(
@@ -413,7 +425,7 @@ describe Descope::Api::V1::Auth do
         access_key
       ).and_return(jwt_response)
 
-      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+      allow(@instance).to receive(:generate_auth_info).and_return(jwt_response)
 
       expect { @instance.exchange_access_key(access_key:, login_options: { customClaims: { k1: 'v1' } }, audience: 'IT') }.not_to raise_error
     end
