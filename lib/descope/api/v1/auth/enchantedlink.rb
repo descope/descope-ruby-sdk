@@ -67,7 +67,9 @@ module Descope
           def enchanted_link_get_session(pending_ref = nil)
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/GetEnchantedLinkSession/
             res = post(GET_SESSION_ENCHANTEDLINK_AUTH_PATH, { pendingRef: pending_ref })
-            generate_jwt_response(response_body: res, refresh_cookie: res['refreshJwt'])
+            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
+            generate_jwt_response(response_body: res, refresh_cookie:)
           end
 
           private

@@ -22,7 +22,9 @@ module Descope
 
             request_params[:user] = password_user_compose_update_body(**user) unless user.nil?
             res = post(SIGN_UP_PASSWORD_PATH, request_params)
-            generate_jwt_response(response_body: res)
+            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
+            generate_jwt_response(response_body: res, refresh_cookie:)
           end
 
           def password_sign_in(login_id: nil, password: nil, sso_app_id: nil)
@@ -38,7 +40,9 @@ module Descope
               ssoAppId: sso_app_id
             }
             res = post(SIGN_IN_PASSWORD_PATH, request_params)
-            generate_jwt_response(response_body: res)
+            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
+            generate_jwt_response(response_body: res, refresh_cookie:)
           end
 
           def password_replace(login_id: nil, old_password: nil, new_password: nil)

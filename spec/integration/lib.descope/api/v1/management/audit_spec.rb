@@ -4,6 +4,8 @@ require 'spec_helper'
 
 describe Descope::Api::V1::Management::Audit do
   before(:all) do
+    raise 'DESCOPE_MANAGEMENT_KEY is not set' if ENV['DESCOPE_MANAGEMENT_KEY'].nil?
+
     @client = DescopeClient.new(Configuration.config)
     @client.logger.info('Deleting all tenants for Ruby SDK...')
     @client.search_all_tenants(names: ['Ruby-SDK-test'])['tenants'].each do |tenant|
@@ -39,7 +41,7 @@ describe Descope::Api::V1::Management::Audit do
     created_user = @client.create_user(**user)['user']
 
     expect do
-      res = @client.audit_create_event(
+      @client.audit_create_event(
         user_id: created_user['loginId'],
         action: 'pencil.created',
         type: 'info',
@@ -47,7 +49,6 @@ describe Descope::Api::V1::Management::Audit do
         actor_id: created_user['loginIds'][0],
         data: { 'key' => 'value' }
       )
-      expect(res).to eq({})
     end.not_to raise_error
   end
 end

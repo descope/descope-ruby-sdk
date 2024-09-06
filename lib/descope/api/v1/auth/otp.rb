@@ -63,7 +63,9 @@ module Descope
               code:
             }
             res = post(uri, request_params)
-            generate_jwt_response(response_body: res, refresh_cookie: res.fetch('refreshJwt', {}))
+            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
+            generate_jwt_response(response_body: res, refresh_cookie:)
           end
 
           def otp_update_user_email(login_id: nil, email: nil, refresh_token: nil, add_to_login_ids: false,
