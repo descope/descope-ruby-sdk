@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "addressable/uri"
+require 'addressable/uri'
 require 'retryable'
 require_relative '../exception'
 
@@ -44,9 +44,17 @@ module Descope
         }
       end
 
-      def safe_parse_json(body)
+      def safe_parse_json(body, cookies: {})
         @logger.debug "response => #{JSON.parse(body.to_s)}"
-        JSON.parse(body.to_s)
+        res = JSON.parse(body.to_s)
+
+        # Handle DSR cookie in response.
+        if cookies.key?(REFRESH_SESSION_COOKIE_NAME)
+          res['cookies'] = {}
+          res['cookies'][REFRESH_SESSION_COOKIE_NAME] = cookies[REFRESH_SESSION_COOKIE_NAME]
+        end
+
+        res
       rescue JSON::ParserError
         body
       end
@@ -94,11 +102,12 @@ module Descope
                    call(method, encode_uri(uri), timeout, @headers, body.to_json)
                  end
 
-        raise Descope::Unsupported.new("No response from server", code: 400) unless result && result.respond_to?(:code)
+        raise Descope::Unsupported.new('No response from server', code: 400) unless result.respond_to?(:code)
 
         @logger.info("API Request: [#{method}] #{uri} - Response Code: #{result.code}")
+
         case result.code
-        when 200...226 then safe_parse_json(result.body)
+        when 200...226 then safe_parse_json(result.body, cookies: result.cookies)
         when 400       then raise Descope::BadRequest.new(result.body, code: result.code, headers: result.headers)
         when 401       then raise Descope::Unauthorized.new(result.body, code: result.code, headers: result.headers)
         when 403       then raise Descope::AccessDenied.new(result.body, code: result.code, headers: result.headers)

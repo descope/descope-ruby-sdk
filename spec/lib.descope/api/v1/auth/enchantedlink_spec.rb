@@ -51,7 +51,7 @@ describe Descope::Api::V1::EnchantedLink do
 
     it 'is expected to validate refresh token and not raise an error with refresh token and valid login options' do
       expect do
-        @instance.send(:validate_refresh_token_provided, { mfa: true, stepup: true },  'some-token')
+        @instance.send(:validate_refresh_token_provided, { mfa: true, stepup: true }, 'some-token')
       end.not_to raise_error
     end
 
@@ -148,7 +148,16 @@ describe Descope::Api::V1::EnchantedLink do
     end
 
     it 'is expected to get session by pending ref with enchanted link' do
-      jwt_response = { 'fake': 'response' }
+      jwt_response = {
+        'sessionJwt' => 'fake_session_jwt',
+        'refreshJwt' => 'fake_refresh_jwt',
+        'cookies' => {
+          'refresh_token' => 'fake_refresh_cookie'
+        }
+      }
+      allow(@instance).to receive(:post).with(
+        GET_SESSION_ENCHANTEDLINK_AUTH_PATH, { pendingRef: 'pendingRef' }
+      ).and_return(jwt_response)
       allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
 
       expect do

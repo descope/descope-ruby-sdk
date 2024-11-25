@@ -4,6 +4,8 @@ require 'spec_helper'
 
 describe Descope::Api::V1::Management::Permission do
   before(:all) do
+    raise 'DESCOPE_MANAGEMENT_KEY is not set' if ENV['DESCOPE_MANAGEMENT_KEY'].nil?
+
     @client = DescopeClient.new(Configuration.config)
     @client.load_all_permissions['permissions'].each do |perm|
       if perm['description'] == 'Ruby SDK'

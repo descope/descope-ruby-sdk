@@ -42,7 +42,9 @@ module Descope
           def magiclink_verify_token(token = nil)
             validate_token_not_empty(token)
             res = post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
-            generate_jwt_response(response_body: res)
+            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
+            generate_jwt_response(response_body: res, refresh_cookie:)
           end
 
           def magiclink_update_user_email(login_id: nil, email: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, refresh_token: nil)

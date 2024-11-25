@@ -31,12 +31,32 @@ describe Descope::Api::V1::Session do
     end
 
     it 'is expected to post refresh session' do
-      jwt_response = { 'fake': 'response' }
-      allow(@instance).to receive(:generate_jwt_response).and_return(jwt_response)
+      jwt_response = {
+        'sessionJwt' => 'fake_session_jwt',
+        'refreshJwt' => 'fake_refresh_jwt',
+        'cookies' => {
+          'refresh_token' => 'fake_refresh_cookie'
+        }
+      }
+      refresh_token = 'refresh_token'
+      audience = nil
 
-      expect(@instance).to receive(:post).with(REFRESH_TOKEN_PATH, {}, {}, 'refresh_token')
-      allow(@instance).to receive(:validate_token).with('refresh_token', nil).and_return({})
-      expect { @instance.refresh_session(refresh_token: 'refresh_token') }.not_to raise_error
+      allow(@instance).to receive(:validate_refresh_token_not_nil).with(refresh_token).and_return(true)
+      allow(@instance).to receive(:validate_token).with(refresh_token, audience).and_return(true)
+      allow(@instance).to receive(:post).with(REFRESH_TOKEN_PATH, {}, {}, refresh_token).and_return(jwt_response)
+      refresh_cookie = jwt_response['cookies'][REFRESH_SESSION_COOKIE_NAME] || jwt_response['refreshJwt']
+
+      allow(@instance).to receive(:generate_jwt_response).with(
+        response_body: jwt_response,
+        refresh_cookie:,
+        audience:
+      ).and_return(jwt_response)
+
+      expect { @instance.refresh_session(refresh_token:, audience:) }.not_to raise_error
+
+      # Optionally verify the response if needed
+      result = @instance.refresh_session(refresh_token:, audience:)
+      expect(result).to eq(jwt_response)
     end
   end
 

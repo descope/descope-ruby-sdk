@@ -5,7 +5,6 @@ module Configuration
   module_function
 
   def config
-    raise 'DESCOPE_MANAGEMENT_KEY is not set' if ENV['DESCOPE_MANAGEMENT_KEY'].nil?
     raise 'DESCOPE_PROJECT_ID is not set' if ENV['DESCOPE_PROJECT_ID'].nil?
 
     {

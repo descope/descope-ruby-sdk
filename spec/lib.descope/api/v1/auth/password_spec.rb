@@ -43,9 +43,18 @@ describe Descope::Api::V1::Password do
     end
 
     it 'is expected to sign in with password' do
+      response_body = {
+        'sessionJwt' => 'fake_session_jwt',
+        'refreshJwt' => 'fake_refresh_jwt',
+        'cookies' => {
+          'refresh_token' => 'fake_refresh_cookie'
+        }
+      }
+
       expect(@instance).to receive(:post).with(
         SIGN_IN_PASSWORD_PATH, { loginId: 'test', password: 's3cr3t', ssoAppId: nil }
-      )
+      ).and_return(response_body)
+
       # stub the jwt_get_unverified_header method to return the kid of the public key created above
       allow(@instance).to receive(:generate_jwt_response).and_return({})
       expect { @instance.password_sign_in(login_id: 'test', password: 's3cr3t') }.not_to raise_error
