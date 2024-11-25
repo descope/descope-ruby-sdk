@@ -9,55 +9,69 @@ describe Descope::Api::V1::Management::User do
     @instance = dummy_instance
   end
 
-  context '.create_user' do
+  context '.create_user_and_test_user' do
     it 'is expected to respond to a user create method' do
       expect(@instance).to respond_to(:create_user)
+      expect(@instance).to respond_to(:create_test_user)
     end
 
+    user_tenants_args = [
+      {
+        tenant_id: 'tenant1'
+      },
+      {
+        tenant_id: 'tenant2',
+        role_names: %w[role1 role2]
+      }
+    ]
+
+    params = {
+      loginId: 'name@mail.com',
+      email: 'name@mail.com',
+      phone: '+1-212-669-2542',
+      name: 'name',
+      givenName: 'name',
+      familyName: 'Ruby SDK',
+      userTenants: associated_tenants_to_hash_array(user_tenants_args),
+      test: false,
+      picture: 'https://www.example.com/picture.png',
+      customAttributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
+      additionalIdentifiers: %w[id-1 id-2],
+      password: 's3cr3t',
+      ssoAppIds: %w[app1 app2],
+      invite: false
+    }
+
+    args = {
+      login_id: 'name@mail.com',
+      email: 'name@mail.com',
+      phone: '+1-212-669-2542',
+      name: 'name',
+      given_name: 'name',
+      family_name: 'Ruby SDK',
+      user_tenants: user_tenants_args,
+      picture: 'https://www.example.com/picture.png',
+      custom_attributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
+      additional_identifiers: %w[id-1 id-2],
+      password: 's3cr3t',
+      sso_app_ids: %w[app1 app2]
+    }
+
     it 'is expected to create a user with user data' do
-      user_tenants_args = [
-        {
-          tenant_id: 'tenant1'
-        },
-        {
-          tenant_id: 'tenant2',
-          role_names: %w[role1 role2]
-        }
-      ]
-      expect(@instance).to receive(:post).with(
-        USER_CREATE_PATH, {
-          loginId: 'name@mail.com',
-          email: 'name@mail.com',
-          phone: '+1-212-669-2542',
-          name: 'name',
-          givenName: 'name',
-          familyName: 'Ruby SDK',
-          userTenants: associated_tenants_to_hash_array(user_tenants_args),
-          test: false,
-          picture: 'https://www.example.com/picture.png',
-          customAttributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
-          additionalIdentifiers: %w[id-1 id-2],
-          password: 's3cr3t',
-          ssoAppIds: %w[app1 app2],
-          invite: false
-        }
-      )
+      expect(@instance).to receive(:post).with(USER_CREATE_PATH, params)
 
       expect do
-        @instance.create_user(
-          login_id: 'name@mail.com',
-          email: 'name@mail.com',
-          phone: '+1-212-669-2542',
-          name: 'name',
-          given_name: 'name',
-          family_name: 'Ruby SDK',
-          user_tenants: user_tenants_args,
-          picture: 'https://www.example.com/picture.png',
-          custom_attributes: { 'attr1' => 'value1', 'attr2' => 'value2' },
-          additional_identifiers: %w[id-1 id-2],
-          password: 's3cr3t',
-          sso_app_ids: %w[app1 app2]
-        )
+        @instance.create_user(**args)
+      end.not_to raise_error
+    end
+
+    it 'is expected to create a test user with user data' do
+      params[:test] = true
+      expect(@instance).to receive(:post).with(TEST_USER_CREATE_PATH, params)
+
+      expect do
+        args[:test] = true
+        @instance.create_test_user(**args)
       end.not_to raise_error
     end
   end
@@ -728,6 +742,30 @@ describe Descope::Api::V1::Management::User do
           email: 'name@mail.com',
           given_name: 'mister',
           name: 'something else'
+        )
+      end.not_to raise_error
+    end
+  end
+
+  context '.search_all_test_users' do
+    it 'is expected to respond to a search_all_test_users method' do
+      expect(@instance).to respond_to(:search_all_test_users)
+
+      expect(@instance).to receive(:post).with(
+        TEST_USERS_SEARCH_PATH, {
+          tenantIds: %w[t1 t2],
+          roleNames: %w[r1 r2],
+          limit: 0,
+          page: 0,
+          testUsersOnly: true,
+          withTestUser: true
+        }
+      )
+
+      expect do
+        @instance.search_all_test_users(
+          tenant_ids: %w[t1 t2],
+          role_names: %w[r1 r2]
         )
       end.not_to raise_error
     end
