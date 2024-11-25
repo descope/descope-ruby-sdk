@@ -118,12 +118,22 @@ describe Descope::Api::V1::Management::User do
 
   it 'should create a test user' do
     @client.delete_all_test_users
+    # ensure no roles exist with that name
+    role_name = 'some-new-role'
+    all_roles = @client.load_all_roles
+    all_roles['roles'].each do |role|
+      @client.delete_role(name: role['name']) if role['name'] == role_name
+    end
     sleep 5
+
     user_args = build(:user)
     test_user = @client.create_test_user(**user_args)['user']
-    test_users = @client.search_all_users(test_users_only: true)['users']
+    @client.create_role(name: role_name)
+    @client.user_add_roles(login_id: test_user['loginIds'][0], role_names: [role_name])
+    test_users = @client.search_all_test_users(role_names: [role_name])['users']
     expect(test_users.length).to be >= 1
     expect(test_users[0]['loginIds'][0]).to eq(test_user['loginIds'][0])
+    expect(test_users[0]['roleNames']).to eq([role_name])
   end
 
   it 'should update user status' do
@@ -226,8 +236,8 @@ describe Descope::Api::V1::Management::User do
       new_password = SpecUtils.generate_password
       @client.set_password(login_id: user['loginIds'][0], password: new_password)
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
-    rescue Descope::Unauthorized => e
-      expect(e.message).to match(/"errorDescription":"Invalid signin credentials"/)
+    rescue Descope::ServerError => e
+      expect(e.message).to match(/"Password expired"/)
     end
   end
 

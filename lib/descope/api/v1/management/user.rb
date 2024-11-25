@@ -505,6 +505,71 @@ module Descope
             post(USER_GENERATE_EMBEDDED_LINK_PATH, request_params)
           end
 
+          # Search for all test users.
+          #
+          # @param tenant_ids [Array<String>] Optional list of tenant IDs to filter by
+          # @param role_names [Array<String>] Optional list of role names to filter by
+          # @param limit [Integer] Optional limit of the number of users returned. Leave empty for default.
+          # @param page [Integer] Optional pagination control. Pages start at 0 and must be non-negative.
+          # @param custom_attributes [Hash] Optional search for an attribute with a given value
+          # @param statuses [Array<String>] Optional list of statuses to search for ("enabled", "disabled", "invited")
+          # @param emails [Array<String>] Optional list of emails to search for
+          # @param phones [Array<String>] Optional list of phones to search for
+          # @param sso_app_ids [Array<String>] Optional list of SSO application IDs to filter by
+          # @param text [String] Optional string, allows free text search among all user's attributes.
+          # @param login_ids [Array<String>] Optional list of login ids
+          # @param sort [Array<Hash>] Optional array, allows to sort by fields.
+          #
+          # @return [Hash] Return hash in the format {"users": []}
+          #
+          # The "users" key contains a list of all the found users and their information
+          #
+          # @raise [AuthException] Raised if the search operation fails
+          #
+          def search_all_test_users(
+            tenant_ids: [],
+            role_names: [],
+            limit: 0,
+            page: 0,
+            custom_attributes: {},
+            statuses: [],
+            emails: [],
+            phones: [],
+            sso_app_ids: [],
+            sort: [],
+            text: nil,
+            login_ids: []
+          )
+            tenant_ids ||= []
+            role_names ||= []
+
+            if limit < 0 || page < 0
+              raise Descope::ArgumentException.new(
+                'limit or page must be non-negative', code: 400
+              )
+            end
+
+            body = {
+              tenantIds: tenant_ids,
+              roleNames: role_names,
+              limit:,
+              page:,
+              testUsersOnly: true,
+              withTestUser: true
+            }
+
+            body[:statuses] =  statuses unless statuses.nil? || statuses.empty?
+            body[:emails] = emails unless emails.nil? || emails.empty?
+            body[:phones] = phones unless phones.nil? || phones.empty?
+            body[:customAttributes] = custom_attributes unless custom_attributes.nil? || custom_attributes.empty?
+            body[:ssoAppsIds] = sso_app_ids unless sso_app_ids.nil? || sso_app_ids.empty?
+            body[:loginIds] = login_ids unless login_ids.nil? || login_ids.empty?
+            body[:sort] = sort unless sort.nil? || sort.empty?
+            body[:text] = text unless text.nil? || text.empty?
+
+            post(Common::TEST_USERS_SEARCH_PATH, body)
+          end
+
 
           private
 
@@ -536,6 +601,9 @@ module Descope
             role_names ||= []
             user_tenants ||= []
             path = Common::USER_CREATE_PATH
+
+            path = Common::TEST_USER_CREATE_PATH if test
+
             request_params = user_compose_create_body(
               login_id:,
               email:,
@@ -609,11 +677,11 @@ module Descope
               sso_app_ids:
             )
             body[:invite] = invite
-            body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.empty?
-            body[:verifiedPhone] = verified_phone unless verified_phone.nil? || !verified_phone.empty?
-            body[:inviteUrl] = invite_url unless invite_url.nil? || !invite_url.empty?
-            body[:sendMail] = send_mail unless send_mail.nil? || !send_mail.empty?
-            body[:sendSMS] = send_sms unless send_sms.nil? || !send_sms.empty?
+            body[:verifiedEmail] = verified_email unless verified_email.nil? || verified_email.empty?
+            body[:verifiedPhone] = verified_phone unless verified_phone.nil? || verified_phone.empty?
+            body[:inviteUrl] = invite_url unless invite_url.nil? || invite_url.empty?
+            body[:sendMail] = send_mail unless send_mail.nil? || send_mail.empty?
+            body[:sendSMS] = send_sms unless send_sms.nil? || send_sms.empty?
 
             body
           end
@@ -660,12 +728,16 @@ module Descope
             body[:phone] = phone unless phone.nil? || phone.empty?
             body[:name] = name unless name.nil? || name.empty?
             body[:roleNames] = role_names unless role_names.nil? || role_names.empty?
-            body[:userTenants] = associated_tenants_to_hash_array(user_tenants) unless user_tenants.nil? || user_tenants.empty?
+            unless user_tenants.nil? || user_tenants.empty?
+              body[:userTenants] = associated_tenants_to_hash_array(user_tenants)
+            end
             body[:test] = test unless test.nil?
             body[:invite] = invite unless invite.nil?
             body[:picture] = picture unless picture.nil? || picture.empty?
             body[:customAttributes] = custom_attributes unless custom_attributes.nil? || custom_attributes.empty?
-            body[:additionalIdentifiers] = additional_identifiers unless additional_identifiers.nil? || additional_identifiers.empty?
+            unless additional_identifiers.nil? || additional_identifiers.empty?
+              body[:additionalIdentifiers] = additional_identifiers
+            end
             body[:ssoAppIds] = sso_app_ids unless sso_app_ids.nil? || sso_app_ids.empty?
             body[:verifiedEmail] = verified_email unless verified_email.nil? || !verified_email.to_s.empty?
             body[:givenName] = given_name unless given_name.nil?

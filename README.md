@@ -1153,6 +1153,13 @@ descope_client.create_test_user(
         user_tenants: client.associated_tenants_to_hash_array(associated_tenants)
 )
 
+# Search all test users, optionally according to tenant and/or role filter
+# results can be paginated using the limit and page parameters
+users_resp = descope_client.search_all_test_users()
+users = users_resp["users"]
+users.each do |user|
+  # Do something
+
 # Now test user got created, and this user will be available until you delete it,
 # you can use any management operation for test user CRUD.
 # You can also delete all test users.

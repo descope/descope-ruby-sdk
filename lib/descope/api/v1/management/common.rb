@@ -17,6 +17,7 @@ module Descope
 
           # user
           USER_CREATE_PATH = '/v1/mgmt/user/create'
+          TEST_USER_CREATE_PATH = '/v1/mgmt/user/create/test'
           USER_CREATE_BATCH_PATH = '/v1/mgmt/user/create/batch'
           USER_UPDATE_PATH = '/v1/mgmt/user/update'
           USER_DELETE_PATH = '/v1/mgmt/user/delete'
@@ -37,6 +38,8 @@ module Descope
           USER_SET_TEMPORARY_PASSWORD_PATH = '/v1/mgmt/user/password/set/temporary'
           USER_SET_ACTIVE_PASSWORD_PATH = '/v1/mgmt/user/password/set/active'
           USER_SET_PASSWORD_PATH = '/v1/mgmt/user/password/set'
+          USER_SEARCH_PATH = "/v2/mgmt/user/search"
+          TEST_USERS_SEARCH_PATH = "/v2/mgmt/user/search/test"
           USER_EXPIRE_PASSWORD_PATH = '/v1/mgmt/user/password/expire'
           USER_ADD_TENANT_PATH = '/v1/mgmt/user/update/tenant/add'
           USER_REMOVE_TENANT_PATH = '/v1/mgmt/user/update/tenant/remove'
