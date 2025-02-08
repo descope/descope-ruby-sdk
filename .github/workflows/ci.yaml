@@ -24,7 +24,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@28c4deda893d5a96a6b2d958c5b47fc18d65c9d3 # v1.213.0
         with:
           # We are not letting this step to run bundle install, we will do it later
           bundler-cache: false
