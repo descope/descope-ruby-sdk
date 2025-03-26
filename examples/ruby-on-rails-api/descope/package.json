@@ -37,7 +37,7 @@
   "devDependencies": {
     "dotenv": "^16.4.5",
     "env": "^0.0.2",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.25.0",
     "esbuild-envfile-plugin": "^1.0.5"
   }
 }
