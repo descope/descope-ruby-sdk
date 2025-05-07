@@ -18,7 +18,7 @@ describe Descope::Api::V1::Management::User do
   after(:all) do
     all_users = @client.search_all_users
     all_users['users'].each do |user|
-      if user['middleName'] == 'Ruby SDK User'
+      if user['middleName'] == "#{SpecUtils.build_prefix}Ruby-SDK-User"
         puts "Deleting ruby spec test user #{user['loginIds'][0]}"
         @client.delete_user(user['loginIds'][0])
       end
@@ -116,7 +116,7 @@ describe Descope::Api::V1::Management::User do
     users = FactoryBot.build_list(:user, 5)
     @client.create_batch_users(users)
     all_users = @client.search_all_users
-    sdk_users = all_users['users'].select { |user| user['middleName'] == 'Ruby SDK User' }
+    sdk_users = all_users['users'].select { |user| user['middleName'] == "#{SpecUtils.build_prefix}Ruby-SDK-User" }
     expect(sdk_users.length).to be >= 5
   end
 

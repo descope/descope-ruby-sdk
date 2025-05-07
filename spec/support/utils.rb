@@ -29,4 +29,10 @@ module SpecUtils
       value.each { |v| deep_stringify_keys(v) if v.is_a? Hash } if value.is_a? Array
     end
   end
+
+  def build_prefix
+    # Use GITHUB_RUN_NUMBER as the primary identifier, fall back to a timestamp if not available
+    prefix = ENV['GITHUB_RUN_NUMBER'] || ENV['GITHUB_RUN_ID']
+    prefix ? "build#{prefix}-" : "local-#{Time.now.to_i}-"
+  end
 end

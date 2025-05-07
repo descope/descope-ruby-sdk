@@ -60,7 +60,7 @@ describe Descope::Api::V1::Auth::EnchantedLink do
     @client.logger.info('Cleaning up test users...')
     all_users = @client.search_all_users
     all_users['users'].each do |user|
-      if user['middleName'] == 'Ruby SDK User'
+      if user['middleName'] == "#{SpecUtils.build_prefix}Ruby-SDK-User" 
         @client.logger.info("Deleting ruby spec test user #{user['loginIds'][0]}")
         @client.delete_user(user['loginIds'][0])
       end
