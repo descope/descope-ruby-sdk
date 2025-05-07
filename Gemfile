@@ -16,5 +16,5 @@ group :test do
   gem 'rspec', '3.13.0', require: false
   gem 'selenium-webdriver', '4.19.0', require: false
   gem 'simplecov', '0.22.0', require: false
-  gem 'super_diff', '0.11.0', require: false
+  gem 'super_diff', '0.15.0', require: false
 end
