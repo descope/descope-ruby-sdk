@@ -11,10 +11,10 @@ end
 group :test do
   gem 'factory_bot', '6.5.1', require: false
   gem 'faker', require: false
-  gem 'rack-test', '2.1.0', require: false
+  gem 'rack-test', '2.2.0', require: false
   gem 'rotp', '6.3.0', require: false
   gem 'rspec', '3.13.0', require: false
-  gem 'selenium-webdriver', '4.31.0', require: false
+  gem 'selenium-webdriver', '4.32.0', require: false
   gem 'simplecov', '0.22.0', require: false
   gem 'super_diff', '0.15.0', require: false
 end
