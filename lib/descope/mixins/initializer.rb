@@ -13,10 +13,11 @@ module Descope
         @base_uri = base_url(options)
         @headers = client_headers
         @project_id = options[:project_id] || ENV['DESCOPE_PROJECT_ID'] || ''
+        @headers['x-descope-project-id'] = @project_id
         @public_key = options[:public_key] || ENV['DESCOPE_PUBLIC_KEY']
         @mlock = Mutex.new
         log_level = options[:log_level] || ENV['DESCOPE_LOG_LEVEL'] || 'info'
-        @logger ||= Descope::Mixins::Logging.logger_for(self.class.name, log_level)
+        @logger ||= Descope::Mixins::Logging.logger_for(self.class.name, log_level, @project_id)
 
         @logger.debug("Initializing Descope API with project_id: #{@project_id} and base_uri: #{@base_uri}")
 
