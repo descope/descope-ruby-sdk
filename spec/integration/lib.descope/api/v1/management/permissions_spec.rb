@@ -8,7 +8,7 @@ describe Descope::Api::V1::Management::Permission do
 
     @client = DescopeClient.new(Configuration.config)
     @client.load_all_permissions['permissions'].each do |perm|
-      if perm['description'] == 'Ruby SDK'
+      if perm['description'] == "#{SpecUtils.build_prefix} Ruby SDK"
         puts "Deleting permission: #{perm['name']}"
         @client.delete_permission(perm['name'])
       end
@@ -16,7 +16,7 @@ describe Descope::Api::V1::Management::Permission do
   end
 
   it 'should create update and delete a permission' do
-    @client.create_permission(name: 'test_permission', description: 'Ruby SDK')
+    @client.create_permission(name: 'test_permission', description: "#{SpecUtils.build_prefix} Ruby SDK")
     all_permissions = @client.load_all_permissions['permissions']
     expect(all_permissions.any? { |perm| perm['name'] == 'test_permission' }).to eq(true)
     @client.update_permission(name: 'test_permission', new_name: 'test_permission_2')

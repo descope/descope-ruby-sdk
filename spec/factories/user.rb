@@ -10,7 +10,7 @@ FactoryBot.define do
     phone { "+1#{Faker::Number.number(digits: 10)}" }
     name { Faker::Name.name }
     given_name { Faker::Name.first_name }
-    middle_name { 'Ruby SDK User' }
+    middle_name { "#{SpecUtils.build_prefix}Ruby-SDK-User" }
     family_name { Faker::Name.last_name }
   end
 end
