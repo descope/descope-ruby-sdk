@@ -237,6 +237,8 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a search_all method' do
       expect(@instance).to respond_to(:search_all_users)
 
+      tenant_role_ids = { 'tenant1' => ['roleA', 'roleB'] }
+      tenant_role_names = { 'tenant1' => ['roleName1', 'roleName2'] }
       expect(@instance).to receive(:post).with(
         USERS_SEARCH_PATH, {
           loginId: 'someone@example.com',
@@ -248,7 +250,13 @@ describe Descope::Api::V1::Management::User do
           ssoOnly: false,
           text: 'some text',
           testUsersOnly: false,
-          withTestUser: false
+          withTestUser: false,
+          tenantRoleIds: {
+            'tenant1' => { values: ['roleA', 'roleB'] }
+          },
+          tenantRoleNames: {
+            'tenant1' => { values: ['roleName1', 'roleName2'] }
+          }
         }
       )
 
@@ -262,7 +270,9 @@ describe Descope::Api::V1::Management::User do
           page: 1,
           sso_app_ids: [],
           test_users_only: false,
-          with_test_user: false
+          with_test_user: false,
+          tenant_role_ids: tenant_role_ids,
+          tenant_role_names: tenant_role_names
         )
       end.not_to raise_error
     end
@@ -751,6 +761,8 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a search_all_test_users method' do
       expect(@instance).to respond_to(:search_all_test_users)
 
+      tenant_role_ids = { 'tenant1' => ['roleA', 'roleB'] }
+      tenant_role_names = { 'tenant1' => ['roleName1', 'roleName2'] }
       expect(@instance).to receive(:post).with(
         TEST_USERS_SEARCH_PATH, {
           tenantIds: %w[t1 t2],
@@ -758,14 +770,22 @@ describe Descope::Api::V1::Management::User do
           limit: 0,
           page: 0,
           testUsersOnly: true,
-          withTestUser: true
+          withTestUser: true,
+          tenantRoleIds: {
+            'tenant1' => { values: ['roleA', 'roleB'] }
+          },
+          tenantRoleNames: {
+            'tenant1' => { values: ['roleName1', 'roleName2'] }
+          }
         }
       )
 
       expect do
         @instance.search_all_test_users(
           tenant_ids: %w[t1 t2],
-          role_names: %w[r1 r2]
+          role_names: %w[r1 r2],
+          tenant_role_ids: tenant_role_ids,
+          tenant_role_names: tenant_role_names
         )
       end.not_to raise_error
     end

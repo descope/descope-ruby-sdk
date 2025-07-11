@@ -185,7 +185,9 @@ module Descope
             statuses: [],
             emails: [],
             phones: [],
-            sso_app_ids: []
+            sso_app_ids: [],
+            tenant_role_ids: {},
+            tenant_role_names: {}
           )
             body = {
               loginId: login_id,
@@ -212,7 +214,16 @@ module Descope
             body[:ssoAppIds] = sso_app_ids unless sso_app_ids.empty?
             body[:tenantIds] = tenant_ids unless tenant_ids.empty?
             body[:roleNames] = role_names unless role_names.empty?
+            body[:tenantRoleIds] = map_to_values_object(tenant_role_ids) unless tenant_role_ids.nil? || tenant_role_ids.empty?
+            body[:tenantRoleNames] = map_to_values_object(tenant_role_names) unless tenant_role_names.nil? || tenant_role_names.empty?
             post(Common::USERS_SEARCH_PATH, body)
+          end
+
+          def map_to_values_object(input_map)
+            return {} unless input_map.is_a?(Hash)
+            input_map.each_with_object({}) do |(key, values), result|
+              result[key] = { values: Array(values) }
+            end
           end
 
           # Get an existing user's provider token, using a valid management key.
@@ -538,7 +549,9 @@ module Descope
             sso_app_ids: [],
             sort: [],
             text: nil,
-            login_ids: []
+            login_ids: [],
+            tenant_role_ids: {},
+            tenant_role_names: {}
           )
             tenant_ids ||= []
             role_names ||= []
@@ -562,10 +575,12 @@ module Descope
             body[:emails] = emails unless emails.nil? || emails.empty?
             body[:phones] = phones unless phones.nil? || phones.empty?
             body[:customAttributes] = custom_attributes unless custom_attributes.nil? || custom_attributes.empty?
-            body[:ssoAppsIds] = sso_app_ids unless sso_app_ids.nil? || sso_app_ids.empty?
+            body[:ssoAppIds] = sso_app_ids unless sso_app_ids.nil? || sso_app_ids.empty?
             body[:loginIds] = login_ids unless login_ids.nil? || login_ids.empty?
             body[:sort] = sort unless sort.nil? || sort.empty?
             body[:text] = text unless text.nil? || text.empty?
+            body[:tenantRoleIds] = map_to_values_object(tenant_role_ids) unless tenant_role_ids.nil? || tenant_role_ids.empty?
+            body[:tenantRoleNames] = map_to_values_object(tenant_role_names) unless tenant_role_names.nil? || tenant_role_names.empty?
 
             post(Common::TEST_USERS_SEARCH_PATH, body)
           end
