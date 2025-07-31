@@ -611,7 +611,8 @@ module Descope
             middle_name: nil,
             family_name: nil,
             sso_app_ids: [],
-            skip_create: false
+            skip_create: false,
+            template_id: nil
           )
             role_names ||= []
             user_tenants ||= []
@@ -641,7 +642,8 @@ module Descope
               additional_identifiers:,
               password:,
               hashed_password:,
-              sso_app_ids:
+              sso_app_ids:,
+              template_id:,
             )
             return request_params if skip_create
 
@@ -670,7 +672,8 @@ module Descope
             additional_identifiers: [],
             password: nil,
             hashed_password: {},
-            sso_app_ids: []
+            sso_app_ids: [],
+            template_id: nil
           )
             body = user_compose_update_body(
               login_id:,
@@ -689,7 +692,8 @@ module Descope
               additional_identifiers:,
               password:,
               hashed_password:,
-              sso_app_ids:
+              sso_app_ids:,
+              template_id:,
             )
             body[:invite] = invite
             body[:verifiedEmail] = verified_email unless verified_email.nil? || verified_email.empty?
@@ -720,7 +724,8 @@ module Descope
             additional_identifiers: [],
             password: nil,
             hashed_password: {},
-            sso_app_ids: []
+            sso_app_ids: [],
+            template_id: nil
           )
             body = {
               loginId: login_id,
@@ -759,6 +764,7 @@ module Descope
             body[:middleName] = middle_name unless middle_name.nil?
             body[:familyName] = family_name unless family_name.nil?
             body[:verifiedPhone] = verified_phone unless verified_phone.nil?
+            body[:templateId] = template_id unless template_id.nil? || template_id.empty?
             body
           end
         end

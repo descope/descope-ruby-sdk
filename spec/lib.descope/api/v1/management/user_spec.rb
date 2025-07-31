@@ -122,14 +122,16 @@ describe Descope::Api::V1::Management::User do
           loginId: 'name@mail.com',
           email: 'name@mail.com',
           test: false,
-          invite: true
+          invite: true,
+          templateId: "tid",
         }
       )
 
       expect do
         @instance.invite_user(
           login_id: 'name@mail.com',
-          email: 'name@mail.com'
+          email: 'name@mail.com',
+          template_id: "tid",
         )
       end.not_to raise_error
     end
