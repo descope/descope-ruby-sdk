@@ -92,7 +92,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.4)
-    rubocop (1.79.0)
+    rubocop (1.79.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -102,7 +102,6 @@ GEM
       regexp_parser (>= 2.9.3, < 3.0)
       rubocop-ast (>= 1.46.0, < 2.0)
       ruby-progressbar (~> 1.7)
-      tsort (>= 0.2.0)
       unicode-display_width (>= 2.4.0, < 4.0)
     rubocop-ast (1.46.0)
       parser (>= 3.3.7.2)
@@ -132,7 +131,6 @@ GEM
       attr_extras (>= 6.2.4)
       diff-lcs
       patience_diff
-    tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.6.0)
@@ -151,7 +149,7 @@ DEPENDENCIES
   rack-test (= 2.2.0)
   rotp (= 6.3.0)
   rspec (= 3.13.1)
-  rubocop (= 1.79.0)
+  rubocop (= 1.79.1)
   rubocop-rails (= 2.32.0)
   selenium-webdriver (= 4.34.0)
   simplecov (= 0.22.0)
