@@ -145,7 +145,7 @@ describe Descope::Api::V1::Session do
         {
           'userId' => 'test123',
           'cookieExpiration' => 1640704758,
-          'cookieDomain' => 'dev.rextherapymanager.com',
+          'cookieDomain' => 'dev.lulukuku.com',
           'cookies' => {
             'DS' => session_jwt,
             'DSR' => refresh_jwt

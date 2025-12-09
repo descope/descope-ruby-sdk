@@ -455,7 +455,7 @@ describe Descope::Api::V1::Auth do
         {
           'userId' => 'test123',
           'cookieExpiration' => 1640704758,
-          'cookieDomain' => 'dev.rextherapymanager.com',
+          'cookieDomain' => 'dev.lulukuku.com',
           'cookies' => {
             'DS' => session_jwt,      # Session token in cookies
             'DSR' => refresh_jwt      # Refresh token in cookies

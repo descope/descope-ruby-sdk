@@ -25,15 +25,15 @@ describe 'Cookie Domain Fix Integration' do
         {
           'userId' => 'test123',
           'cookieExpiration' => 1640704758,
-          'cookieDomain' => 'dev.rextherapymanager.com',
+          'cookieDomain' => 'dev.lulukuku.com',
           'cookiePath' => '/'
         }
       end
 
       let(:set_cookie_headers) do
         [
-          "DS=#{session_jwt}; Path=/; Domain=dev.rextherapymanager.com; HttpOnly; Secure; SameSite=None",
-          "DSR=#{refresh_jwt}; Path=/; Domain=dev.rextherapymanager.com; HttpOnly; Secure; SameSite=None; Max-Age=2592000"
+          "DS=#{session_jwt}; Path=/; Domain=dev.lulukuku.com; HttpOnly; Secure; SameSite=None",
+          "DSR=#{refresh_jwt}; Path=/; Domain=dev.lulukuku.com; HttpOnly; Secure; SameSite=None; Max-Age=2592000"
         ]
       end
 
@@ -69,7 +69,7 @@ describe 'Cookie Domain Fix Integration' do
         expect(result['refreshSessionToken']['iss']).to eq('https://api.descope.com/P2abcde12345')
         expect(result['refreshSessionToken']['sub']).to eq('U2abcde12345')
         
-        expect(result['cookieData'][:domain]).to eq('dev.rextherapymanager.com')
+        expect(result['cookieData'][:domain]).to eq('dev.lulukuku.com')
       end
 
       it 'validates the extracted session token' do
@@ -92,7 +92,7 @@ describe 'Cookie Domain Fix Integration' do
 
       it 'includes cookie metadata in response' do
         result = @instance.refresh_session(refresh_token: refresh_token, audience: audience)
-        expect(result['cookieData'][:domain]).to eq('dev.rextherapymanager.com')
+        expect(result['cookieData'][:domain]).to eq('dev.lulukuku.com')
       end
     end
 
@@ -102,13 +102,13 @@ describe 'Cookie Domain Fix Integration' do
           'sessionJwt' => session_jwt,  # Session token in response body
           'userId' => 'test123',
           'cookieExpiration' => 1640704758,
-          'cookieDomain' => 'dev.rextherapymanager.com'
+          'cookieDomain' => 'dev.lulukuku.com'
         }
       end
 
       let(:set_cookie_headers) do
         [
-          "DSR=#{refresh_jwt}; Path=/; Domain=dev.rextherapymanager.com; HttpOnly; Secure; Max-Age=2592000"
+          "DSR=#{refresh_jwt}; Path=/; Domain=dev.lulukuku.com; HttpOnly; Secure; Max-Age=2592000"
         ]
       end
 
@@ -147,7 +147,7 @@ describe 'Cookie Domain Fix Integration' do
         {
           'userId' => 'test123',
           'cookieExpiration' => 1640704758,
-          'cookieDomain' => 'dev.rextherapymanager.com'
+          'cookieDomain' => 'dev.lulukuku.com'
         }
       end
 
@@ -190,14 +190,14 @@ describe 'Cookie Domain Fix Integration' do
         {
           'userId' => 'test123',
           'cookieExpiration' => 1640704758,
-          'cookieDomain' => 'dev.rextherapymanager.com'
+          'cookieDomain' => 'dev.lulukuku.com'
         }
       end
 
       let(:set_cookie_headers) do
         [
-          "DS=new_session_jwt; Path=/; Domain=dev.rextherapymanager.com; HttpOnly; Secure",
-          "DSR=#{refresh_jwt}; Path=/; Domain=dev.rextherapymanager.com; HttpOnly; Secure; Max-Age=2592000"
+          "DS=new_session_jwt; Path=/; Domain=dev.lulukuku.com; HttpOnly; Secure",
+          "DSR=#{refresh_jwt}; Path=/; Domain=dev.lulukuku.com; HttpOnly; Secure; Max-Age=2592000"
         ]
       end
 
