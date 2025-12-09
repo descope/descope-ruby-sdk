@@ -17,7 +17,7 @@ module Descope
             uri = VERIFY_TOTP_PATH
             body = totp_compose_signin_body(login_id, code, login_options)
             res = post(uri, body, {}, nil)
-            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            cookies = res.fetch(COOKIE_DATA_NAME, nil) || res.fetch('cookies', {})
             refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
             generate_jwt_response(response_body: res, refresh_cookie:)
           end

@@ -24,7 +24,7 @@ module Descope
           validate_refresh_token_not_nil(refresh_token)
           validate_token(refresh_token, audience)
           res = post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
-          cookies = res.fetch(COOKIE_DATA_NAME, {})
+          cookies = res.fetch(COOKIE_DATA_NAME, nil) || res.fetch('cookies', {})
           
           # Check each source and use the first non-empty value
           refresh_cookie = nil

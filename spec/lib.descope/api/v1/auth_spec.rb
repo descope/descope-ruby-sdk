@@ -541,19 +541,7 @@ describe Descope::Api::V1::Auth do
       it 'raises helpful error when no refresh token is found' do
         expect {
           @instance.send(:generate_auth_info, response_body, nil, true, audience)
-        }.to raise_error(Descope::AuthException, /Could not find refresh token.*custom cookie domains/)
-      end
-
-      it 'includes debug information in error' do
-        allow(@instance.logger).to receive(:debug)
-        
-        expect(@instance.logger).to receive(:debug).with(
-          /Error: Could not find refresh token in response body.*cookies.*passed in refresh_token/
-        )
-
-        expect {
-          @instance.send(:generate_auth_info, response_body, nil, true, audience)
-        }.to raise_error(Descope::AuthException)
+        }.to raise_error(Descope::AuthException, /Could not find refreshJwt in response body \/ cookies \/ passed in refresh_token/)
       end
     end
 

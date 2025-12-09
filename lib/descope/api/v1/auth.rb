@@ -246,7 +246,7 @@ module Descope
           cookies = response_body.fetch('cookies', {})
           if jwt_response[SESSION_TOKEN_NAME].nil?
             cookies.each do |cookie_name, cookie_value|
-              if cookie_name == SESSION_COOKIE_NAME || cookie_name == 'DS'
+              if cookie_name == SESSION_COOKIE_NAME
                 @logger.debug "found session token in cookies with name #{cookie_name}, adding to jwt_response"
                 jwt_response[SESSION_TOKEN_NAME] = validate_token(cookie_value, audience)
                 break
