@@ -244,9 +244,14 @@ module Descope
 
           # Check for session token in cookies if not found in response body
           cookies = response_body.fetch('cookies', {})
-          if jwt_response[SESSION_TOKEN_NAME].nil? && cookies.key?(SESSION_COOKIE_NAME)
-            @logger.debug 'found session token in cookies, adding to jwt_response'
-            jwt_response[SESSION_TOKEN_NAME] = validate_token(cookies[SESSION_COOKIE_NAME], audience)
+          if jwt_response[SESSION_TOKEN_NAME].nil?
+            cookies.each do |cookie_name, cookie_value|
+              if cookie_name == SESSION_COOKIE_NAME || cookie_name == 'DS'
+                @logger.debug "found session token in cookies with name #{cookie_name}, adding to jwt_response"
+                jwt_response[SESSION_TOKEN_NAME] = validate_token(cookie_value, audience)
+                break
+              end
+            end
           end
 
           # validate refresh token if refresh_token was passed or if refreshJwt is not empty
@@ -256,17 +261,23 @@ module Descope
             @logger.debug 'found refreshJwt in response body, adding to jwt_response'
             @logger.debug 'validating refreshJwt token...'
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, audience)
-          elsif refresh_token && !refresh_token.empty?
-            # if refresh_token is in response body (local storage)
-            @logger.debug 'refreshJwt is empty, but refresh_token was passed, adding to jwt_response'
-            @logger.debug 'validating passed-in refresh token...'
-            jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
           else
-            # else if refresh token is in response cookie
+            # Check cookies for refresh token
+            refresh_cookie_found = false
             cookies.each do |cookie_name, cookie_value|
-              if cookie_name == REFRESH_SESSION_COOKIE_NAME
+              if (cookie_name == REFRESH_SESSION_COOKIE_NAME || cookie_name == 'DSR') && !cookie_value.to_s.empty?
+                @logger.debug "found refresh token in cookies with name #{cookie_name}, adding to jwt_response"
                 jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(cookie_value, audience)
+                refresh_cookie_found = true
+                break
               end
+            end
+            
+            # If not found in cookies, check if refresh_token parameter was passed
+            if !refresh_cookie_found && refresh_token && !refresh_token.to_s.empty?
+              @logger.debug 'refresh token not found in cookies, but refresh_token was passed, adding to jwt_response'
+              @logger.debug 'validating passed-in refresh token...'
+              jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
             end
           end
 

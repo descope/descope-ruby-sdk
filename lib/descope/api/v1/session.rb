@@ -21,11 +21,28 @@ module Descope
           #  them from the sessionToken key instead, as these claims will soon be deprecated from the top level
           #  of the response dict.
           #  Make sure you set Enable refresh token rotation in the Project Settings before using this.
+          logger.debug("Refreshing session with refresh token: #{refresh_token}")
           validate_refresh_token_not_nil(refresh_token)
           validate_token(refresh_token, audience)
           res = post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
+          logger.debug("Refreshing session res: #{res}")
           cookies = res.fetch(COOKIE_DATA_NAME, {})
-          refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
+          
+          # Check each source and use the first non-empty value
+          refresh_cookie = nil
+          cookie_value = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil)
+          if cookie_value && !cookie_value.empty?
+            refresh_cookie = cookie_value
+          else
+            jwt_value = res.fetch('refreshJwt', nil)
+            if jwt_value && !jwt_value.empty?
+              refresh_cookie = jwt_value
+            else
+              refresh_cookie = refresh_token
+            end
+          end
+          
+          logger.debug("Refreshing refresh_cookie: #{refresh_cookie}")
           generate_jwt_response(response_body: res, refresh_cookie: refresh_cookie, audience: audience)
         end
 
