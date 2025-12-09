@@ -134,4 +134,97 @@ describe Descope::Api::V1::Session do
       expect { @instance.validate_and_refresh_session(session_token: 'session_token', refresh_token: 'refresh_token') }.to_not raise_error
     end
   end
+
+  context 'cookie domain fix for refresh_session' do
+    let(:refresh_token) { 'test_refresh_token' }
+    let(:session_jwt) { 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature' }
+    let(:refresh_jwt) { 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.refresh_sig' }
+
+    context 'when using cookie-only tokens with custom domain' do
+      let(:cookie_only_response) do
+        {
+          'userId' => 'test123',
+          'cookieExpiration' => 1640704758,
+          'cookieDomain' => 'dev.rextherapymanager.com',
+          'cookies' => {
+            'DS' => session_jwt,
+            'DSR' => refresh_jwt
+          }
+        }
+      end
+
+      it 'extracts tokens from cookies when not in response body' do
+        allow(@instance).to receive(:validate_refresh_token_not_nil).and_return(true)
+        allow(@instance).to receive(:validate_token).and_return({})
+        allow(@instance).to receive(:post).and_return(cookie_only_response)
+        allow(@instance).to receive(:generate_jwt_response).and_return(cookie_only_response)
+
+        expect { @instance.refresh_session(refresh_token: refresh_token) }.not_to raise_error
+        
+        result = @instance.refresh_session(refresh_token: refresh_token)
+        expect(result).to eq(cookie_only_response)
+      end
+
+      it 'passes correct refresh_cookie to generate_jwt_response' do
+        allow(@instance).to receive(:validate_refresh_token_not_nil).and_return(true)
+        allow(@instance).to receive(:validate_token).and_return({})
+        allow(@instance).to receive(:post).and_return(cookie_only_response)
+
+        # Verify that refresh_cookie is extracted correctly from cookies
+        expected_refresh_cookie = refresh_jwt
+        expect(@instance).to receive(:generate_jwt_response).with(
+          response_body: cookie_only_response,
+          refresh_cookie: expected_refresh_cookie,
+          audience: nil
+        ).and_return(cookie_only_response)
+
+        @instance.refresh_session(refresh_token: refresh_token)
+      end
+    end
+
+    context 'when using mixed configuration (some tokens in body, some in cookies)' do
+      let(:mixed_response) do
+        {
+          'sessionJwt' => session_jwt,  # Session token in response body
+          'userId' => 'test123',
+          'cookies' => {
+            'DSR' => refresh_jwt        # Refresh token in cookies only
+          }
+        }
+      end
+
+      it 'handles mixed token locations correctly' do
+        allow(@instance).to receive(:validate_refresh_token_not_nil).and_return(true)
+        allow(@instance).to receive(:validate_token).and_return({})
+        allow(@instance).to receive(:post).and_return(mixed_response)
+        allow(@instance).to receive(:generate_jwt_response).and_return(mixed_response)
+
+        expect { @instance.refresh_session(refresh_token: refresh_token) }.not_to raise_error
+      end
+    end
+
+    context 'backward compatibility with traditional response body tokens' do
+      let(:traditional_response) do
+        {
+          'sessionJwt' => session_jwt,
+          'refreshJwt' => refresh_jwt,
+          'userId' => 'test123'
+        }
+      end
+
+      it 'continues to work with response body tokens' do
+        allow(@instance).to receive(:validate_refresh_token_not_nil).and_return(true)
+        allow(@instance).to receive(:validate_token).and_return({})
+        allow(@instance).to receive(:post).and_return(traditional_response)
+        
+        expect(@instance).to receive(:generate_jwt_response).with(
+          response_body: traditional_response,
+          refresh_cookie: refresh_jwt,  # Should use refreshJwt from response body
+          audience: nil
+        ).and_return(traditional_response)
+
+        @instance.refresh_session(refresh_token: refresh_token)
+      end
+    end
+  end
 end

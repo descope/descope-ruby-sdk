@@ -26,7 +26,7 @@ module Descope
           res = post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
           cookies = res.fetch(COOKIE_DATA_NAME, {})
           refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
-          generate_jwt_response(response_body: res, refresh_cookie:, audience:)
+          generate_jwt_response(response_body: res, refresh_cookie: refresh_cookie, audience: audience)
         end
 
         def me(refresh_token = nil)
@@ -74,10 +74,10 @@ module Descope
 
           begin
             @logger.debug("Validating session token: #{session_token}")
-            validate_session(session_token:, audience:)
+            validate_session(session_token: session_token, audience: audience)
           rescue Descope::AuthException
             @logger.debug("Session is invalid, refreshing session with refresh token: #{refresh_token}")
-            refresh_session(refresh_token:, audience:)
+            refresh_session(refresh_token: refresh_token, audience: audience)
           end
         end
 

@@ -430,4 +430,166 @@ describe Descope::Api::V1::Auth do
       expect { @instance.exchange_access_key(access_key:, login_options: { customClaims: { k1: 'v1' } }, audience: 'IT') }.not_to raise_error
     end
   end
+
+  describe '#generate_auth_info cookie handling enhancements' do
+    let(:audience) { nil }
+    let(:session_jwt) { 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS5kZXNjb3BlLmNvbSJ9.session_sig' }
+    let(:refresh_jwt) { 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS5kZXNjb3BlLmNvbSJ9.refresh_sig' }
+    
+    let(:mock_token_validation) do
+      {
+        'iss' => 'https://api.descope.com/P2abcde12345',
+        'sub' => 'U2abcde12345',
+        'permissions' => ['read', 'write'],
+        'roles' => ['admin'],
+        'tenants' => { 'tenant1' => { 'permissions' => ['read'] } }
+      }
+    end
+
+    before do
+      allow(@instance).to receive(:validate_token).and_return(mock_token_validation)
+    end
+
+    context 'when session token is in cookies (custom domain scenario)' do
+      let(:response_body) do
+        {
+          'userId' => 'test123',
+          'cookieExpiration' => 1640704758,
+          'cookieDomain' => 'dev.rextherapymanager.com',
+          'cookies' => {
+            'DS' => session_jwt,      # Session token in cookies
+            'DSR' => refresh_jwt      # Refresh token in cookies
+          }
+        }
+      end
+
+      it 'extracts session token from cookies when not in response body' do
+        result = @instance.send(:generate_auth_info, response_body, nil, true, audience)
+        
+        expect(result['sessionToken']).to eq(mock_token_validation)
+        expect(result['refreshSessionToken']).to eq(mock_token_validation)
+      end
+
+      it 'validates session token from cookies' do
+        expect(@instance).to receive(:validate_token).with(session_jwt, audience).and_return(mock_token_validation)
+        expect(@instance).to receive(:validate_token).with(refresh_jwt, audience).and_return(mock_token_validation)
+        
+        @instance.send(:generate_auth_info, response_body, nil, true, audience)
+      end
+
+      it 'includes permissions and roles from cookie tokens' do
+        result = @instance.send(:generate_auth_info, response_body, nil, true, audience)
+        
+        expect(result['permissions']).to eq(['read', 'write'])
+        expect(result['roles']).to eq(['admin'])
+        expect(result['tenants']).to eq({ 'tenant1' => { 'permissions' => ['read'] } })
+      end
+    end
+
+    context 'when session token is in response body and refresh token in cookies' do
+      let(:response_body) do
+        {
+          'sessionJwt' => session_jwt,  # Session token in response body
+          'userId' => 'test123',
+          'cookies' => {
+            'DSR' => refresh_jwt        # Only refresh token in cookies
+          }
+        }
+      end
+
+      it 'uses session token from response body and refresh token from cookies' do
+        expect(@instance).to receive(:validate_token).with(session_jwt, audience).and_return(mock_token_validation)
+        expect(@instance).to receive(:validate_token).with(refresh_jwt, audience).and_return(mock_token_validation)
+        
+        result = @instance.send(:generate_auth_info, response_body, nil, true, audience)
+        
+        expect(result['sessionToken']).to eq(mock_token_validation)
+        expect(result['refreshSessionToken']).to eq(mock_token_validation)
+      end
+    end
+
+    context 'when refresh token is passed as parameter' do
+      let(:response_body) do
+        {
+          'userId' => 'test123',
+          'cookies' => {
+            'DS' => session_jwt         # Only session token in cookies
+          }
+        }
+      end
+
+      it 'uses passed refresh token when not in response body or cookies' do
+        expect(@instance).to receive(:validate_token).with(session_jwt, audience).and_return(mock_token_validation)
+        expect(@instance).to receive(:validate_token).with(refresh_jwt, audience).and_return(mock_token_validation)
+        
+        result = @instance.send(:generate_auth_info, response_body, refresh_jwt, true, audience)
+        
+        expect(result['sessionToken']).to eq(mock_token_validation)
+        expect(result['refreshSessionToken']).to eq(mock_token_validation)
+      end
+    end
+
+    context 'error handling for missing tokens' do
+      let(:response_body) do
+        {
+          'userId' => 'test123',
+          'cookieExpiration' => 1640704758,
+          'cookies' => {}  # No tokens anywhere
+        }
+      end
+
+      it 'raises helpful error when no refresh token is found' do
+        expect {
+          @instance.send(:generate_auth_info, response_body, nil, true, audience)
+        }.to raise_error(Descope::AuthException, /Could not find refresh token.*custom cookie domains/)
+      end
+
+      it 'includes debug information in error' do
+        allow(@instance.logger).to receive(:debug)
+        
+        expect(@instance.logger).to receive(:debug).with(
+          /Error: Could not find refresh token in response body.*cookies.*passed in refresh_token/
+        )
+
+        expect {
+          @instance.send(:generate_auth_info, response_body, nil, true, audience)
+        }.to raise_error(Descope::AuthException)
+      end
+    end
+
+    context 'backward compatibility' do
+      let(:traditional_response_body) do
+        {
+          'sessionJwt' => session_jwt,
+          'refreshJwt' => refresh_jwt,
+          'userId' => 'test123'
+        }
+      end
+
+      it 'continues to work with traditional response body tokens' do
+        expect(@instance).to receive(:validate_token).with(session_jwt, audience).and_return(mock_token_validation)
+        expect(@instance).to receive(:validate_token).with(refresh_jwt, audience).and_return(mock_token_validation)
+        
+        result = @instance.send(:generate_auth_info, traditional_response_body, nil, true, audience)
+        
+        expect(result['sessionToken']).to eq(mock_token_validation)
+        expect(result['refreshSessionToken']).to eq(mock_token_validation)
+      end
+
+      it 'works with same-domain cookies (existing RestClient behavior)' do
+        response_with_restclient_cookies = {
+          'userId' => 'test123',
+          'cookies' => {
+            'DSR' => refresh_jwt
+          }
+        }
+
+        expect(@instance).to receive(:validate_token).with(refresh_jwt, audience).and_return(mock_token_validation)
+        
+        result = @instance.send(:generate_auth_info, response_with_restclient_cookies, nil, false, audience)
+        
+        expect(result['refreshSessionToken']).to eq(mock_token_validation)
+      end
+    end
+  end
 end
