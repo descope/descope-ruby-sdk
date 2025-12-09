@@ -265,7 +265,7 @@ module Descope
             # Check cookies for refresh token
             refresh_cookie_found = false
             cookies.each do |cookie_name, cookie_value|
-              if (cookie_name == REFRESH_SESSION_COOKIE_NAME || cookie_name == 'DSR') && !cookie_value.to_s.empty?
+              if cookie_name == REFRESH_SESSION_COOKIE_NAME && !cookie_value.to_s.empty?
                 @logger.debug "found refresh token in cookies with name #{cookie_name}, adding to jwt_response"
                 jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(cookie_value, audience)
                 refresh_cookie_found = true
@@ -282,8 +282,8 @@ module Descope
           end
 
           if jwt_response[REFRESH_SESSION_TOKEN_NAME].nil?
-            @logger.debug "Error: Could not find refresh token in response body: #{response_body} / cookies: #{cookies} / passed in refresh_token ->#{refresh_token}<-"
-            raise Descope::AuthException.new('Could not find refresh token in response body, cookies, or passed parameters. This may indicate a configuration issue with token response methods or custom cookie domains.', code: 500)
+            @logger.debug "Error: Could not find refreshJwt in response body: #{response_body} / cookies: #{cookies} / passed in refresh_token ->#{refresh_token}<-"
+            raise Descope::AuthException.new('Could not find refreshJwt in response body / cookies / passed in refresh_token', code: 500)
           end
 
           jwt_response = adjust_properties(jwt_response, user_jwt)

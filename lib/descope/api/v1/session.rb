@@ -21,11 +21,9 @@ module Descope
           #  them from the sessionToken key instead, as these claims will soon be deprecated from the top level
           #  of the response dict.
           #  Make sure you set Enable refresh token rotation in the Project Settings before using this.
-          logger.debug("Refreshing session with refresh token: #{refresh_token}")
           validate_refresh_token_not_nil(refresh_token)
           validate_token(refresh_token, audience)
           res = post(REFRESH_TOKEN_PATH, {}, {}, refresh_token)
-          logger.debug("Refreshing session res: #{res}")
           cookies = res.fetch(COOKIE_DATA_NAME, {})
           
           # Check each source and use the first non-empty value
