@@ -89,7 +89,7 @@ describe Descope::Mixins::HTTP do
 
         result = @instance.safe_parse_json(mock_body, cookies: {}, headers: mock_headers)
         
-        expect(result['cookies']).to be_present
+        expect(result['cookies']).to_not be_nil
         expect(result['cookies']['DS']).to eq('session_jwt_token')
         expect(result['cookies']['DSR']).to eq('refresh_jwt_token')
       end
@@ -99,7 +99,7 @@ describe Descope::Mixins::HTTP do
 
         result = @instance.safe_parse_json(mock_body, cookies: {}, headers: mock_headers)
         
-        expect(result['cookies']).to be_present
+        expect(result['cookies']).to_not be_nil
         expect(result['cookies']['DS']).to eq('session_jwt_token')
       end
 
@@ -211,7 +211,7 @@ describe Descope::Mixins::HTTP do
 
       result = @instance.request(:get, '/test', {}, {})
       
-      expect(result['cookies']).to be_present
+      expect(result['cookies']).to_not be_nil
       expect(result['cookies']['DS']).to eq('test_token')
     end
   end

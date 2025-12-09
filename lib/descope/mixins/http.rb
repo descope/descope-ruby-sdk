@@ -95,7 +95,7 @@ module Descope
         # Extract cookie value from Set-Cookie header
         # Format: "cookieName=cookieValue; attribute1=value1; attribute2=value2"
         # Only match valid cookie value characters (RFC 6265: exclude whitespace, semicolon, comma)
-        match = cookie_header.match(/#{Regexp.escape(cookie_name)}=([^\s;,]+)/)
+        match = cookie_header.match(/#{Regexp.escape(cookie_name)}=([^;]+)/)
         match ? match[1].strip : nil
       end
 
