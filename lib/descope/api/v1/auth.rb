@@ -53,7 +53,7 @@ module Descope
             raise AuthException.new('Access key should be a string!', code: 400)
           end
 
-          res = post(EXCHANGE_AUTH_ACCESS_KEY_PATH, { loginOptions: login_options, audience: }, {}, access_key)
+          res = post(EXCHANGE_AUTH_ACCESS_KEY_PATH, { loginOptions: login_options, audience: audience }, {}, access_key)
           generate_auth_info(res, nil, false, audience)
         end
 
@@ -72,7 +72,7 @@ module Descope
         def validate_permissions(jwt_response: nil, permissions: nil)
           # Validate that a jwt_response has been granted the specified permissions.
           # For a multi-tenant environment use validate_tenant_permissions function
-          validate_tenant_permissions(jwt_response:, permissions:)
+          validate_tenant_permissions(jwt_response: jwt_response, permissions: permissions)
         end
 
         # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/MethodLength
@@ -123,7 +123,7 @@ module Descope
         def validate_roles(jwt_response: nil, roles: nil)
           # Validate that a jwt_response has been granted the specified roles.
           # For a multi-tenant environment use validate_tenant_roles function
-          validate_tenant_roles(jwt_response:, tenant: '', roles:)
+          validate_tenant_roles(jwt_response: jwt_response, tenant: '', roles: roles)
         end
 
         def validate_tenant_roles(jwt_response: nil, tenant: nil, roles: nil)
@@ -242,6 +242,18 @@ module Descope
             jwt_response[SESSION_TOKEN_NAME] = validate_token(st_jwt, audience)
           end
 
+          # Check for session token in cookies if not found in response body
+          cookies = response_body.fetch('cookies', {})
+          if jwt_response[SESSION_TOKEN_NAME].nil?
+            cookies.each do |cookie_name, cookie_value|
+              if cookie_name == SESSION_COOKIE_NAME
+                @logger.debug "found session token in cookies with name #{cookie_name}, adding to jwt_response"
+                jwt_response[SESSION_TOKEN_NAME] = validate_token(cookie_value, audience)
+                break
+              end
+            end
+          end
+
           # validate refresh token if refresh_token was passed or if refreshJwt is not empty
           rt_jwt = response_body.fetch('refreshJwt', '')
 
@@ -249,18 +261,23 @@ module Descope
             @logger.debug 'found refreshJwt in response body, adding to jwt_response'
             @logger.debug 'validating refreshJwt token...'
             jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(rt_jwt, audience)
-          elsif refresh_token && !refresh_token.empty?
-            # if refresh_token is in response body (local storage)
-            @logger.debug 'refreshJwt is empty, but refresh_token was passed, adding to jwt_response'
-            @logger.debug 'validating passed-in refresh token...'
-            jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
           else
-            cookies = response_body.fetch('cookies', {})
-            # else if refresh token is in response cookie
+            # Check cookies for refresh token
+            refresh_cookie_found = false
             cookies.each do |cookie_name, cookie_value|
-              if cookie_name == REFRESH_SESSION_COOKIE_NAME
+              if cookie_name == REFRESH_SESSION_COOKIE_NAME && !cookie_value.to_s.empty?
+                @logger.debug "found refresh token in cookies with name #{cookie_name}, adding to jwt_response"
                 jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(cookie_value, audience)
+                refresh_cookie_found = true
+                break
               end
+            end
+            
+            # If not found in cookies, check if refresh_token parameter was passed
+            if !refresh_cookie_found && refresh_token && !refresh_token.to_s.empty?
+              @logger.debug 'refresh token not found in cookies, but refresh_token was passed, adding to jwt_response'
+              @logger.debug 'validating passed-in refresh token...'
+              jwt_response[REFRESH_SESSION_TOKEN_NAME] = validate_token(refresh_token, audience)
             end
           end
 
@@ -470,7 +487,7 @@ module Descope
         def exchange_token(uri, code)
           raise Descope::ArgumentException.new("Code can't be empty", code: 400) if code.nil? || code.empty?
 
-          res = post(uri, { code: })
+          res = post(uri, { code: code })
           generate_jwt_response(
             response_body: res,
             refresh_cookie: res['refreshJwt']

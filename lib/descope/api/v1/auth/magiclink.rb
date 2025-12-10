@@ -42,7 +42,7 @@ module Descope
           def magiclink_verify_token(token = nil)
             validate_token_not_empty(token)
             res = post(VERIFY_MAGICLINK_AUTH_PATH, { token: })
-            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            cookies = res.fetch(COOKIE_DATA_NAME, nil) || res.fetch('cookies', {})
             refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
             generate_jwt_response(response_body: res, refresh_cookie:)
           end

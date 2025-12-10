@@ -22,7 +22,7 @@ module Descope
 
             request_params[:user] = password_user_compose_update_body(**user) unless user.nil?
             res = post(SIGN_UP_PASSWORD_PATH, request_params)
-            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            cookies = res.fetch(COOKIE_DATA_NAME, nil) || res.fetch('cookies', {})
             refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
             generate_jwt_response(response_body: res, refresh_cookie:)
           end
@@ -40,7 +40,7 @@ module Descope
               ssoAppId: sso_app_id
             }
             res = post(SIGN_IN_PASSWORD_PATH, request_params)
-            cookies = res.fetch(COOKIE_DATA_NAME, {})
+            cookies = res.fetch(COOKIE_DATA_NAME, nil) || res.fetch('cookies', {})
             refresh_cookie = cookies.fetch(REFRESH_SESSION_COOKIE_NAME, nil) || res.fetch('refreshJwt', nil)
             generate_jwt_response(response_body: res, refresh_cookie:)
           end

@@ -44,19 +44,59 @@ module Descope
         }
       end
 
-      def safe_parse_json(body, cookies: {})
+      def safe_parse_json(body, cookies: {}, headers: {})
         @logger.debug "response => #{JSON.parse(body.to_s)}"
         res = JSON.parse(body.to_s)
 
-        # Handle DSR cookie in response.
+        # Handle DS and DSR cookies in response.
+        # First check RestClient's cookies (works for same-domain cookies)
+        extracted_cookies = {}
+        if cookies.key?(SESSION_COOKIE_NAME)
+          extracted_cookies[SESSION_COOKIE_NAME] = cookies[SESSION_COOKIE_NAME]
+        end
         if cookies.key?(REFRESH_SESSION_COOKIE_NAME)
-          res['cookies'] = {}
-          res['cookies'][REFRESH_SESSION_COOKIE_NAME] = cookies[REFRESH_SESSION_COOKIE_NAME]
+          extracted_cookies[REFRESH_SESSION_COOKIE_NAME] = cookies[REFRESH_SESSION_COOKIE_NAME]
+        end
+
+        # If no cookies found via RestClient, parse Set-Cookie headers directly
+        # This handles custom domain cookies that RestClient filters out
+        if extracted_cookies.empty? && headers.respond_to?(:[])
+          set_cookie_headers = headers['set-cookie'] || headers['Set-Cookie'] || []
+          set_cookie_headers = [set_cookie_headers] unless set_cookie_headers.is_a?(Array)
+          
+          set_cookie_headers.each do |cookie_header|
+            next unless cookie_header.is_a?(String)
+            
+            # Parse DS cookie (session token)
+            if cookie_header.include?("#{SESSION_COOKIE_NAME}=")
+              cookie_value = parse_cookie_value(cookie_header, SESSION_COOKIE_NAME)
+              extracted_cookies[SESSION_COOKIE_NAME] = cookie_value if cookie_value
+            end
+            
+            # Parse DSR cookie (refresh token)
+            if cookie_header.include?("#{REFRESH_SESSION_COOKIE_NAME}=")
+              cookie_value = parse_cookie_value(cookie_header, REFRESH_SESSION_COOKIE_NAME)
+              extracted_cookies[REFRESH_SESSION_COOKIE_NAME] = cookie_value if cookie_value
+            end
+          end
+        end
+
+        # Add extracted cookies to response if any were found
+        unless extracted_cookies.empty?
+          res['cookies'] = extracted_cookies
         end
 
         res
       rescue JSON::ParserError
         body
+      end
+
+      def parse_cookie_value(cookie_header, cookie_name)
+        # Extract cookie value from Set-Cookie header
+        # Format: "cookieName=cookieValue; attribute1=value1; attribute2=value2"
+        # Only match valid cookie value characters (RFC 6265: exclude whitespace, semicolon, comma)
+        match = cookie_header.match(/#{Regexp.escape(cookie_name)}=([^;]+)/)
+        match ? match[1].strip : nil
       end
 
       def encode_uri(uri)
@@ -107,7 +147,7 @@ module Descope
         @logger.info("API Request: [#{method}] #{uri} - Response Code: #{result.code}")
 
         case result.code
-        when 200...226 then safe_parse_json(result.body, cookies: result.cookies)
+        when 200...226 then safe_parse_json(result.body, cookies: result.cookies, headers: result.headers)
         when 400       then raise Descope::BadRequest.new(result.body, code: result.code, headers: result.headers)
         when 401       then raise Descope::Unauthorized.new(result.body, code: result.code, headers: result.headers)
         when 403       then raise Descope::AccessDenied.new(result.body, code: result.code, headers: result.headers)
@@ -122,10 +162,10 @@ module Descope
 
       def call(method, url, timeout, headers, body = nil)
         RestClient::Request.execute(
-          method:,
-          url:,
-          timeout:,
-          headers:,
+          method: method,
+          url: url,
+          timeout: timeout,
+          headers: headers,
           payload: body
         )
       rescue RestClient::Exception => e
