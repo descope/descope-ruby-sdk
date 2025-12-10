@@ -30,10 +30,19 @@ jobs:
           private_key: ${{ secrets.RELEASE_APP_PEM }}
           app_id: ${{ secrets.RELEASE_APP_ID }}
           
+      - name: Determine version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            NEW_VERSION="${{ github.event.inputs.version }}"
+          else
+            NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')
+          fi
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
+
       - name: Bump version
         run: |
-          NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//') # strip the 'v' from the tag if present
-          sed -i "s/^  VERSION = '.*'/  VERSION = '${NEW_VERSION}'/g" lib/descope/version.rb
+          sed -i "s/^  VERSION = '.*'/  VERSION = '${{ steps.version.outputs.NEW_VERSION }}'/g" lib/descope/version.rb
           echo -e "Updated version file:\n $(cat lib/descope/version.rb)"
 
       - name: Commit changes
@@ -42,16 +51,17 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git checkout main
           git add ./lib/descope/version.rb
-          git commit -m "Bump version to $NEW_VERSION"
+          git commit -m "Bump version to ${{ steps.version.outputs.NEW_VERSION }}"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
 
       - name: Repoint the tag to latest commit
         run: |
-          git tag -d ${{ github.event.release.tag_name }}
-          git tag ${{ github.event.release.tag_name }} -m "Release $NEW_VERSION"
-          git push origin :${{ github.event.release.tag_name }}
+          TAG="${{ github.event.release.tag_name }}"
+          git tag -d "${TAG}"
+          git tag "${TAG}" -m "Release ${{ steps.version.outputs.NEW_VERSION }}"
+          git push origin :"${TAG}"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
