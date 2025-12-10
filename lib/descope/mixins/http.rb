@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'descope/mixins/common'
 require 'addressable/uri'
 require 'retryable'
 require_relative '../exception'
@@ -7,6 +8,7 @@ module Descope
   module Mixins
     # HTTP-related methods
     module HTTP
+      include Descope::Mixins::Common
       attr_accessor :headers, :base_uri, :timeout, :retry_count
 
       DEFAULT_RETRIES = 3
