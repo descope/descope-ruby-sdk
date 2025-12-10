@@ -33,12 +33,22 @@ jobs:
       - name: Determine version
         id: version
         run: |
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            NEW_VERSION="${{ github.event.inputs.version }}"
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          INPUT_VERSION="${{ github.event.inputs.version }}"
+          
+          if [ -n "$INPUT_VERSION" ]; then
+            NEW_VERSION="$INPUT_VERSION"
+            TAG="v${INPUT_VERSION}"
+          elif [ -n "$RELEASE_TAG" ]; then
+            NEW_VERSION=$(echo "$RELEASE_TAG" | sed 's/^v//')
+            TAG="$RELEASE_TAG"
           else
-            NEW_VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')
+            echo "Error: No version provided"
+            exit 1
           fi
+          
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "TAG=${TAG}" >> $GITHUB_OUTPUT
 
       - name: Bump version
         run: |
@@ -58,13 +68,13 @@ jobs:
 
       - name: Repoint the tag to latest commit
         run: |
-          TAG="${{ github.event.release.tag_name }}"
-          git tag -d "${TAG}"
+          TAG="${{ steps.version.outputs.TAG }}"
+          git tag -d "${TAG}" || true
           git tag "${TAG}" -m "Release ${{ steps.version.outputs.NEW_VERSION }}"
-          git push origin :"${TAG}"
+          git push origin :"${TAG}" || true
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
 
       - name: Publish to RubyGems
         run: |
