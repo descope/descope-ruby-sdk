@@ -37,10 +37,7 @@ jobs:
 
       - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
         with:
-          bundler-cache: false
-
-      - name: Install dependencies
-        run: bundle install
+          bundler-cache: true  # Cache bundle based on Gemfile.lock
 
       - name: Run RSpec Unit Tests (Parallel)
         run: bundle exec parallel_rspec spec/lib.descope -n ${{ matrix.ci_node_total }} --only-group ${{ matrix.ci_node_index }}
@@ -56,10 +53,7 @@ jobs:
 
       - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
         with:
-          bundler-cache: false
-
-      - name: Install dependencies
-        run: bundle install
+          bundler-cache: true  # Cache bundle based on Gemfile.lock
 
       - name: Run Auth Integration Tests
         env:
@@ -78,10 +72,7 @@ jobs:
 
       - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
         with:
-          bundler-cache: false
-
-      - name: Install dependencies
-        run: bundle install
+          bundler-cache: true  # Cache bundle based on Gemfile.lock
 
       - name: Run Management Integration Tests (excluding global state tests)
         env:
@@ -103,10 +94,7 @@ jobs:
 
       - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
         with:
-          bundler-cache: false
-
-      - name: Install dependencies
-        run: bundle install
+          bundler-cache: true  # Cache bundle based on Gemfile.lock
 
       - name: Run Global State Integration Tests (project & authz)
         env:
