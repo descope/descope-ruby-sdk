@@ -13,7 +13,11 @@ describe Descope::Api::V1::Session do
     all_users['users'].each do |user|
       if user['middleName'] == "#{SpecUtils.build_prefix}Ruby-SDK-User" 
         @client.logger.info("Deleting ruby spec test user #{user['loginIds'][0]}")
-        @client.delete_user(user['loginIds'][0])
+        begin
+          @client.delete_user(user['loginIds'][0])
+        rescue Descope::NotFound => e
+          @client.logger.info("User already deleted: #{e.message}")
+        end
       end
     end
   end
