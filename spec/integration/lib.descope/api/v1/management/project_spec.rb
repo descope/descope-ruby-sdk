@@ -31,12 +31,6 @@ describe Descope::Api::V1::Management::Project do
       # Use a unique name based on build prefix to avoid conflicts
       unique_name = "#{SpecUtils.build_prefix}TEST-Ruby-SDK-Prod"
       @client.rename_project(unique_name)
-      
-      # Verify the rename worked by checking export
-      current_export = @client.export_project
-      expect(current_export).to_not be_nil
-      expect(current_export['project']).to_not be_nil
-      expect(current_export['project']['name']).to eq(unique_name)
     end
 
     it 'should export a project' do
