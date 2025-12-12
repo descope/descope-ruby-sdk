@@ -17,7 +17,7 @@ describe Descope::Api::V1::Management::Project do
       # Store it so we can restore it later
       begin
         @original_project_name = @client.export_project['project']['name']
-      rescue KeyError, NoMethodError, TypeError
+      rescue StandardError
         @original_project_name = 'Ruby-SDK-Prod'
       end
     end
@@ -34,6 +34,8 @@ describe Descope::Api::V1::Management::Project do
       
       # Verify the rename worked by checking export
       current_export = @client.export_project
+      expect(current_export).to_not be_nil
+      expect(current_export['project']).to_not be_nil
       expect(current_export['project']['name']).to eq(unique_name)
     end
 
