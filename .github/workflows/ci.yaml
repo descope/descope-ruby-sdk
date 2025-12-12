@@ -13,6 +13,8 @@ on:
         description: "Descope Log Level"
         default: "info"
 
+concurrency: ci
+
 env:
   DESCOPE_LOG_LEVEL: ${{ github.event.inputs.DESCOPE_LOG_LEVEL || 'info' }}
 
