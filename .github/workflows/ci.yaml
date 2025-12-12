@@ -13,14 +13,35 @@ on:
         description: "Descope Log Level"
         default: "info"
 
-concurrency: ci
-
 env:
   DESCOPE_LOG_LEVEL: ${{ github.event.inputs.DESCOPE_LOG_LEVEL || 'info' }}
 
 jobs:
-  ci:
-    name: Descope Ruby SDK CI
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Run unit tests in parallel across 4 workers
+        ci_node_total: [4]
+        ci_node_index: [0, 1, 2, 3]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+
+      - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
+        with:
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run RSpec Unit Tests (Parallel)
+        run: bundle exec parallel_rspec spec/lib.descope -n ${{ matrix.ci_node_total }} --only-group ${{ matrix.ci_node_index }}
+
+  integration-tests-auth:
+    name: Integration Tests - Auth
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -28,17 +49,59 @@ jobs:
 
       - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
         with:
-          # We are not letting this step to run bundle install, we will do it later
           bundler-cache: false
 
       - name: Install dependencies
         run: bundle install
 
-      - name: Run RSpec Test
-        run: bundle exec rspec spec/lib.descope
-
-      - name: Run RSpec Integration Tests
+      - name: Run Auth Integration Tests
         env:
           DESCOPE_MANAGEMENT_KEY: ${{ secrets.DESCOPE_MANAGEMENT_KEY }}
           DESCOPE_PROJECT_ID: ${{ secrets.DESCOPE_PROJECT_ID }}
-        run: bundle exec rspec spec/integration
+        run: bundle exec rspec spec/integration/lib.descope/api/v1/auth
+
+  integration-tests-management:
+    name: Integration Tests - Management
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+
+      - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
+        with:
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run Management Integration Tests (excluding global state tests)
+        env:
+          DESCOPE_MANAGEMENT_KEY: ${{ secrets.DESCOPE_MANAGEMENT_KEY }}
+          DESCOPE_PROJECT_ID: ${{ secrets.DESCOPE_PROJECT_ID }}
+        run: |
+          bundle exec rspec spec/integration/lib.descope/api/v1/management \
+            --exclude-pattern "spec/integration/lib.descope/api/v1/management/{project,authz}_spec.rb"
+
+  integration-tests-global:
+    name: Integration Tests - Global State
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+
+      - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
+        with:
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run Global State Integration Tests (project & authz)
+        env:
+          DESCOPE_MANAGEMENT_KEY: ${{ secrets.DESCOPE_MANAGEMENT_KEY }}
+          DESCOPE_PROJECT_ID: ${{ secrets.DESCOPE_PROJECT_ID }}
+          AUTHZ_FULL_TEST: "true"
+        run: |
+          bundle exec rspec spec/integration/lib.descope/api/v1/management/project_spec.rb \
+                            spec/integration/lib.descope/api/v1/management/authz_spec.rb
+

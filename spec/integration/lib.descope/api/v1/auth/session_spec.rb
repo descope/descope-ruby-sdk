@@ -32,8 +32,13 @@ describe Descope::Api::V1::Session do
       login_res = @client.password_sign_in(login_id: user[:login_id], password: @password)
       @client.logger.info("sign_in res: #{login_res}")
 
-      @client.logger.info('3. sleep 1 second before calling refresh_session')
-      sleep(1)
+      @client.logger.info('3. Wait briefly to ensure token timestamps differ')
+      SpecUtils.wait_for_condition(max_wait: 3, interval: 1, description: 'timestamp to advance') do
+        Time.now.to_i > login_res[REFRESH_SESSION_TOKEN_NAME]['exp']
+      rescue StandardError
+        sleep(1)
+        true
+      end
 
       @client.logger.info('4. Refresh session')
       refresh_session_res = @client.refresh_session(refresh_token: login_res[REFRESH_SESSION_TOKEN_NAME]['jwt'])

@@ -30,8 +30,16 @@ describe Descope::Api::V1::Management::AccessKey do
       @tenant_id = @client.create_tenant(name: 'some-new-tenant')['id']
       @client.logger.info('creating access key')
       @access_key = @client.create_access_key(name: @key_name, key_tenants: [{ tenant_id: @tenant_id }])
-      @client.logger.info("waiting for access key #{@access_key['key']['id']} to be active 60 seconds")
-      sleep 60
+      @client.logger.info("waiting for access key #{@access_key['key']['id']} to be active")
+      SpecUtils.wait_for_condition(max_wait: 65, interval: 3, description: 'access key to be active') do
+        begin
+          key = @client.load_access_key(@access_key['key']['id'])
+          key['key']['status'] == 'active' || key['key']
+        rescue StandardError => e
+          @client.logger.info("Waiting for key activation: #{e.message}")
+          false
+        end
+      end
     end
 
     it 'should create the access key and load it' do

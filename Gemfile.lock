@@ -58,6 +58,8 @@ GEM
     netrc (0.11.0)
     optimist (3.2.1)
     parallel (1.27.0)
+    parallel_tests (5.5.0)
+      parallel
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
@@ -149,6 +151,7 @@ DEPENDENCIES
   descope!
   factory_bot (= 6.5.4)
   faker
+  parallel_tests
   rack-test (= 2.2.0)
   rotp (= 6.3.0)
   rspec (= 3.13.2)

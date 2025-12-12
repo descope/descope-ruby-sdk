@@ -7,30 +7,87 @@ describe Descope::Api::V1::Management::Role do
     raise 'DESCOPE_MANAGEMENT_KEY is not set' if ENV['DESCOPE_MANAGEMENT_KEY'].nil?
 
     @client = DescopeClient.new(Configuration.config)
-    @client.logger.info('Staring cleanup before tests...')
-    @client.logger.info('Deleting all permissions for Ruby SDK...')
+    @test_prefix = SpecUtils.build_prefix
+    @client.logger.info("Starting cleanup before tests with prefix: #{@test_prefix}...")
+    
+    # Define resource names with unique prefix for parallel execution
+    @permission_viewer = "#{@test_prefix}viewer"
+    @permission_editor = "#{@test_prefix}editor"
+    @permission_admin = "#{@test_prefix}admin"
+    @role_viewer = "#{@test_prefix}Ruby-SDK-test-viewer"
+    @role_editor = "#{@test_prefix}Ruby-SDK-test-editor"
+    @role_admin = "#{@test_prefix}Ruby-SDK-test-admin"
+    @tenant_name = "#{@test_prefix}Ruby-SDK-test"
+    @description = "#{@test_prefix}Ruby SDK"
+    
+    # Cleanup any leftover resources from previous failed runs
+    @client.logger.info('Deleting all permissions for this test run...')
     @client.load_all_permissions['permissions'].each do |perm|
-      if perm['description'] =~ /Ruby SDK/
+      if perm['description'] == @description
         @client.logger.info("Deleting permission: #{perm['name']}")
         @client.delete_permission(perm['name'])
       end
     end
 
-    @client.logger.info('Deleting all roles for Ruby SDK...')
+    @client.logger.info('Deleting all roles for this test run...')
     @client.load_all_roles['roles'].each do |role|
-      puts "got role: #{role}"
-      if role['description'] == 'Ruby SDK'
+      if role['description'] == @description
         @client.logger.info("Deleting role: #{role['name']}")
         @client.delete_role(name: role['name'], tenant_id: role['tenantId'])
       end
     end
 
-    @client.logger.info('Deleting all tenants for Ruby SDK...')
-    @client.search_all_tenants(names: ['Ruby-SDK-test'])['tenants'].each do |tenant|
+    @client.logger.info('Deleting all tenants for this test run...')
+    @client.search_all_tenants(names: [@tenant_name])['tenants'].each do |tenant|
       @client.logger.info("Deleting tenant: #{tenant['name']}")
       @client.delete_tenant(tenant['id'])
     end
     @client.logger.info('Cleanup completed. Starting tests...')
+  end
+  
+  after(:all) do
+    # Cleanup after tests to ensure no resources are left behind
+    @client.logger.info('Cleaning up test resources...')
+    
+    begin
+      @client.delete_permission(@permission_viewer) if defined?(@permission_viewer)
+    rescue StandardError => e
+      @client.logger.info("Permission #{@permission_viewer} already deleted or doesn't exist: #{e.message}")
+    end
+    
+    begin
+      @client.delete_permission(@permission_editor) if defined?(@permission_editor)
+    rescue StandardError => e
+      @client.logger.info("Permission #{@permission_editor} already deleted or doesn't exist: #{e.message}")
+    end
+    
+    begin
+      @client.delete_permission(@permission_admin) if defined?(@permission_admin)
+    rescue StandardError => e
+      @client.logger.info("Permission #{@permission_admin} already deleted or doesn't exist: #{e.message}")
+    end
+    
+    # Delete any roles with our test description
+    begin
+      @client.load_all_roles['roles'].each do |role|
+        if role['description'] == @description
+          @client.delete_role(name: role['name'], tenant_id: role['tenantId'])
+        end
+      end
+    rescue StandardError => e
+      @client.logger.info("Error cleaning up roles: #{e.message}")
+    end
+    
+    # Delete tenant
+    begin
+      @client.search_all_tenants(names: [@tenant_name])['tenants'].each do |tenant|
+        @client.delete_tenant(tenant['id'])
+      end
+    rescue StandardError => e
+      @client.logger.info("Error cleaning up tenant: #{e.message}")
+    end
+    
+    @client.logger.info('Cleanup completed.')
   end
 
   it 'should create update and delete a role' do
@@ -38,43 +95,43 @@ describe Descope::Api::V1::Management::Role do
 
     # Create permissions
     @client.logger.info('creating viewer permission for role')
-    @client.create_permission(name: 'viewer', description: 'Viewer Permission Ruby SDK')
+    @client.create_permission(name: @permission_viewer, description: @description)
 
     @client.logger.info('creating editor permission for role')
-    @client.create_permission(name: 'editor', description: 'Editor Permission Ruby SDK')
+    @client.create_permission(name: @permission_editor, description: @description)
 
     @client.logger.info('creating admin permission for role')
-    @client.create_permission(name: 'admin', description: 'Admin Permission Ruby SDK')
+    @client.create_permission(name: @permission_admin, description: @description)
 
     # Create tenants
-    @client.logger.info('creating Ruby-SDK-test tenant')
-    tenant_id = @client.create_tenant(name: 'Ruby-SDK-test')['id']
+    @client.logger.info("creating #{@tenant_name} tenant")
+    tenant_id = @client.create_tenant(name: @tenant_name)['id']
 
     # Create roles
-    @client.logger.info('creating Ruby-SDK-test role')
-    @client.create_role(name: 'Ruby-SDK-test-viewer', description: 'Ruby SDK', permission_names: ['viewer'])
-    @client.logger.info('creating Ruby-SDK-test-admin role')
-    @client.create_role(name: 'Ruby-SDK-test-admin', description: 'Ruby SDK', permission_names: ['admin'], tenant_id:)
+    @client.logger.info("creating #{@role_viewer} role")
+    @client.create_role(name: @role_viewer, description: @description, permission_names: [@permission_viewer])
+    @client.logger.info("creating #{@role_admin} role")
+    @client.create_role(name: @role_admin, description: @description, permission_names: [@permission_admin], tenant_id:)
 
     # check all roles matching the correct permission
     @client.logger.info('check all roles matching the correct permission (load roles)')
     roles = @client.load_all_roles['roles']
     roles.each do |role|
-      expect(role['permissionNames']).to include('viewer') if role['name'] == 'Ruby-SDK-test-viewer'
-      expect(role['permissionNames']).to include('admin') if role['name'] == 'Ruby-SDK-test-admin'
+      expect(role['permissionNames']).to include(@permission_viewer) if role['name'] == @role_viewer
+      expect(role['permissionNames']).to include(@permission_admin) if role['name'] == @role_admin
     end
 
     @client.logger.info('updating role')
     @client.update_role(
-      name: 'Ruby-SDK-test-viewer',
-      new_name: 'Ruby-SDK-test-editor',
-      description: 'Ruby SDK',
-      permission_names: ['editor']
+      name: @role_viewer,
+      new_name: @role_editor,
+      description: @description,
+      permission_names: [@permission_editor]
     )
 
     @client.logger.info('searching for roles by role names...')
-    all_roles = @client.search_roles(role_names: %w[Ruby-SDK-test-admin Ruby-SDK-test-editor])['roles']
-    expected_roles = %w[Ruby-SDK-test-editor Ruby-SDK-test-admin]
+    all_roles = @client.search_roles(role_names: [@role_admin, @role_editor])['roles']
+    expected_roles = [@role_editor, @role_admin]
     role_count = 0
     expected_roles.each do |expected_role|
       expect(all_roles.map { |role| role['name'] }).to include(expected_role)
@@ -83,8 +140,8 @@ describe Descope::Api::V1::Management::Role do
     expect(role_count).to eq(2)
 
     @client.logger.info('searching for roles with role name like...')
-    all_roles = @client.search_roles(role_name_like: 'Ruby-SDK-test')['roles']
-    expected_roles = %w[Ruby-SDK-test-editor Ruby-SDK-test-admin]
+    all_roles = @client.search_roles(role_name_like: "#{@test_prefix}Ruby-SDK-test")['roles']
+    expected_roles = [@role_editor, @role_admin]
     role_count = 0
     expected_roles.each do |expected_role|
       expect(all_roles.map { |role| role['name'] }).to include(expected_role)
@@ -94,23 +151,23 @@ describe Descope::Api::V1::Management::Role do
     expect(role_count).to eq(2)
 
     @client.logger.info('searching for roles with permission names...')
-    all_roles = @client.search_roles(permission_names: %w[admin])['roles']
-    expect(all_roles.map { |role| role['name'] }).to include('Ruby-SDK-test-admin')
+    all_roles = @client.search_roles(permission_names: [@permission_admin])['roles']
+    expect(all_roles.map { |role| role['name'] }).to include(@role_admin)
 
     @client.logger.info('searching for roles with tenant ids...')
-    all_roles = @client.search_roles(role_name_like: 'Ruby-SDK-test', tenant_ids: [tenant_id])['roles']
-    expect(all_roles.map { |role| role['name'] }).to include('Ruby-SDK-test-admin')
+    all_roles = @client.search_roles(role_name_like: "#{@test_prefix}Ruby-SDK-test", tenant_ids: [tenant_id])['roles']
+    expect(all_roles.map { |role| role['name'] }).to include(@role_admin)
 
     @client.logger.info('deleting permission')
 
-    @client.delete_permission('editor')
-    @client.delete_permission('admin')
+    @client.delete_permission(@permission_editor)
+    @client.delete_permission(@permission_admin)
 
     @client.logger.info('deleting editor role')
-    @client.delete_role(name: 'Ruby-SDK-test-editor')
+    @client.delete_role(name: @role_editor)
 
     @client.logger.info('deleting admin role')
-    @client.delete_role(name: 'Ruby-SDK-test-admin', tenant_id:)
+    @client.delete_role(name: @role_admin, tenant_id:)
 
     @client.logger.info('deleting tenant')
     @client.delete_tenant(tenant_id)

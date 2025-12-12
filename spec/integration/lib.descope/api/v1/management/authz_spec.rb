@@ -12,7 +12,12 @@ describe Descope::Api::V1::Management::Authz do
 
   context 'authz ops' do
     before(:all) do
-      @client.authz_delete_schema
+      # Instead of deleting the entire schema, we'll work with it
+      # This allows parallel test execution
+      # Only delete schema if we're running in isolation
+      if ENV['AUTHZ_FULL_TEST'] == 'true'
+        @client.authz_delete_schema
+      end
     end
 
     it 'should create a new schema' do
@@ -160,13 +165,17 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'should create a relation between a resource and user' do
+      # Use unique resource name to avoid conflicts between parallel tests
+      unique_resource = "#{SpecUtils.build_prefix}some-doc"
+      unique_user = "#{SpecUtils.build_prefix}user1"
+      
       @client.authz_create_relations(
         [
           {
-            "resource": 'some-doc',
+            "resource": unique_resource,
             "relationDefinition": 'owner',
             "namespace": 'note',
-            "target": 'user1'
+            "target": unique_user
           }
         ]
       )
@@ -176,14 +185,26 @@ describe Descope::Api::V1::Management::Authz do
       relations = @client.authz_has_relations?(
         [
           {
-            "resource": 'some-doc',
+            "resource": unique_resource,
             "relationDefinition": 'viewer',
             "namespace": 'note',
-            "target": 'user1'
+            "target": unique_user
           }
         ]
       )
       expect(relations['relationQueries'][0]['hasRelation']).to be_truthy
+      
+      # Clean up the test relations
+      @client.authz_delete_relations(
+        [
+          {
+            "resource": unique_resource,
+            "relationDefinition": 'owner',
+            "namespace": 'note',
+            "target": unique_user
+          }
+        ]
+      )
     end
   end
 end
