@@ -94,6 +94,17 @@ describe Descope::Mixins::HTTP do
         expect(result['cookies']['DSR']).to eq('refresh_jwt_token')
       end
 
+      it 'parses cookies from Set-Cookie headers with symbol key (real RestClient behavior)' do
+        # RestClient returns headers with symbol keys like :set_cookie, not string keys
+        mock_headers = { set_cookie: set_cookie_headers }
+
+        result = @instance.safe_parse_json(mock_body, cookies: {}, headers: mock_headers)
+
+        expect(result['cookies']).to_not be_nil
+        expect(result['cookies']['DS']).to eq('session_jwt_token')
+        expect(result['cookies']['DSR']).to eq('refresh_jwt_token')
+      end
+
       it 'parses cookies from Set-Cookie header when headers is a string' do
         mock_headers = { 'Set-Cookie' => set_cookie_headers.first }
 
@@ -120,7 +131,7 @@ describe Descope::Mixins::HTTP do
           "DS=#{jwt_session}; Path=/; Domain=custom.example.com; HttpOnly; Secure; SameSite=None",
           "DSR=#{jwt_refresh}; Path=/; Domain=custom.example.com; HttpOnly; Secure; SameSite=None; Max-Age=2592000"
         ]
-        mock_headers = { 'set-cookie' => complex_headers }
+        mock_headers = { set_cookie: complex_headers }
 
         result = @instance.safe_parse_json(mock_body, cookies: {}, headers: mock_headers)
         
@@ -134,7 +145,7 @@ describe Descope::Mixins::HTTP do
           'CLOUDFLARE_SESSION=cf_token; Path=/; Domain=.example.com; HttpOnly',
           'DSR=refresh_token; Path=/; Domain=dev.example.com; HttpOnly'
         ]
-        mock_headers = { 'set-cookie' => mixed_headers }
+        mock_headers = { set_cookie: mixed_headers }
 
         result = @instance.safe_parse_json(mock_body, cookies: {}, headers: mock_headers)
         
@@ -175,7 +186,7 @@ describe Descope::Mixins::HTTP do
           'DS=; Path=/; Domain=example.com',  # Empty value
           '=value_without_name; Path=/',       # No name
         ]
-        mock_headers = { 'set-cookie' => malformed_headers }
+        mock_headers = { set_cookie: malformed_headers }
 
         result = @instance.safe_parse_json(mock_body, cookies: {}, headers: mock_headers)
         
@@ -186,7 +197,7 @@ describe Descope::Mixins::HTTP do
       it 'prefers RestClient cookies over Set-Cookie headers when both available' do
         mock_cookies = { 'DS' => 'restclient_token' }
         set_cookie_headers = ['DS=header_token; Path=/; Domain=example.com']
-        mock_headers = { 'set-cookie' => set_cookie_headers }
+        mock_headers = { set_cookie: set_cookie_headers }
 
         result = @instance.safe_parse_json(mock_body, cookies: mock_cookies, headers: mock_headers)
         
@@ -204,7 +215,7 @@ describe Descope::Mixins::HTTP do
       allow(mock_response).to receive(:body).and_return('{"success": true}')
       allow(mock_response).to receive(:cookies).and_return({})
       allow(mock_response).to receive(:headers).and_return({
-        'set-cookie' => ['DS=test_token; Domain=custom.example.com']
+        set_cookie: ['DS=test_token; Domain=custom.example.com']
       })
 
       allow(@instance).to receive(:call).and_return(mock_response)
