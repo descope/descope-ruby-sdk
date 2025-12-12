@@ -63,9 +63,9 @@ module Descope
         # If no cookies found via RestClient, parse Set-Cookie headers directly
         # This handles custom domain cookies that RestClient filters out
         if extracted_cookies.empty? && headers.respond_to?(:[])
-          set_cookie_headers = headers['set-cookie'] || headers['Set-Cookie'] || []
+          set_cookie_headers = headers[:set_cookie] || headers['set-cookie'] || headers['Set-Cookie'] || []
           set_cookie_headers = [set_cookie_headers] unless set_cookie_headers.is_a?(Array)
-          
+
           set_cookie_headers.each do |cookie_header|
             next unless cookie_header.is_a?(String)
             
