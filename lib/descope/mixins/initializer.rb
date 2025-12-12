@@ -16,7 +16,6 @@ module Descope
         @headers['x-descope-project-id'] = @project_id
         @public_key = options[:public_key] || ENV['DESCOPE_PUBLIC_KEY']
         @mlock = Mutex.new
-        log_level = options[:log_level] || ENV['DESCOPE_LOG_LEVEL'] || 'info'
         @logger = options[:logger] || begin
           log_level = options[:log_level] || ENV['DESCOPE_LOG_LEVEL'] || 'info'
           Descope::Mixins::Logging.logger_for(self.class.name, log_level, @project_id)
