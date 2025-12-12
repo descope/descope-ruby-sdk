@@ -34,7 +34,7 @@ describe Descope::Api::V1::Management::AccessKey do
       SpecUtils.wait_for_condition(max_wait: 65, interval: 3, description: 'access key to be active') do
         begin
           key = @client.load_access_key(@access_key['key']['id'])
-          key['key']['status'] == 'active' || key['key']
+          key['key']['status'] == 'active'
         rescue StandardError => e
           @client.logger.info("Waiting for key activation: #{e.message}")
           false

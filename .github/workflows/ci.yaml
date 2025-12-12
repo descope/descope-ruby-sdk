@@ -22,10 +22,13 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         # Run unit tests in parallel across 4 workers
+        # NOTE: ci_node_total and ci_node_index must be kept in sync
         ci_node_total: [4]
         ci_node_index: [0, 1, 2, 3]
     steps:
@@ -45,6 +48,8 @@ jobs:
   integration-tests-auth:
     name: Integration Tests - Auth
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
@@ -65,6 +70,8 @@ jobs:
   integration-tests-management:
     name: Integration Tests - Management
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
@@ -82,11 +89,14 @@ jobs:
           DESCOPE_PROJECT_ID: ${{ secrets.DESCOPE_PROJECT_ID }}
         run: |
           bundle exec rspec spec/integration/lib.descope/api/v1/management \
-            --exclude-pattern "spec/integration/lib.descope/api/v1/management/{project,authz}_spec.rb"
+            --exclude-pattern "spec/integration/lib.descope/api/v1/management/project_spec.rb" \
+            --exclude-pattern "spec/integration/lib.descope/api/v1/management/authz_spec.rb"
 
   integration-tests-global:
     name: Integration Tests - Global State
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0

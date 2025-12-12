@@ -15,7 +15,11 @@ describe Descope::Api::V1::Management::Project do
     before(:all) do
       # Get the current project name before we modify it
       # Store it so we can restore it later
-      @original_project_name = @client.export_project['project']['name'] rescue 'Ruby-SDK-Prod'
+      begin
+        @original_project_name = @client.export_project['project']['name']
+      rescue KeyError, NoMethodError, TypeError
+        @original_project_name = 'Ruby-SDK-Prod'
+      end
     end
 
     after(:all) do
