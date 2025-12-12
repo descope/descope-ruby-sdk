@@ -13,7 +13,11 @@ describe Descope::Api::V1::Session do
     all_users['users'].each do |user|
       if user['middleName'] == "#{SpecUtils.build_prefix}Ruby-SDK-User" 
         @client.logger.info("Deleting ruby spec test user #{user['loginIds'][0]}")
-        @client.delete_user(user['loginIds'][0])
+        begin
+          @client.delete_user(user['loginIds'][0])
+        rescue Descope::NotFound => e
+          @client.logger.info("User already deleted: #{e.message}")
+        end
       end
     end
   end
@@ -32,8 +36,8 @@ describe Descope::Api::V1::Session do
       login_res = @client.password_sign_in(login_id: user[:login_id], password: @password)
       @client.logger.info("sign_in res: #{login_res}")
 
-      @client.logger.info('3. sleep 1 second before calling refresh_session')
-      sleep(1)
+      @client.logger.info('3. Wait briefly to ensure token timestamps differ')
+      sleep(2)  # Wait 2 seconds to ensure new token will have different 'iat' timestamp
 
       @client.logger.info('4. Refresh session')
       refresh_session_res = @client.refresh_session(refresh_token: login_res[REFRESH_SESSION_TOKEN_NAME]['jwt'])

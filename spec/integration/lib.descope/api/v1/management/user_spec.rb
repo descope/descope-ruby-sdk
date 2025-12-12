@@ -102,7 +102,17 @@ describe Descope::Api::V1::Management::User do
     created_user = @client.create_user(**user)['user']
     loaded_user = @client.load_user(created_user['loginIds'][0])['user']
     expect(loaded_user['loginIds']).to eq(created_user['loginIds'])
-    sleep 10
+    
+    # Wait for user to be fully propagated before deletion
+    SpecUtils.wait_for_condition(max_wait: 15, interval: 2, description: 'user to be ready for deletion') do
+      begin
+        @client.load_user(created_user['loginIds'][0])
+        true
+      rescue StandardError => e
+        @client.logger.info("Waiting for user propagation: #{e.message}")
+        false
+      end
+    end
 
     @client.delete_user(created_user['loginIds'][0])
     begin
@@ -128,7 +138,12 @@ describe Descope::Api::V1::Management::User do
     all_roles['roles'].each do |role|
       @client.delete_role(name: role['name']) if role['name'] == role_name
     end
-    sleep 5
+    
+    # Wait for role deletion to propagate
+    SpecUtils.wait_for_condition(max_wait: 10, interval: 1, description: 'role deletion to propagate') do
+      all_roles = @client.load_all_roles
+      all_roles['roles'].none? { |role| role['name'] == role_name }
+    end
 
     user_args = build(:user)
     test_user = @client.create_test_user(**user_args)['user']

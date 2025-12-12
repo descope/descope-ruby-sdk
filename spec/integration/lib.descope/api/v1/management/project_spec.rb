@@ -8,15 +8,29 @@ describe Descope::Api::V1::Management::Project do
 
     @client = DescopeClient.new(Configuration.config)
     @export_output = @client.export_project
+    @original_project_name = nil
   end
 
   context 'Test project methods' do
+    before(:all) do
+      # Get the current project name before we modify it
+      # Store it so we can restore it later
+      begin
+        @original_project_name = @client.export_project['project']['name']
+      rescue StandardError
+        @original_project_name = 'Ruby-SDK-Prod'
+      end
+    end
+
     after(:all) do
-      @client.rename_project('Ruby-SDK-Prod')
+      # Restore the original project name
+      @client.rename_project(@original_project_name) if @original_project_name
     end
 
     it 'should rename a project' do
-      @client.rename_project('TEST-Ruby-SDK-Prod')
+      # Use a unique name based on build prefix to avoid conflicts
+      unique_name = "#{SpecUtils.build_prefix}TEST-Ruby-SDK-Prod"
+      @client.rename_project(unique_name)
     end
 
     it 'should export a project' do

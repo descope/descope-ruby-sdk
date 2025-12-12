@@ -3,31 +3,25 @@
 require 'spec_helper'
 
 def poll_for_session(descope_client, pending_ref)
-  max_tries = 15
-  i = 0
-  done = false
-  while !done && i < max_tries
+  @client.logger.info('Waiting for session to be created...')
+  
+  SpecUtils.wait_for_condition(max_wait: 60, interval: 3, description: 'enchanted link session') do
     begin
-      i += 1
-      @client.logger.info('waiting 4 seconds for session to be created...')
-      sleep(4)
-      print '.'
       @client.logger.info("Getting session for pending_ref: #{pending_ref}...")
       jwt_response = descope_client.enchanted_link_get_session(pending_ref)
-      done = true
+      
+      if jwt_response
+        @client.logger.info("jwt_response: #{jwt_response}")
+        refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME]['jwt']
+        @client.logger.info("refresh_token: #{refresh_token}")
+        return refresh_token
+      end
+      
+      false
     rescue Descope::AuthException, Descope::Unauthorized => e
-      @client.logger.info("Failed pending session, err: #{e}")
-     nil
+      @client.logger.info("Waiting for session, err: #{e}")
+      false
     end
-
-    next unless jwt_response
-
-    @client.logger.info("jwt_response: #{jwt_response}")
-    refresh_token = jwt_response[Descope::Mixins::Common::REFRESH_SESSION_TOKEN_NAME]['jwt']
-
-    @client.logger.info("refresh_token: #{refresh_token}")
-    done = true
-    return refresh_token
   end
 end
 
@@ -62,7 +56,11 @@ describe Descope::Api::V1::Auth::EnchantedLink do
     all_users['users'].each do |user|
       if user['middleName'] == "#{SpecUtils.build_prefix}Ruby-SDK-User" 
         @client.logger.info("Deleting ruby spec test user #{user['loginIds'][0]}")
-        @client.delete_user(user['loginIds'][0])
+        begin
+          @client.delete_user(user['loginIds'][0])
+        rescue Descope::NotFound => e
+          @client.logger.info("User already deleted: #{e.message}")
+        end
       end
     end
   end

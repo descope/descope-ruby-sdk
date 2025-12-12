@@ -35,4 +35,19 @@ module SpecUtils
     prefix = ENV['GITHUB_RUN_NUMBER'] || ENV['GITHUB_RUN_ID']
     prefix ? "build#{prefix}-" : "local-#{Time.now.to_i}-"
   end
+
+  def wait_for_condition(max_wait: 60, interval: 2, description: 'condition')
+    start = Time.now
+    loop do
+      result = yield
+      return result if result
+
+      elapsed = Time.now - start
+      if elapsed > max_wait
+        raise "Timeout after #{max_wait}s waiting for #{description}"
+      end
+
+      sleep interval
+    end
+  end
 end
