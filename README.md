@@ -37,6 +37,17 @@ Be aware that only the management key is truncated, and the JWT responses are pr
 
 Do not run with log level debug on Production!
 
+### Logging
+
+You can customize logging behavior:
+
+```ruby
+# Use your application's logger
+descope_client = Descope::Client.new(
+  project_id: '<project_id>',
+  logger: Rails.logger  # or any Logger-compatible object
+)
+```
 
 ## Authentication Methods
 These sections show how to use the SDK to perform various authentication/authorization functions:
