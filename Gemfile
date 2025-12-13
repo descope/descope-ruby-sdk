@@ -15,7 +15,7 @@ group :test do
   gem 'rack-test', '2.2.0', require: false
   gem 'rotp', '6.3.0', require: false
   gem 'rspec', '3.13.2', require: false
-  gem 'selenium-webdriver', '4.34.0', require: false
+  gem 'selenium-webdriver', '4.38.0', require: false
   gem 'simplecov', '0.22.0', require: false
   gem 'super_diff', '0.16.0', require: false
 end
