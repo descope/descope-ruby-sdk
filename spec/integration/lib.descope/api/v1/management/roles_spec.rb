@@ -108,8 +108,17 @@ describe Descope::Api::V1::Management::Role do
     tenant_id = @client.create_tenant(name: @tenant_name)['id']
     @client.logger.info("Created tenant with id: #{tenant_id}")
     
-    # Small delay to ensure tenant is fully created before using it
-    sleep(0.5)
+    # Wait for tenant to be available (polling, up to 5 seconds)
+    timeout = 5.0
+    interval = 0.1
+    waited = 0.0
+    loop do
+      tenants = @client.search_all_tenants(names: [@tenant_name])['tenants']
+      break if tenants.any? { |t| t['id'] == tenant_id }
+      raise "Tenant #{@tenant_name} not available after #{timeout} seconds" if waited >= timeout
+      sleep(interval)
+      waited += interval
+    end
 
     # Create roles
     @client.logger.info("creating #{@role_viewer} role")
