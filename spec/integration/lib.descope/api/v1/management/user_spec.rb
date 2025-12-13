@@ -262,7 +262,7 @@ describe Descope::Api::V1::Management::User do
     @client.password_sign_in(login_id: user['loginIds'][0], password: new_password)
     
     # Verify old password no longer works.
-    expect { @client.password_sign_in(login_id: user['loginIds'][0], password:) }.to raise_error(Descope::Unauthorized)
+    expect { @client.password_sign_in(login_id: user['loginIds'][0], password:) }.to raise_error(Descope::Unauthorized, /"Invalid signin credentials"/)
   end
 
   it 'should update create tenant, add to user, remove from user and delete tenant' do
