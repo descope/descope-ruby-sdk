@@ -1,5 +1,26 @@
 # Change Log
 
+## [1.1.0](https://github.com/descope/descope-ruby-sdk/compare/descope-v1.0.7...descope/v1.1.0) (2025-12-13)
+
+
+### Features
+
+* add release-please workflow for automated releases ([#157](https://github.com/descope/descope-ruby-sdk/issues/157)) ([5bbfb9b](https://github.com/descope/descope-ruby-sdk/commit/5bbfb9be77c753bd1c99060c92d3d1204ce6e803))
+
+
+### Bug Fixes
+
+* examples/ruby-on-rails-api/descope/Gemfile to reduce vulnerabilities ([#122](https://github.com/descope/descope-ruby-sdk/issues/122)) ([85e77ea](https://github.com/descope/descope-ruby-sdk/commit/85e77ea9a511f208e4818e7231c50416b58f9437))
+* examples/ruby-on-rails-api/descope/Gemfile to reduce vulnerabilities ([#124](https://github.com/descope/descope-ruby-sdk/issues/124)) ([7fcd9f5](https://github.com/descope/descope-ruby-sdk/commit/7fcd9f5ed9e1af7c3adceca403da5585f0768eb9))
+* Parse Set-Cookie headers directly to handle custom domain cookies when RestClient filtering fails ([#150](https://github.com/descope/descope-ruby-sdk/issues/150)) ([bb94536](https://github.com/descope/descope-ruby-sdk/commit/bb945368b76199df3bfa0dbd635756cd28dc2709))
+* resolve integration test failures ([#162](https://github.com/descope/descope-ruby-sdk/issues/162)) ([ea880ea](https://github.com/descope/descope-ruby-sdk/commit/ea880ea91860ef67b97083a8e23c1580df95205b))
+* unparallel tests ([#165](https://github.com/descope/descope-ruby-sdk/issues/165)) ([9a08c74](https://github.com/descope/descope-ruby-sdk/commit/9a08c74a7b8e5e02dc3816aa14b61a533d1c5962))
+
+
+### Performance Improvements
+
+* optimize test suite for parallel execution with 3-5x speedup ([#159](https://github.com/descope/descope-ruby-sdk/issues/159)) ([da42969](https://github.com/descope/descope-ruby-sdk/commit/da4296952c936d028d6655bf503fc6dca0e568bb))
+
 ## [1.0.4](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.0.0...descope/v1.0.4) (2024-02-13)
 
 
