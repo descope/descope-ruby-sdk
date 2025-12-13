@@ -129,7 +129,7 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    super_diff (0.17.0)
+    super_diff (0.18.0)
       attr_extras (>= 6.2.4)
       diff-lcs
       patience_diff
@@ -157,7 +157,7 @@ DEPENDENCIES
   rubocop-rails (= 2.34.0)
   selenium-webdriver (= 4.38.0)
   simplecov (= 0.22.0)
-  super_diff (= 0.17.0)
+  super_diff (= 0.18.0)
 
 BUNDLED WITH
    2.5.6
