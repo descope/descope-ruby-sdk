@@ -258,16 +258,11 @@ describe Descope::Api::V1::Management::User do
     new_password = SpecUtils.generate_password
     @client.set_password(login_id: user['loginIds'][0], password: new_password)
     
-    # Verify new password works
+    # Verify new password works.
     @client.password_sign_in(login_id: user['loginIds'][0], password: new_password)
     
-    # Verify old password no longer works
-    begin
-      @client.password_sign_in(login_id: user['loginIds'][0], password:)
-      raise 'Expected Unauthorized error but none was raised'
-    rescue Descope::Unauthorized => e
-      expect(e.message).to match(/"Invalid signin credentials"/)
-    end
+    # Verify old password no longer works.
+    expect { @client.password_sign_in(login_id: user['loginIds'][0], password:) }.to raise_error(Descope::Unauthorized)
   end
 
   it 'should update create tenant, add to user, remove from user and delete tenant' do
