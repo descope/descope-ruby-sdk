@@ -250,16 +250,21 @@ describe Descope::Api::V1::Management::User do
     password = SpecUtils.generate_password
     user = @client.create_user(**user_args)['user']
     
-    # Set initial password for user without password
+    # Set initial password for user without password.
     @client.set_password(login_id: user['loginIds'][0], password:)
     @client.password_sign_in(login_id: user['loginIds'][0], password:)
 
-    # Set new password and verify old password no longer works
+    # Set new password and verify old password no longer works.
     new_password = SpecUtils.generate_password
     @client.set_password(login_id: user['loginIds'][0], password: new_password)
     
+    # Verify new password works
+    @client.password_sign_in(login_id: user['loginIds'][0], password: new_password)
+    
+    # Verify old password no longer works
     begin
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
+      raise 'Expected Unauthorized error but none was raised'
     rescue Descope::Unauthorized => e
       expect(e.message).to match(/"Invalid signin credentials"/)
     end
@@ -316,7 +321,7 @@ describe Descope::Api::V1::Management::User do
     user_args = build(:user)
     user = @client.create_test_user(**user_args)['user']
     
-    # Wait for test user to be fully propagated before generating login methods
+    # Wait for test user to be fully propagated before generating login methods.
     SpecUtils.wait_for_condition(max_wait: 15, interval: 2, description: 'test user to be ready') do
       begin
         @client.load_user(user['loginIds'][0])
