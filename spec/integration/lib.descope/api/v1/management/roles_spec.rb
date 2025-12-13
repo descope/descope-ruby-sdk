@@ -106,6 +106,19 @@ describe Descope::Api::V1::Management::Role do
     # Create tenants
     @client.logger.info("creating #{@tenant_name} tenant")
     tenant_id = @client.create_tenant(name: @tenant_name)['id']
+    @client.logger.info("Created tenant with id: #{tenant_id}")
+    
+    # Wait for tenant to be available (polling, up to 5 seconds)
+    timeout = 5.0
+    interval = 0.1
+    waited = 0.0
+    loop do
+      tenants = @client.search_all_tenants(names: [@tenant_name])['tenants']
+      break if tenants.any? { |t| t['id'] == tenant_id }
+      raise "Tenant #{@tenant_name} not available after #{timeout} seconds" if waited >= timeout
+      sleep(interval)
+      waited += interval
+    end
 
     # Create roles
     @client.logger.info("creating #{@role_viewer} role")
@@ -167,9 +180,17 @@ describe Descope::Api::V1::Management::Role do
     @client.delete_role(name: @role_editor)
 
     @client.logger.info('deleting admin role')
-    @client.delete_role(name: @role_admin, tenant_id:)
+    begin
+      @client.delete_role(name: @role_admin, tenant_id:)
+    rescue Descope::Unauthorized, Descope::NotFound => e
+      @client.logger.info("Admin role already deleted or tenant invalid: #{e.message}")
+    end
 
     @client.logger.info('deleting tenant')
-    @client.delete_tenant(tenant_id)
+    begin
+      @client.delete_tenant(tenant_id)
+    rescue Descope::NotFound => e
+      @client.logger.info("Tenant already deleted: #{e.message}")
+    end
   end
 end

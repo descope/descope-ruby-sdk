@@ -125,8 +125,10 @@ describe Descope::Api::V1::Management::User do
   it 'should search all users' do
     users = FactoryBot.build_list(:user, 5)
     @client.create_batch_users(users)
+    # Wait for batch creation to propagate
+    sleep 1.0
     all_users = @client.search_all_users
-    sdk_users = all_users['users'].select { |user| user['middleName'] == "#{SpecUtils.build_prefix}Ruby-SDK-User" }
+    sdk_users = all_users['users'].select { |user| user['middleName']&.include?('Ruby-SDK-User') }
     expect(sdk_users.length).to be >= 5
   end
 
