@@ -9,7 +9,7 @@ group :development do
 end
 
 group :test do
-  gem 'factory_bot', '6.5.4', require: false
+  gem 'factory_bot', '6.5.6', require: false
   gem 'faker', require: false
   gem 'parallel_tests', require: false
   gem 'rack-test', '2.2.0', require: false
