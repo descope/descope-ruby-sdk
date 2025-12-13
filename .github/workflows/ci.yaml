@@ -42,8 +42,8 @@ jobs:
       - name: Run RSpec Unit Tests (Parallel)
         run: bundle exec parallel_rspec spec/lib.descope -n ${{ matrix.ci_node_total }} --only-group ${{ matrix.ci_node_index }}
 
-  integration-tests-auth:
-    name: Integration Tests - Auth
+  integration-tests:
+    name: Integration Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -61,19 +61,6 @@ jobs:
           DESCOPE_PROJECT_ID: ${{ secrets.DESCOPE_PROJECT_ID }}
         run: bundle exec rspec spec/integration/lib.descope/api/v1/auth
 
-  integration-tests-management:
-    name: Integration Tests - Management
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-
-      - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
-        with:
-          bundler-cache: true  # Cache bundle based on Gemfile.lock
-
       - name: Run Management Integration Tests (excluding global state tests)
         env:
           DESCOPE_MANAGEMENT_KEY: ${{ secrets.DESCOPE_MANAGEMENT_KEY }}
@@ -82,19 +69,6 @@ jobs:
           bundle exec rspec spec/integration/lib.descope/api/v1/management \
             --exclude-pattern "spec/integration/lib.descope/api/v1/management/project_spec.rb" \
             --exclude-pattern "spec/integration/lib.descope/api/v1/management/authz_spec.rb"
-
-  integration-tests-global:
-    name: Integration Tests - Global State
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-
-      - uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
-        with:
-          bundler-cache: true  # Cache bundle based on Gemfile.lock
 
       - name: Run Global State Integration Tests (project & authz)
         env:
