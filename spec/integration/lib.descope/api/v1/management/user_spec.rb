@@ -248,12 +248,17 @@ describe Descope::Api::V1::Management::User do
   it 'should set user password' do
     user_args = build(:user)
     password = SpecUtils.generate_password
-    user = @client.create_user(**user_args, password:)['user']
+    user = @client.create_user(**user_args)['user']
+    
+    # Set initial password for user without password
+    @client.set_password(login_id: user['loginIds'][0], password:)
     @client.password_sign_in(login_id: user['loginIds'][0], password:)
 
+    # Set new password and verify old password no longer works
+    new_password = SpecUtils.generate_password
+    @client.set_password(login_id: user['loginIds'][0], password: new_password)
+    
     begin
-      new_password = SpecUtils.generate_password
-      @client.set_password(login_id: user['loginIds'][0], password: new_password)
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
     rescue Descope::Unauthorized => e
       expect(e.message).to match(/"Invalid signin credentials"/)
@@ -310,6 +315,18 @@ describe Descope::Api::V1::Management::User do
     @client.delete_all_test_users
     user_args = build(:user)
     user = @client.create_test_user(**user_args)['user']
+    
+    # Wait for test user to be fully propagated before generating login methods
+    SpecUtils.wait_for_condition(max_wait: 15, interval: 2, description: 'test user to be ready') do
+      begin
+        @client.load_user(user['loginIds'][0])
+        true
+      rescue StandardError => e
+        @client.logger.info("Waiting for test user propagation: #{e.message}")
+        false
+      end
+    end
+    
     login_info = @client.generate_otp_for_test_user(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id: user['loginIds'][0])
     expect(login_info['loginId']).to eq(user['loginIds'][0])
     expect(login_info['code']).to_not be_nil
