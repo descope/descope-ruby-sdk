@@ -14,6 +14,7 @@ require 'descope/api/v1/management/sso_application'
 require 'descope/api/v1/management/sso_settings'
 require 'descope/api/v1/management/scim'
 require 'descope/api/v1/management/password'
+require 'descope/api/v1/management/outbound_app'
 
 module Descope
   module Api
@@ -34,6 +35,7 @@ module Descope
         include Descope::Api::V1::Management::SSOSettings
         include Descope::Api::V1::Management::SCIM
         include Descope::Api::V1::Management::Password
+        include Descope::Api::V1::Management::OutboundApp
       end
     end
   end
