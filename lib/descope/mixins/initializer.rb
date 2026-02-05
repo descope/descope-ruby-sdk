@@ -6,7 +6,7 @@ module Descope
   module Mixins
     # Helper class for initializing the Descope API
     module Initializer
-      attr_accessor :public_keys, :mlock
+      attr_accessor :public_keys, :mlock, :license_type
 
       def initialize(config)
         options = Hash[config.map { |(k, v)| [k.to_sym, v] }]
@@ -33,6 +33,7 @@ module Descope
         @skip_verify = options[:skip_verify]
         @secure = !@skip_verify
         @management_key = options[:management_key] || ENV['DESCOPE_MANAGEMENT_KEY']
+        @license_type = nil
         @logger.debug("Management Key ID: #{@management_key}")
         @timeout_seconds = options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
         @jwt_validation_leeway = options[:jwt_validation_leeway] || Common::DEFAULT_JWT_VALIDATION_LEEWAY
@@ -70,6 +71,7 @@ module Descope
         initialize_v1(options)
         @default_pswd = options.fetch(:management_key, ENV['DESCOPE_MANAGEMENT_KEY'])
         authorization_header
+        @license_type = fetch_license if @management_key
       end
 
       def initialize_v1(_options)
@@ -77,6 +79,18 @@ module Descope
         extend Descope::Api::V1::Management
         extend Descope::Api::V1::Auth
         extend Descope::Api::V1::Session
+      end
+
+      def fetch_license
+        return nil unless @management_key
+
+        begin
+          response = get('/v1/mgmt/license')
+          response['licenseType']
+        rescue StandardError => e
+          @logger.warn("License handshake failed, continuing without header: #{e.message}")
+          nil
+        end
       end
     end
   end

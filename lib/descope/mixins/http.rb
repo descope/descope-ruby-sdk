@@ -125,6 +125,13 @@ module Descope
       end
 
       def request(method, uri, body = {}, extra_headers = {})
+        # Only add license header for management API requests (not auth requests)
+        if @license_type && uri.to_s.include?('/mgmt/')
+          @headers['x-descope-license'] = @license_type
+        else
+          @headers.delete('x-descope-license')
+        end
+
         # @headers is getting the authorization header merged in initializer.rb
         headers_debug = @headers.dup
         if headers_debug['Authorization']
