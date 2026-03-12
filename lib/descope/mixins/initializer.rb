@@ -32,9 +32,16 @@ module Descope
 
         @skip_verify = options[:skip_verify]
         @secure = !@skip_verify
+
+        # Warn if TLS verification is disabled (for development only)
+        if @skip_verify
+          @logger.warn('⚠️  TLS certificate verification disabled (skip_verify=true). This is INSECURE and should only be used in local development environments.')
+        end
+
         @management_key = options[:management_key] || ENV['DESCOPE_MANAGEMENT_KEY']
         @logger.debug("Management Key ID: #{@management_key}")
         @timeout_seconds = options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
+        @timeout = @timeout_seconds  # Set timeout for HTTP requests
         @jwt_validation_leeway = options[:jwt_validation_leeway] || Common::DEFAULT_JWT_VALIDATION_LEEWAY
 
         if @project_id.to_s.empty?
