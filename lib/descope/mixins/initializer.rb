@@ -35,7 +35,7 @@ module Descope
 
         # Warn if TLS verification is disabled (for development only)
         if @skip_verify
-          @logger.warn('⚠️  TLS certificate verification disabled (skip_verify=true). This is INSECURE and should only be used in local development environments.')
+          @logger.warn('SECURITY WARNING: TLS certificate verification disabled (skip_verify=true). This is INSECURE and should only be used in local development environments.')
         end
 
         @management_key = options[:management_key] || ENV['DESCOPE_MANAGEMENT_KEY']

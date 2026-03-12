@@ -2,7 +2,7 @@
 require 'descope/mixins/common'
 require 'addressable/uri'
 require 'retryable'
-require 'cgi'
+require 'openssl'
 require_relative '../exception'
 
 module Descope
@@ -97,7 +97,7 @@ module Descope
       def parse_cookie_value(cookie_header, cookie_name)
         # Extract cookie value from Set-Cookie header using standard library
         # Format: "cookieName=cookieValue; attribute1=value1; attribute2=value2"
-        # Use CGI::Cookie to parse the Set-Cookie header according to RFC 6265
+        # Extract cookie value from Set-Cookie header by splitting on semicolons
         begin
           # Extract just the cookie name=value part (before first semicolon)
           cookie_parts = cookie_header.split(';', 2)
@@ -107,8 +107,8 @@ module Descope
           if name_value.start_with?("#{cookie_name}=")
             # Extract value after the '=' sign
             cookie_value = name_value.split('=', 2)[1]
-            # CGI.unescape to handle any URL-encoded characters
-            CGI.unescape(cookie_value).strip
+            # Return cookie value (JWT tokens should not be URL-decoded)
+            cookie_value.strip
           else
             nil
           end
