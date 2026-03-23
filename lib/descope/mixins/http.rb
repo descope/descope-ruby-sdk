@@ -18,6 +18,9 @@ module Descope
       MIN_REQUEST_RETRY_DELAY = 250
       BASE_DELAY = 100
 
+      TRANSIENT_RETRY_STATUS_CODES = [503, 521, 522, 524, 530].freeze
+      TRANSIENT_RETRY_DELAYS = [0.1, 5.0, 5.0].freeze
+
       %i[get post post_file post_form put patch delete delete_with_body].each do |method|
         define_method(method) do |uri, body = {}, extra_headers = {}, pswd = nil|
           body = body.delete_if { |_, v| v.nil? }
@@ -120,6 +123,13 @@ module Descope
 
       def request_with_retry(method, uri, body = {}, extra_headers = {}, pswd = nil)
         Retryable.retryable(retry_options) do
+          TRANSIENT_RETRY_DELAYS.each do |delay|
+            begin
+              return request(method, uri, body, extra_headers)
+            rescue Descope::TransientError
+              sleep(delay)
+            end
+          end
           request(method, uri, body, extra_headers)
         end
       end
@@ -157,6 +167,8 @@ module Descope
         when 405       then raise Descope::MethodNotAllowed.new(result.body, code: result.code, headers: result.headers)
         when 429       then raise Descope::RateLimitException.new(result.body, code: result.code, headers: result.headers)
         when 500       then raise Descope::ServerError.new(result.body, code: result.code, headers: result.headers)
+        when *TRANSIENT_RETRY_STATUS_CODES
+          raise Descope::TransientError.new(result.body, code: result.code, headers: result.headers)
         else
           raise Descope::Unsupported.new(result.body, code: result.code, headers: result.headers)
         end

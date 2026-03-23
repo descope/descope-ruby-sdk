@@ -47,4 +47,6 @@ module Descope
   class AccessDenied < Descope::HTTPError; end
   class RateLimitException < Descope::HTTPError; end
   class RequestTimeout < Descope::HTTPError; end
+  # exception for transient server errors that should be retried (503, 521, 522, 524, 530)
+  class TransientError < Descope::HTTPError; end
 end
