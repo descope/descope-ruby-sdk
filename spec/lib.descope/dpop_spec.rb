@@ -11,10 +11,12 @@ describe Descope::DPoP do
   let(:subject_class) do
     Class.new do
       include Descope::DPoP
+      # Re-expose private helpers for unit testing
       public :pad_base64, :compute_jwk_thumbprint, :htu_matches?, :normalize_uri,
              :extract_token_claims, :import_jwk_public_key, :verify_dpop_signature,
              :validate_dpop_payload_claims, :validate_dpop_ath, :validate_dpop_jkt,
-             :import_ec_public_key, :import_rsa_public_key, :verify_ec_dpop_signature
+             :import_ec_public_key, :import_rsa_public_key, :verify_ec_dpop_signature,
+             :get_dpop_thumbprint
     end
   end
 
@@ -185,26 +187,34 @@ describe Descope::DPoP do
     it 'returns false for invalid URI' do
       expect(subject.htu_matches?('not-a-uri', 'https://api.example.com/res')).to be false
     end
+
+    it 'treats empty path and "/" as equivalent (RFC 3986 §6.2.3)' do
+      expect(subject.htu_matches?('https://api.example.com', 'https://api.example.com/')).to be true
+      expect(subject.htu_matches?('https://api.example.com/', 'https://api.example.com')).to be true
+    end
   end
 
   # ── #compute_jwk_thumbprint ──────────────────────────────────────────────────
 
   describe '#compute_jwk_thumbprint' do
     it 'computes correct EC thumbprint (RFC 7638 example)' do
-      # Test vector from RFC 7638 §3.3
+      # Test vector from RFC 7638 §3.1 — the canonical thumbprint of the example key.
+      # Canonical JSON: {"crv":"P-256","kty":"EC","x":"f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
+      #                  "y":"x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0"}
+      # Expected SHA-256 base64url thumbprint per RFC 7638 §3.3:
+      #   NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs
       jwk = {
         'kty' => 'EC',
         'crv' => 'P-256',
-        'x' => '0tbHIv9LPUBT5MGPKK2Nw_ZsqYMgUFNcQIkFv4QD_I8',
-        'y' => 'qMJt6sUrqFbIHi9a4Zl5B5S6xv2GmQq6M-X39QfNgzg',
-        'd' => 'somePrivateKey'
+        'x' => 'f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU',
+        'y' => 'x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0',
+        'use' => 'sig',
+        'kid' => 'Public key used in JWK spec Appendix B.1',
+        'd' => 'somePrivateKey'  # private material must be excluded from thumbprint
       }
       thumbprint = subject.compute_jwk_thumbprint(jwk)
-      # The result should be a non-empty base64url string
-      expect(thumbprint).to be_a(String)
-      expect(thumbprint).not_to be_empty
-      # Verify it's base64url (no padding, no +/)
-      expect(thumbprint).not_to include('=', '+', '/')
+      # Exact value from RFC 7638 §3.3
+      expect(thumbprint).to eq('NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs')
     end
 
     it 'computes RSA thumbprint using only e, kty, n' do
@@ -416,6 +426,70 @@ describe Descope::DPoP do
       expect do
         subject.validate_dpop_proof(dpop_proof: bad_proof, method: method, request_url: url, session_token: session_token)
       end.to raise_error(Descope::AuthException, /private key/)
+    end
+
+    it 'raises when RSA JWK contains CRT private parameters (p, q, dp, dq, qi)' do
+      session_token = build_rsa_token_for(rsa_key)
+      proof, jwk = build_dpop_proof(rsa_key: rsa_key, alg: 'RS256', htm: method, htu: url, access_token: session_token)
+      %w[p q dp dq qi].each do |param|
+        jwk_with_param = jwk.merge(param => 'private_crt_material')
+        parts = proof.split('.')
+        bad_header = b64url_encode(JSON.dump({ 'typ' => 'dpop+jwt', 'alg' => 'RS256', 'jwk' => jwk_with_param }))
+        bad_proof = "#{bad_header}.#{parts[1]}.#{parts[2]}"
+        expect do
+          subject.validate_dpop_proof(dpop_proof: bad_proof, method: method, request_url: url, session_token: session_token)
+        end.to raise_error(Descope::AuthException, /private key/), "expected rejection for RSA param '#{param}'"
+      end
+    end
+  end
+
+  # ── #import_jwk_public_key — alg/kty cross-check ────────────────────────────
+
+  describe '#import_jwk_public_key alg/kty mismatch' do
+    let(:ec_key) { OpenSSL::PKey::EC.generate('prime256v1') }
+    let(:rsa_key) { OpenSSL::PKey::RSA.generate(2048) }
+
+    it 'raises when RS256 alg is used with EC kty' do
+      jwk = ec_key_to_jwk(ec_key)
+      expect do
+        subject.import_jwk_public_key(jwk, 'RS256')
+      end.to raise_error(Descope::AuthException, /alg\/kty mismatch/)
+    end
+
+    it 'raises when ES256 alg is used with RSA kty' do
+      jwk = rsa_key_to_jwk(rsa_key)
+      expect do
+        subject.import_jwk_public_key(jwk, 'ES256')
+      end.to raise_error(Descope::AuthException, /alg\/kty mismatch/)
+    end
+
+    it 'raises when EdDSA alg is used with RSA kty' do
+      jwk = rsa_key_to_jwk(rsa_key)
+      expect do
+        subject.import_jwk_public_key(jwk, 'EdDSA')
+      end.to raise_error(Descope::AuthException, /alg\/kty mismatch/)
+    end
+  end
+
+  # ── #import_ec_public_key — coordinate length validation ────────────────────
+
+  describe '#import_ec_public_key coordinate length validation' do
+    it 'raises when x coordinate has wrong byte length for P-256' do
+      jwk = { 'kty' => 'EC', 'crv' => 'P-256',
+               'x' => Base64.urlsafe_encode64('short', padding: false),
+               'y' => Base64.urlsafe_encode64('y' * 32, padding: false) }
+      expect do
+        subject.import_ec_public_key(jwk)
+      end.to raise_error(Descope::AuthException, /x coordinate has wrong length/)
+    end
+
+    it 'raises when y coordinate has wrong byte length for P-256' do
+      jwk = { 'kty' => 'EC', 'crv' => 'P-256',
+               'x' => Base64.urlsafe_encode64('x' * 32, padding: false),
+               'y' => Base64.urlsafe_encode64('short', padding: false) }
+      expect do
+        subject.import_ec_public_key(jwk)
+      end.to raise_error(Descope::AuthException, /y coordinate has wrong length/)
     end
   end
 end

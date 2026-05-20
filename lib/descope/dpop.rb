@@ -32,6 +32,11 @@ module Descope
     # If the session_token has no cnf.jkt claim, validation is skipped (token is not DPoP-bound).
     # Raises Descope::AuthException if proof is invalid.
     #
+    # NOTE — jti replay protection (RFC 9449 §11.1): this SDK is stateless and has no
+    # server-side storage, so jti uniqueness enforcement is out of scope. Callers that
+    # require replay protection must implement their own jti cache. This matches the
+    # go-sdk reference implementation (descope/go-sdk#737).
+    #
     # @param dpop_proof [String] the value of the DPoP HTTP header
     # @param method [String] the HTTP method of the request (e.g. "GET", "POST")
     # @param request_url [String] the full URL of the request
@@ -77,7 +82,17 @@ module Descope
         raise Descope::AuthException.new('DPoP proof JWK must not be a symmetric key (kty=oct)', code: 400)
       end
 
-      if jwk_dict.key?('d')
+      kty = jwk_dict['kty']
+      private_key_present =
+        case kty
+        when 'RSA'
+          %w[d p q dp dq qi].any? { |param| jwk_dict.key?(param) }
+        when 'EC', 'OKP'
+          jwk_dict.key?('d')
+        else
+          jwk_dict.key?('d')
+        end
+      if private_key_present
         raise Descope::AuthException.new('DPoP proof JWK must not contain a private key', code: 400)
       end
 
@@ -107,6 +122,8 @@ module Descope
       validate_dpop_jkt(jwk_dict, stored_jkt)
     end
 
+    private
+
     # Extracts cnf.jkt from parsed JWT claims hash.
     # Returns nil if not present.
     def get_dpop_thumbprint(claims)
@@ -117,8 +134,6 @@ module Descope
 
       cnf['jkt']
     end
-
-    private
 
     # Extract JWT claims without signature verification (used to check cnf.jkt)
     def extract_token_claims(session_token)
@@ -210,9 +225,19 @@ module Descope
       Base64.urlsafe_encode64(Digest::SHA256.digest(sorted_json), padding: false)
     end
 
-    # Imports a public key from a JWK dict.
+    # Imports a public key from a JWK dict, cross-checking alg against kty.
     def import_jwk_public_key(jwk, alg)
       kty = jwk['kty']
+
+      # Validate alg/kty compatibility
+      if alg.start_with?('RS', 'PS') && kty != 'RSA'
+        raise Descope::AuthException.new("alg/kty mismatch: alg '#{alg}' requires kty=RSA but got '#{kty}'", code: 400)
+      elsif alg.start_with?('ES') && kty != 'EC'
+        raise Descope::AuthException.new("alg/kty mismatch: alg '#{alg}' requires kty=EC but got '#{kty}'", code: 400)
+      elsif alg == 'EdDSA' && kty != 'OKP'
+        raise Descope::AuthException.new("alg/kty mismatch: alg 'EdDSA' requires kty=OKP but got '#{kty}'", code: 400)
+      end
+
       case kty
       when 'EC'
         import_ec_public_key(jwk)
@@ -229,6 +254,13 @@ module Descope
       raise Descope::AuthException.new("Failed to import JWK public key: #{e.message}", code: 400)
     end
 
+    # Expected byte lengths for EC coordinate values per curve
+    EC_COORD_BYTES = {
+      'P-256' => 32,
+      'P-384' => 48,
+      'P-521' => 66
+    }.freeze
+
     def import_ec_public_key(jwk)
       crv = jwk['crv']
       curve_name = EC_CURVE_MAP[crv]
@@ -237,6 +269,20 @@ module Descope
       group = OpenSSL::PKey::EC::Group.new(curve_name)
       x_bytes = Base64.urlsafe_decode64(pad_base64(jwk['x']))
       y_bytes = Base64.urlsafe_decode64(pad_base64(jwk['y']))
+
+      # Validate coordinate lengths per curve (RFC 7518 §6.2.1.2)
+      expected_len = EC_COORD_BYTES[crv]
+      if x_bytes.bytesize != expected_len
+        raise Descope::AuthException.new(
+          "EC JWK x coordinate has wrong length for #{crv}: expected #{expected_len} bytes, got #{x_bytes.bytesize}", code: 400
+        )
+      end
+      if y_bytes.bytesize != expected_len
+        raise Descope::AuthException.new(
+          "EC JWK y coordinate has wrong length for #{crv}: expected #{expected_len} bytes, got #{y_bytes.bytesize}", code: 400
+        )
+      end
+
       # Uncompressed point: 0x04 || x || y
       point_octets = "\x04".b + x_bytes.b + y_bytes.b
       point = OpenSSL::PKey::EC::Point.new(group, OpenSSL::BN.new(point_octets, 2))
@@ -320,11 +366,13 @@ module Descope
     end
 
     # Strips query, fragment, normalizes scheme/host to downcase, removes default ports.
+    # Per RFC 3986 §6.2.3, an empty path with a present authority is equivalent to "/".
     def normalize_uri(uri)
       scheme = uri.scheme.downcase
       host = uri.host.downcase
       port = uri.port
-      path = uri.path.to_s
+      # Normalize empty path to "/" per RFC 3986 §6.2.3 (scheme-based normalization)
+      path = uri.path.empty? ? '/' : uri.path
 
       # Strip default ports
       port = nil if (scheme == 'https' && port == 443) || (scheme == 'http' && port == 80)
