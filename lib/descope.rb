@@ -1,6 +1,7 @@
 require 'descope/version'
 require 'descope/mixins'
 require 'descope/exception'
+require 'descope/dpop'
 require 'descope/client'
 require 'descope_client'
 
