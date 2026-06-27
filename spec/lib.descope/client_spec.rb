@@ -39,6 +39,11 @@ describe Descope::Client do
   end
 
   describe 'timeout configuration' do
+    it 'prefers the timeout option over timeout_seconds' do
+      client = Descope::Client.new(project_id:, management_key:, timeout: 5, timeout_seconds: 17)
+      expect(client.timeout).to eq(5)
+    end
+
     it 'uses the timeout_seconds option as the HTTP timeout' do
       client = Descope::Client.new(project_id:, management_key:, timeout_seconds: 17)
       expect(client.timeout).to eq(17)
