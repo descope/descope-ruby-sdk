@@ -15,7 +15,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - uses: ruby/setup-ruby@708024e6c902387ab41de36e1669e43b5ee7085e # v1.283.0
+      - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9 # v1.316.0
         with:
           # We are not letting this step to run bundle install, we will do it later
           bundler-cache: false
