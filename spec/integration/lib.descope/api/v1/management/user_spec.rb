@@ -242,7 +242,7 @@ describe Descope::Api::V1::Management::User do
     begin
       @client.expire_password(user['loginIds'][0])
       @client.password_sign_in(login_id: user['loginIds'][0], password:)
-    rescue Descope::ServerError => e
+    rescue Descope::Unauthorized => e
       expect(e.message).to match(/"errorCode":"E062909"/)
     end
   end

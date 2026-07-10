@@ -1283,6 +1283,157 @@ resp["apps"].each do |app|
 end
 ```
 
+### Manage Third Party Applications
+
+You can create, update, patch, delete or load third party (OIDC) applications, and manage their secrets and consents:
+
+```ruby
+# Create a third party application (response includes the generated id and secret)
+resp = descope_client.create_application(
+  name: "My third party app",
+  login_page_url: "https://dummy.com/login"
+)
+id = resp["id"]
+
+# Update (overrides all fields) or patch (only given fields)
+descope_client.update_application(id: id, name: "Updated name", login_page_url: "https://dummy.com/login")
+descope_client.patch_application(id: id, name: "Patched name")
+
+# Load one / all applications
+descope_client.load_application(id)
+descope_client.load_all_applications
+
+# Manage the application secret
+descope_client.get_application_secret(id)
+descope_client.rotate_application_secret(id)
+
+# Delete consents for the application
+descope_client.delete_consents(app_id: id, user_ids: ["U123"])
+
+# Application deletion cannot be undone. Use carefully.
+descope_client.delete_application(id)
+```
+
+### Manage Management Keys
+
+Create and manage management keys for a project:
+
+```ruby
+# Response includes the key metadata and the one-time cleartext value
+resp = descope_client.create_management_key(
+  name: "CI key",
+  description: "used by CI",
+  expires_in: 0, # 0 = no expiration (seconds)
+  permitted_ips: ["1.2.3.4/32"]
+)
+
+descope_client.update_management_key(id: "key-id", name: "renamed CI key")
+descope_client.get_management_key(id: "key-id")
+descope_client.search_management_keys(status: "active")
+descope_client.delete_management_key(id: "key-id")
+```
+
+### Manage Engines
+
+```ruby
+resp = descope_client.create_engine(name: "my-engine") # secret returned only here and on rotate
+descope_client.update_engine(id: resp["id"], name: "renamed-engine")
+descope_client.load_engine(id: resp["id"])
+descope_client.load_all_engines
+descope_client.rotate_engine_secret(id: resp["id"])
+descope_client.delete_engine(id: resp["id"])
+```
+
+### Manage Descopers
+
+```ruby
+descope_client.create_descoper([{ loginId: "admin@descope.com", roleNames: ["Descoper"] }])
+descope_client.update_descoper(id: "U123", attributes: { name: "Admin" })
+descope_client.get_descoper(id: "U123")
+descope_client.search_descopers
+descope_client.delete_descoper(id: "U123")
+```
+
+### Manage Lists
+
+Manage allow/deny lists of IPs and text values:
+
+```ruby
+list = descope_client.create_list(name: "blocklist", type: "ip")
+descope_client.update_list(id: list["id"], name: "blocklist", type: "ip")
+descope_client.load_list(list["id"])
+descope_client.load_list_by_name("blocklist")
+descope_client.load_all_lists
+descope_client.import_lists(lists: [{ name: "blocklist", type: "ip", data: ["1.2.3.4"] }])
+
+# IP entries
+descope_client.list_add_ips(id: list["id"], ips: ["1.2.3.4"])
+descope_client.list_remove_ips(id: list["id"], ips: ["1.2.3.4"])
+descope_client.list_check_ip(id: list["id"], ip: "1.2.3.4")
+
+# Text entries
+descope_client.list_add_texts(id: list["id"], texts: ["blocked"])
+descope_client.list_remove_texts(id: list["id"], texts: ["blocked"])
+descope_client.list_check_text(id: list["id"], text: "blocked")
+
+descope_client.clear_list(id: list["id"])
+descope_client.delete_list(id: list["id"])
+```
+
+### Manage JWT Templates
+
+```ruby
+descope_client.create_jwt_template(template: { name: "my-template", authSchema: "default" })
+descope_client.update_jwt_template(template: { id: "T123", name: "my-template" })
+descope_client.list_jwt_templates
+descope_client.load_jwt_template(id: "T123")
+descope_client.delete_jwt_template(id: "T123")
+```
+
+### Manage Scope Claim Mapping
+
+Manage the project-wide OIDC scope-to-claim mapping:
+
+```ruby
+descope_client.set_scope_claim_mapping(mappings: [{ scope: "email", claims: ["email"] }])
+descope_client.get_scope_claim_mapping
+descope_client.delete_scope_claim_mapping
+```
+
+### Query SSO Groups
+
+Query the SSO groups synced to a project's tenant:
+
+```ruby
+descope_client.load_all_groups(tenant_id: "T123")
+descope_client.load_all_groups_for_members(tenant_id: "T123", user_ids: ["U123"], login_ids: ["a@b.com"])
+descope_client.load_all_group_members(tenant_id: "T123", group_id: "G123")
+```
+
+### Manage FGA (Fine-Grained Authorization)
+
+Manage a fine-grained authorization schema and relations:
+
+```ruby
+# Save/load the schema (schema is a DSL string)
+descope_client.fga_save_schema(schema: "model\n  schema 1.1\ntype user")
+descope_client.fga_load_schema
+
+# Create, delete and check relations
+tuples = [{ resource: "doc1", resourceType: "document", relation: "owner", target: "u1", targetType: "user" }]
+descope_client.fga_create_relations(tuples: tuples)
+descope_client.fga_check(tuples: tuples)
+descope_client.fga_delete_relations(tuples: tuples)
+```
+
+### Analytics
+
+Search project analytics:
+
+```ruby
+descope_client.analytics_search(from_ts: 1700000000000, to_ts: 1700086400000, group_by_action: true)
+```
+
 
 ## API Rate Limits
 

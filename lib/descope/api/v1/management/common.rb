@@ -141,6 +141,82 @@ module Descope
           PROJECT_IMPORT_PATH = '/v1/mgmt/project/import'
           PROJECT_DELETE_PATH = '/v1/mgmt/project/delete'
 
+          # FGA (Fine-Grained Authorization)
+          FGA_SAVE_SCHEMA_PATH = '/v1/mgmt/fga/schema'
+          FGA_LOAD_SCHEMA_PATH = '/v1/mgmt/fga/schema'
+          FGA_CREATE_RELATIONS_PATH = '/v1/mgmt/fga/relations'
+          FGA_DELETE_RELATIONS_PATH = '/v1/mgmt/fga/relations/delete'
+          FGA_CHECK_PATH = '/v1/mgmt/fga/check'
+          FGA_LOAD_MAPPABLE_SCHEMA_PATH = '/v1/mgmt/fga/mappable/schema'
+          FGA_SEARCH_MAPPABLE_RESOURCES_PATH = '/v1/mgmt/fga/mappable/resources'
+          FGA_RESOURCES_LOAD_PATH = '/v1/mgmt/fga/resources/load'
+          FGA_RESOURCES_SAVE_PATH = '/v1/mgmt/fga/resources/save'
+
+          # Third Party Application
+          THIRD_PARTY_APP_CREATE_PATH = '/v1/mgmt/thirdparty/app/create'
+          THIRD_PARTY_APP_UPDATE_PATH = '/v1/mgmt/thirdparty/app/update'
+          THIRD_PARTY_APP_PATCH_PATH = '/v1/mgmt/thirdparty/app/patch'
+          THIRD_PARTY_APP_DELETE_PATH = '/v1/mgmt/thirdparty/app/delete'
+          THIRD_PARTY_APP_LOAD_PATH = '/v1/mgmt/thirdparty/app/load'
+          THIRD_PARTY_APP_LOAD_ALL_PATH = '/v1/mgmt/thirdparty/apps/load'
+          THIRD_PARTY_APP_SECRET_PATH = '/v1/mgmt/thirdparty/app/secret'
+          THIRD_PARTY_APP_ROTATE_PATH = '/v1/mgmt/thirdparty/app/rotate'
+          THIRD_PARTY_APP_DELETE_CONSENTS_PATH = '/v1/mgmt/thirdparty/consents/delete'
+          THIRD_PARTY_APP_DELETE_TENANT_CONSENTS_PATH = '/v1/mgmt/thirdparty/consents/delete/tenant'
+
+          # Management Key
+          MGMT_KEY_CREATE_PATH = '/v1/mgmt/managementkey'
+          MGMT_KEY_UPDATE_PATH = '/v1/mgmt/managementkey'
+          MGMT_KEY_GET_PATH = '/v1/mgmt/managementkey'
+          MGMT_KEY_DELETE_PATH = '/v1/mgmt/managementkey/delete'
+          MGMT_KEY_SEARCH_PATH = '/v1/mgmt/managementkey/search'
+
+          # Analytics
+          ANALYTICS_SEARCH_PATH = '/v1/mgmt/analytics/search'
+
+          # Descoper
+          DESCOPER_CREATE_PATH = '/v1/mgmt/descoper'
+          DESCOPER_UPDATE_PATH = '/v1/mgmt/descoper'
+          DESCOPER_GET_PATH = '/v1/mgmt/descoper'
+          DESCOPER_DELETE_PATH = '/v1/mgmt/descoper'
+          DESCOPER_SEARCH_PATH = '/v1/mgmt/descoper/list'
+
+          # Engine
+          ENGINE_CREATE_PATH = '/v1/mgmt/engine/create'
+          ENGINE_UPDATE_PATH = '/v1/mgmt/engine/update'
+          ENGINE_DELETE_PATH = '/v1/mgmt/engine/delete'
+          ENGINE_LOAD_PATH = '/v1/mgmt/engine/load'
+          ENGINE_LOAD_ALL_PATH = '/v1/mgmt/engines/load'
+          ENGINE_ROTATE_SECRET_PATH = '/v1/mgmt/engine/rotate'
+
+          # List
+          LIST_CREATE_PATH = '/v1/mgmt/list'
+          LIST_UPDATE_PATH = '/v1/mgmt/list/update'
+          LIST_DELETE_PATH = '/v1/mgmt/list/delete'
+          LIST_LOAD_PATH = '/v1/mgmt/list'
+          LIST_LOAD_BY_NAME_PATH = '/v1/mgmt/list/name'
+          LIST_LOAD_ALL_PATH = '/v1/mgmt/list/all'
+          LIST_IMPORT_PATH = '/v1/mgmt/list/import'
+          LIST_ADD_IPS_PATH = '/v1/mgmt/list/ip/add'
+          LIST_REMOVE_IPS_PATH = '/v1/mgmt/list/ip/remove'
+          LIST_CHECK_IP_PATH = '/v1/mgmt/list/ip/check'
+          LIST_ADD_TEXTS_PATH = '/v1/mgmt/list/text/add'
+          LIST_REMOVE_TEXTS_PATH = '/v1/mgmt/list/text/remove'
+          LIST_CHECK_TEXT_PATH = '/v1/mgmt/list/text/check'
+          LIST_CLEAR_PATH = '/v1/mgmt/list/clear'
+
+          # JWT Template
+          JWT_TEMPLATE_CREATE_PATH = '/v1/mgmt/jwt/templates/create'
+          JWT_TEMPLATE_UPDATE_PATH = '/v1/mgmt/jwt/templates/update'
+          JWT_TEMPLATE_DELETE_PATH = '/v1/mgmt/jwt/templates/delete'
+          JWT_TEMPLATE_LIST_PATH = '/v1/mgmt/jwt/templates/list'
+          JWT_TEMPLATE_LOAD_PATH = '/v1/mgmt/jwt/templates/load'
+
+          # Scope Claim Mapping (project-wide OIDC scope-to-claim mapping)
+          SCOPE_CLAIM_MAPPING_GET_PATH = '/v1/mgmt/scopeClaimMapping/get'
+          SCOPE_CLAIM_MAPPING_SET_PATH = '/v1/mgmt/scopeClaimMapping/set'
+          SCOPE_CLAIM_MAPPING_DELETE_PATH = '/v1/mgmt/scopeClaimMapping/delete'
+
           def associated_tenants_to_hash_array(associated_tenants = [])
             # Represents a tenant association for a User or Access Key. The tenant_id is required to denote
             # which tenant the user or access key belongs to. The role_names array is an optional list of
