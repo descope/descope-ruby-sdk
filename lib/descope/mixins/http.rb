@@ -2,6 +2,7 @@
 require 'descope/mixins/common'
 require 'addressable/uri'
 require 'retryable'
+require 'openssl'
 require_relative '../exception'
 
 module Descope
@@ -94,11 +95,27 @@ module Descope
       end
 
       def parse_cookie_value(cookie_header, cookie_name)
-        # Extract cookie value from Set-Cookie header
+        # Extract cookie value from Set-Cookie header using standard library
         # Format: "cookieName=cookieValue; attribute1=value1; attribute2=value2"
-        # Only match valid cookie value characters (RFC 6265: exclude whitespace, semicolon, comma)
-        match = cookie_header.match(/#{Regexp.escape(cookie_name)}=([^;]+)/)
-        match ? match[1].strip : nil
+        # Extract cookie value from Set-Cookie header by splitting on semicolons
+        begin
+          # Extract just the cookie name=value part (before first semicolon)
+          cookie_parts = cookie_header.split(';', 2)
+          name_value = cookie_parts[0].strip
+
+          # Parse the name=value pair
+          if name_value.start_with?("#{cookie_name}=")
+            # Extract value after the '=' sign
+            cookie_value = name_value.split('=', 2)[1]
+            # Return cookie value (JWT tokens should not be URL-decoded)
+            cookie_value.strip
+          else
+            nil
+          end
+        rescue StandardError => e
+          @logger.warn("Failed to parse cookie '#{cookie_name}' from Set-Cookie header: #{e.message}")
+          nil
+        end
       end
 
       def encode_uri(uri)
@@ -163,13 +180,20 @@ module Descope
       end
 
       def call(method, url, timeout, headers, body = nil)
-        RestClient::Request.execute(
+        request_options = {
           method: method,
           url: url,
           timeout: timeout,
           headers: headers,
           payload: body
-        )
+        }
+
+        # Apply TLS verification setting if skip_verify is set
+        if defined?(@skip_verify) && @skip_verify
+          request_options[:verify_ssl] = OpenSSL::SSL::VERIFY_NONE
+        end
+
+        RestClient::Request.execute(request_options)
       rescue RestClient::Exception => e
         case e
         when RestClient::RequestTimeout
