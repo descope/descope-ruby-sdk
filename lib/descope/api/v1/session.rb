@@ -8,6 +8,7 @@ module Descope
         include Descope::Mixins::Common
         include Descope::Mixins::Common::EndpointsV1
         include Descope::Mixins::Common::EndpointsV2
+        include Descope::DPoP
 
         def token_validation_key(project_id)
           get("#{PUBLIC_KEY_PATH}/#{project_id}")
