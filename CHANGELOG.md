@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.2.0](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.1.0...descope/v1.2.0) (2026-07-23)
+
+
+### Features
+
+* **management:** add missing management modules for go-sdk parity ([#209](https://github.com/descope/descope-ruby-sdk/issues/209)) ([17c34e0](https://github.com/descope/descope-ruby-sdk/commit/17c34e0059a50cab5a9839de9c476cbe3112cfe1))
+
 ## [1.1.0](https://github.com/descope/descope-ruby-sdk/compare/descope-v1.0.7...descope/v1.1.0) (2025-12-13)
 
 
