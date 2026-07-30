@@ -60,10 +60,11 @@ These sections show how to use the SDK to perform various authentication/authori
 6. [TOTP Authentication](#totp-authentication)
 7. [Passwords](#passwords)
 8. [Session Validation](#session-validation)
-9. [Roles & Permission Validation](#roles-permission-validation)
-10. [Tenant selection](#tenant-selection)
-11. [Signing Out](#signing-out)
-12. [History](#history)
+9. [DPoP Sender-Constrained Tokens](#dpop-sender-constrained-tokens)
+10. [Roles & Permission Validation](#roles-permission-validation)
+11. [Tenant selection](#tenant-selection)
+12. [Signing Out](#signing-out)
+13. [History](#history)
 
 ## API Management Function
 
@@ -409,6 +410,32 @@ The implementation can defer according to your framework of choice. See our [exa
 
 If Roles & Permissions are used, validate them immediately after validating the session. See the [next section](#roles-permission-validation)
 for more information.
+
+### DPoP Sender-Constrained Tokens
+
+[DPoP (Demonstrated Proof of Possession, RFC 9449)](https://www.rfc-editor.org/rfc/rfc9449) allows Descope session tokens to be sender-constrained. When a session token contains a `cnf.jkt` claim, the client must prove possession of the private key corresponding to that JWK thumbprint on every request by including a signed `DPoP` proof JWT in the request header.
+
+If your Descope project is configured to issue DPoP-bound tokens, validate the DPoP proof on every protected endpoint after validating the session:
+
+```ruby
+# 1. Validate the session token as usual
+jwt_response = descope_client.validate_session(session_token: session_token)
+
+# 2. Validate the DPoP proof (no-op if the token is not DPoP-bound)
+begin
+    descope_client.validate_dpop_proof(
+        dpop_proof: request.headers['DPoP'],   # the DPoP header sent by the client
+        method: request.method,                # HTTP method, e.g. "GET"
+        request_url: request.url,             # full request URL
+        session_token: session_token           # the same session token
+    )
+rescue Descope::AuthException => e
+    # DPoP proof is invalid — reject the request
+    render json: { error: e.message }, status: :unauthorized
+end
+```
+
+`validate_dpop_proof` raises `Descope::AuthException` if the proof is invalid (wrong key, expired `iat`, mismatched `htm`/`htu`, bad signature, etc.). It silently returns when the session token has no `cnf.jkt` claim (i.e. the token is not DPoP-bound), so it is safe to call unconditionally.
 
 ### Roles Permission Validation
 
