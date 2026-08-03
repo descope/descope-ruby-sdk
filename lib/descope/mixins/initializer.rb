@@ -34,7 +34,7 @@ module Descope
         @secure = !@skip_verify
         @management_key = options[:management_key] || ENV['DESCOPE_MANAGEMENT_KEY']
         @logger.debug("Management Key ID: #{@management_key}")
-        @timeout_seconds = options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
+        @timeout = options[:timeout] || options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
         @jwt_validation_leeway = options[:jwt_validation_leeway] || Common::DEFAULT_JWT_VALIDATION_LEEWAY
 
         if @project_id.to_s.empty?

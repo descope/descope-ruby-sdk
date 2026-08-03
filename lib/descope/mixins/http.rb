@@ -68,13 +68,13 @@ module Descope
 
           set_cookie_headers.each do |cookie_header|
             next unless cookie_header.is_a?(String)
-            
+
             # Parse DS cookie (session token)
             if cookie_header.include?("#{SESSION_COOKIE_NAME}=")
               cookie_value = parse_cookie_value(cookie_header, SESSION_COOKIE_NAME)
               extracted_cookies[SESSION_COOKIE_NAME] = cookie_value if cookie_value
             end
-            
+
             # Parse DSR cookie (refresh token)
             if cookie_header.include?("#{REFRESH_SESSION_COOKIE_NAME}=")
               cookie_value = parse_cookie_value(cookie_header, REFRESH_SESSION_COOKIE_NAME)
