@@ -278,6 +278,35 @@ describe Descope::Api::V1::Management::User do
         )
       end.not_to raise_error
     end
+
+    it 'is expected to include time-range filters when provided' do
+      expect(@instance).to receive(:post).with(
+        USERS_SEARCH_PATH, {
+          loginId: nil,
+          tenantIds: [],
+          roleNames: [],
+          limit: 0,
+          page: 0,
+          ssoAppIds: [],
+          ssoOnly: false,
+          testUsersOnly: false,
+          withTestUser: false,
+          fromCreatedTime: 1_700_000_000_000,
+          toCreatedTime: 1_800_000_000_000,
+          fromModifiedTime: 1_700_000_000_000,
+          toModifiedTime: 1_800_000_000_000
+        }
+      )
+
+      expect do
+        @instance.search_all_users(
+          from_created_time: 1_700_000_000_000,
+          to_created_time: 1_800_000_000_000,
+          from_modified_time: 1_700_000_000_000,
+          to_modified_time: 1_800_000_000_000
+        )
+      end.not_to raise_error
+    end
   end
 
   context '.get_provider_token' do
@@ -788,6 +817,32 @@ describe Descope::Api::V1::Management::User do
           role_names: %w[r1 r2],
           tenant_role_ids: tenant_role_ids,
           tenant_role_names: tenant_role_names
+        )
+      end.not_to raise_error
+    end
+
+    it 'is expected to include time-range filters when provided' do
+      expect(@instance).to receive(:post).with(
+        TEST_USERS_SEARCH_PATH, {
+          tenantIds: [],
+          roleNames: [],
+          limit: 0,
+          page: 0,
+          testUsersOnly: true,
+          withTestUser: true,
+          fromCreatedTime: 1_700_000_000_000,
+          toCreatedTime: 1_800_000_000_000,
+          fromModifiedTime: 1_700_000_000_000,
+          toModifiedTime: 1_800_000_000_000
+        }
+      )
+
+      expect do
+        @instance.search_all_test_users(
+          from_created_time: 1_700_000_000_000,
+          to_created_time: 1_800_000_000_000,
+          from_modified_time: 1_700_000_000_000,
+          to_modified_time: 1_800_000_000_000
         )
       end.not_to raise_error
     end

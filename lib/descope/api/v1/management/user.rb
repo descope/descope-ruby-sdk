@@ -171,6 +171,10 @@ module Descope
 
           # Search for users, using a valid management key.
           # @see https://docs.descope.com/api/openapi/usermanagement/operation/SearchUsers/
+          # @param from_created_time [Integer, nil] only include users created on or after this time (Unix epoch milliseconds).
+          # @param to_created_time [Integer, nil] only include users created on or before this time (Unix epoch milliseconds).
+          # @param from_modified_time [Integer, nil] only include users modified on or after this time (Unix epoch milliseconds).
+          # @param to_modified_time [Integer, nil] only include users modified on or before this time (Unix epoch milliseconds).
           def search_all_users(
             login_id: nil,
             tenant_ids: [],
@@ -187,7 +191,11 @@ module Descope
             phones: [],
             sso_app_ids: [],
             tenant_role_ids: {},
-            tenant_role_names: {}
+            tenant_role_names: {},
+            from_created_time: nil,
+            to_created_time: nil,
+            from_modified_time: nil,
+            to_modified_time: nil
           )
             body = {
               loginId: login_id,
@@ -216,6 +224,10 @@ module Descope
             body[:roleNames] = role_names unless role_names.empty?
             body[:tenantRoleIds] = map_to_values_object(tenant_role_ids) unless tenant_role_ids.nil? || tenant_role_ids.empty?
             body[:tenantRoleNames] = map_to_values_object(tenant_role_names) unless tenant_role_names.nil? || tenant_role_names.empty?
+            body[:fromCreatedTime] = from_created_time unless from_created_time.nil?
+            body[:toCreatedTime] = to_created_time unless to_created_time.nil?
+            body[:fromModifiedTime] = from_modified_time unless from_modified_time.nil?
+            body[:toModifiedTime] = to_modified_time unless to_modified_time.nil?
             post(Common::USERS_SEARCH_PATH, body)
           end
 
@@ -530,6 +542,10 @@ module Descope
           # @param text [String] Optional string, allows free text search among all user's attributes.
           # @param login_ids [Array<String>] Optional list of login ids
           # @param sort [Array<Hash>] Optional array, allows to sort by fields.
+          # @param from_created_time [Integer, nil] Optional, only include users created on or after this time (Unix epoch milliseconds).
+          # @param to_created_time [Integer, nil] Optional, only include users created on or before this time (Unix epoch milliseconds).
+          # @param from_modified_time [Integer, nil] Optional, only include users modified on or after this time (Unix epoch milliseconds).
+          # @param to_modified_time [Integer, nil] Optional, only include users modified on or before this time (Unix epoch milliseconds).
           #
           # @return [Hash] Return hash in the format {"users": []}
           #
@@ -551,7 +567,11 @@ module Descope
             text: nil,
             login_ids: [],
             tenant_role_ids: {},
-            tenant_role_names: {}
+            tenant_role_names: {},
+            from_created_time: nil,
+            to_created_time: nil,
+            from_modified_time: nil,
+            to_modified_time: nil
           )
             tenant_ids ||= []
             role_names ||= []
@@ -581,6 +601,10 @@ module Descope
             body[:text] = text unless text.nil? || text.empty?
             body[:tenantRoleIds] = map_to_values_object(tenant_role_ids) unless tenant_role_ids.nil? || tenant_role_ids.empty?
             body[:tenantRoleNames] = map_to_values_object(tenant_role_names) unless tenant_role_names.nil? || tenant_role_names.empty?
+            body[:fromCreatedTime] = from_created_time unless from_created_time.nil?
+            body[:toCreatedTime] = to_created_time unless to_created_time.nil?
+            body[:fromModifiedTime] = from_modified_time unless from_modified_time.nil?
+            body[:toModifiedTime] = to_modified_time unless to_modified_time.nil?
 
             post(Common::TEST_USERS_SEARCH_PATH, body)
           end
