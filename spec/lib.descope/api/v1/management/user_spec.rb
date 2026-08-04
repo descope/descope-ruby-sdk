@@ -287,6 +287,7 @@ describe Descope::Api::V1::Management::User do
           roleNames: [],
           limit: 0,
           page: 0,
+          text: nil,
           ssoAppIds: [],
           ssoOnly: false,
           testUsersOnly: false,
