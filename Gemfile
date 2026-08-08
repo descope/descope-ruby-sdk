@@ -16,6 +16,6 @@ group :test do
   gem 'rotp', '6.3.0', require: false
   gem 'rspec', '3.13.2', require: false
   gem 'selenium-webdriver', '4.46.0', require: false
-  gem 'simplecov', '0.22.0', require: false
+  gem 'simplecov', '1.0.2', require: false
   gem 'super_diff', '0.19.0', require: false
 end
