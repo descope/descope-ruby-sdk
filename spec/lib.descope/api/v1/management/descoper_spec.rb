@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Descoper do
     end
 
     it 'is expected to create the given descopers' do
-      expect(@instance).to receive(:put).with(
+      expect(@instance).to receive(:mgmt_put).with(
         DESCOPER_CREATE_PATH,
         {
           descopers: [{ name: 'test-descoper' }]
@@ -33,7 +33,7 @@ describe Descope::Api::V1::Management::Descoper do
     end
 
     it 'is expected to update the given descoper' do
-      expect(@instance).to receive(:patch).with(
+      expect(@instance).to receive(:mgmt_patch).with(
         DESCOPER_UPDATE_PATH,
         {
           id: 'test-id',
@@ -53,7 +53,7 @@ describe Descope::Api::V1::Management::Descoper do
     end
 
     it 'is expected to get the given descoper by id' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         DESCOPER_GET_PATH,
         {
           id: 'test-id'
@@ -71,7 +71,7 @@ describe Descope::Api::V1::Management::Descoper do
     end
 
     it 'is expected to delete the given descoper by id' do
-      expect(@instance).to receive(:delete).with(
+      expect(@instance).to receive(:mgmt_delete).with(
         DESCOPER_DELETE_PATH,
         {
           id: 'test-id'
@@ -89,7 +89,7 @@ describe Descope::Api::V1::Management::Descoper do
     end
 
     it 'is expected to search (list) all descopers' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         DESCOPER_SEARCH_PATH,
         {}
       )

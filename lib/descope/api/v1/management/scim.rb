@@ -11,21 +11,21 @@ module Descope
           def scim_search_groups(filter: nil, start_index: nil, count: nil, excluded_attributes: nil)
             # Search SCIM Groups
             url = compose_scim_search_groups_url(filter, start_index, count, excluded_attributes)
-            get(url)
+            mgmt_get(url)
           end
 
           def scim_create_group(group_id: nil, display_name: nil, members: nil, external_id: nil,
                                 excluded_attributes: nil)
             # Create SCIM Group
             body = compose_scim_create_group_body(group_id, display_name, members, external_id, excluded_attributes)
-            post(SCIM_GROUPS_PATH, body)
+            mgmt_post(SCIM_GROUPS_PATH, body)
           end
 
           def scim_load_group(group_id: nil, display_name: nil, external_id: nil, excluded_attributes: nil)
             # Load SCIM Group, using a valid access key.
             validate_scim_group_id(group_id)
             url = compose_scim_create_group_url(group_id, display_name, external_id, excluded_attributes)
-            get(url)
+            mgmt_get(url)
           end
 
           def scim_update_group(group_id: nil, display_name: nil, members: nil, external_id: nil,
@@ -33,38 +33,38 @@ module Descope
             # Update SCIM Group, using a valid access key.
             validate_scim_group_id(group_id)
             body = compose_scim_update_group_body(group_id, display_name, members, external_id, excluded_attributes)
-            patch("#{SCIM_GROUPS_PATH}/#{group_id}", body)
+            mgmt_patch("#{SCIM_GROUPS_PATH}/#{group_id}", body)
           end
 
           def scim_delete_group(group_id)
             # Delete SCIM Group, using a valid access key.
             validate_scim_group_id(group_id)
             url = "#{SCIM_GROUPS_PATH}/#{group_id}"
-            delete(url)
+            mgmt_delete(url)
           end
 
           def scim_patch_group(group_id: nil, user_id: nil, operations: nil)
             # Patch SCIM Group, using a valid access key.
             validate_scim_group_id(group_id)
             url = compose_scim_patch_group_url(group_id, user_id, operations)
-            patch(url)
+            mgmt_patch(url)
           end
 
           # SCIM Users
           def scim_load_resource_types
             # Load SCIM Resource Types, using a valid access key.
-            get(SCIM_RESOURCE_TYPES_PATH)
+            mgmt_get(SCIM_RESOURCE_TYPES_PATH)
           end
 
           def scim_load_service_provider_config
             # Load SCIM Service Provider Config, using a valid access key.
-            get(SCIM_SERVICE_PROVIDER_CONFIG_PATH)
+            mgmt_get(SCIM_SERVICE_PROVIDER_CONFIG_PATH)
           end
 
           def scim_search_users(filter: nil, start_index: nil, count: nil)
             # Search SCIM Users, using a valid access key.
             url = compose_scim_search_users_url(filter, start_index, count)
-            get(url)
+            mgmt_get(url)
           end
 
           def scim_create_user(user_id: nil, display_name: nil, emails: nil,
@@ -72,28 +72,28 @@ module Descope
             # Create SCIM User, using a valid access key.
             validate_user_id(user_id)
             body = compose_scim_create_user_body(user_id, display_name, emails, phone_numbers, active, name, user_name)
-            post(SCIM_USERS_PATH, body)
+            mgmt_post(SCIM_USERS_PATH, body)
           end
 
           def scim_load_user(user_id)
             # Load SCIM User, using a valid access key.
             validate_user_id(user_id)
             url = "#{SCIM_USERS_PATH}/#{user_id}"
-            get(url)
+            mgmt_get(url)
           end
 
           def scim_update_user(user_id)
             # Update SCIM User, using a valid access key.
             validate_user_id(user_id)
             url = "#{SCIM_USERS_PATH}/#{user_id}"
-            patch(url)
+            mgmt_patch(url)
           end
 
           def scim_delete_user(user_id)
             # Delete SCIM User, using a valid access key.
             validate_user_id(user_id)
             url = "#{SCIM_USERS_PATH}/#{user_id}"
-            delete(url)
+            mgmt_delete(url)
           end
 
           def scim_patch_user(user_id: nil, group_id: nil, operations: nil)
@@ -101,7 +101,7 @@ module Descope
             validate_user_id(user_id)
             validate_scim_group_id(group_id)
             body = compose_scim_patch_user_body(user_id, group_id, operations)
-            patch(SCIM_USERS_PATH, body)
+            mgmt_patch(SCIM_USERS_PATH, body)
           end
 
           private

@@ -29,7 +29,7 @@ describe Descope::Api::V1::Management::Analytics do
     end
 
     before do
-      allow(@instance).to receive(:post).with(
+      allow(@instance).to receive(:mgmt_post).with(
         ANALYTICS_SEARCH_PATH,
         {
           from: 1_234_567_000,

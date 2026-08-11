@@ -31,9 +31,35 @@ descope_client = Descope::Client.new(
 )
 ```
 
+### Auth Management Key
+
+Authentication methods whose public access has been disabled can still be used by providing an
+auth management key. When set, it is sent along with every authentication request.
+
+Create one in the [Descope Console](https://app.descope.com/settings/company/managementkeys) with
+either the `Authentication` or `Full Access` scope on the project or company.
+
+```ruby
+# Initialized after setting the DESCOPE_PROJECT_ID and DESCOPE_AUTH_MANAGEMENT_KEY env vars
+descope_client = Descope::Client.new({})
+
+# ** Or directly **
+descope_client = Descope::Client.new(
+  {
+    project_id: '<project_id>',
+    auth_management_key: ENV['AUTH_MGMT_KEY']
+  }
+)
+```
+
+**Note**: the auth management key can, and probably should, be a different management key than the
+one provided for [management API usage](#setup-1). The auth management key is never sent on
+management requests, and the management key is never sent on authentication requests.
+
 ### Important Logging note
 You may pass `log_level: 'debug'` to the client config or use `DESCOPE_LOG_LEVEL` env var.
-Be aware that only the management key is truncated, and the JWT responses are printed on debug
+Be aware that everything after the project ID in the `Authorization` header is masked, but the JWT
+responses are printed on debug
 
 Do not run with log level debug on Production!
 
@@ -504,6 +530,8 @@ in nature. Please use responsibly.
 
 To use the management API you'll need a `Management Key` along with your `Project ID`.
 Create one in the [Descope Console](https://app.descope.com/settings/company/managementkeys).
+This key is used only for management functions - to reach authentication methods whose public
+access has been disabled, use the [Auth Management Key](#auth-management-key) instead.
 
 ```ruby
 require 'descope'
@@ -1455,6 +1483,15 @@ You can find various usage examples in the [examples folder](https://github.com/
 
 ```bash
 bundle install
+```
+
+### Environment variables
+
+```bash
+export DESCOPE_PROJECT_ID=<ProjectID>
+export DESCOPE_MANAGEMENT_KEY=<ManagementKey>
+# Optional, only needed for authentication methods with disabled public access
+export DESCOPE_AUTH_MANAGEMENT_KEY=<AuthManagementKey>
 ```
 
 ### Run tests

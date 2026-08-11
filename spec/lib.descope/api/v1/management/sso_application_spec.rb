@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::SSOApplication do
     end
 
     it 'is expected to create SAML application' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         SSO_APPLICATION_OIDC_CREATE_PATH, {
           id: 'tenant1',
           name: 'test',
@@ -44,7 +44,7 @@ describe Descope::Api::V1::Management::SSOApplication do
     end
 
     it 'is expected to create SAML application' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         SSO_APPLICATION_SAML_CREATE_PATH, {
           name: 'test',
           description: 'awesome tenant',
@@ -172,7 +172,7 @@ describe Descope::Api::V1::Management::SSOApplication do
   end
 
   it 'is expected to update sso oidc application' do
-    expect(@instance).to receive(:post).with(
+    expect(@instance).to receive(:mgmt_post).with(
       SSO_APPLICATION_OIDC_UPDATE_PATH, {
         id: 'tenant1',
         name: 'test',
@@ -195,21 +195,21 @@ describe Descope::Api::V1::Management::SSOApplication do
   end
 
   it 'is expected to delete sso app' do
-    expect(@instance).to receive(:delete).with(
+    expect(@instance).to receive(:mgmt_delete).with(
       SSO_APPLICATION_DELETE_PATH, { id: 'tenant1' }
     )
     expect { @instance.delete_sso_app('tenant1') }.not_to raise_error
   end
 
   it 'is expected to load sso app' do
-    expect(@instance).to receive(:get).with(
+    expect(@instance).to receive(:mgmt_get).with(
       SSO_APPLICATION_LOAD_PATH, { id: 'tenant1' }
     )
     expect { @instance.load_sso_app('tenant1') }.not_to raise_error
   end
 
   it 'is expected to load all sso apps' do
-    expect(@instance).to receive(:get).with(
+    expect(@instance).to receive(:mgmt_get).with(
       SSO_APPLICATION_LOAD_ALL_PATH, {}
     )
     expect { @instance.load_all_sso_apps }.not_to raise_error

@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::ManagementKey do
     end
 
     it 'is expected to create a management key' do
-      expect(@instance).to receive(:put).with(
+      expect(@instance).to receive(:mgmt_put).with(
         MGMT_KEY_CREATE_PATH, {
           name: 'test',
           description: 'test key',
@@ -42,7 +42,7 @@ describe Descope::Api::V1::Management::ManagementKey do
     end
 
     it 'is expected to update a management key' do
-      expect(@instance).to receive(:patch).with(
+      expect(@instance).to receive(:mgmt_patch).with(
         MGMT_KEY_UPDATE_PATH, {
           id: '123',
           name: 'test1',
@@ -69,7 +69,7 @@ describe Descope::Api::V1::Management::ManagementKey do
     end
 
     it 'is expected to get a management key' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         MGMT_KEY_GET_PATH, { id: '123' }
       )
       expect { @instance.get_management_key(id: '123') }.not_to raise_error
@@ -82,7 +82,7 @@ describe Descope::Api::V1::Management::ManagementKey do
     end
 
     it 'is expected to delete a management key' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         MGMT_KEY_DELETE_PATH, { ids: ['123'] }
       )
       expect { @instance.delete_management_key(id: '123') }.not_to raise_error
@@ -95,7 +95,7 @@ describe Descope::Api::V1::Management::ManagementKey do
     end
 
     it 'is expected to search management keys' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         MGMT_KEY_SEARCH_PATH, {
           tenantIds: %w[123 456],
           status: 'active'

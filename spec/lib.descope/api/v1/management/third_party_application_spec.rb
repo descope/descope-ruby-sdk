@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::ThirdPartyApplication do
     end
 
     it 'is expected to create a third party application' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         THIRD_PARTY_APP_CREATE_PATH, {
           id: 'app1',
           name: 'test',
@@ -56,7 +56,7 @@ describe Descope::Api::V1::Management::ThirdPartyApplication do
     end
 
     it 'is expected to update a third party application' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         THIRD_PARTY_APP_UPDATE_PATH, {
           id: 'app1',
           name: 'test',
@@ -83,7 +83,7 @@ describe Descope::Api::V1::Management::ThirdPartyApplication do
     end
 
     it 'is expected to patch a third party application' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         THIRD_PARTY_APP_PATCH_PATH, {
           id: 'app1',
           name: 'test'
@@ -99,42 +99,42 @@ describe Descope::Api::V1::Management::ThirdPartyApplication do
   end
 
   it 'is expected to delete a third party application' do
-    expect(@instance).to receive(:post).with(
+    expect(@instance).to receive(:mgmt_post).with(
       THIRD_PARTY_APP_DELETE_PATH, { id: 'app1' }
     )
     expect { @instance.delete_application('app1') }.not_to raise_error
   end
 
   it 'is expected to load a third party application' do
-    expect(@instance).to receive(:get).with(
+    expect(@instance).to receive(:mgmt_get).with(
       THIRD_PARTY_APP_LOAD_PATH, { id: 'app1' }
     )
     expect { @instance.load_application('app1') }.not_to raise_error
   end
 
   it 'is expected to load all third party applications' do
-    expect(@instance).to receive(:get).with(
+    expect(@instance).to receive(:mgmt_get).with(
       THIRD_PARTY_APP_LOAD_ALL_PATH, {}
     )
     expect { @instance.load_all_applications }.not_to raise_error
   end
 
   it 'is expected to get a third party application secret' do
-    expect(@instance).to receive(:get).with(
+    expect(@instance).to receive(:mgmt_get).with(
       THIRD_PARTY_APP_SECRET_PATH, { id: 'app1' }
     )
     expect { @instance.get_application_secret('app1') }.not_to raise_error
   end
 
   it 'is expected to rotate a third party application secret' do
-    expect(@instance).to receive(:post).with(
+    expect(@instance).to receive(:mgmt_post).with(
       THIRD_PARTY_APP_ROTATE_PATH, { id: 'app1' }
     )
     expect { @instance.rotate_application_secret('app1') }.not_to raise_error
   end
 
   it 'is expected to delete consents' do
-    expect(@instance).to receive(:post).with(
+    expect(@instance).to receive(:mgmt_post).with(
       THIRD_PARTY_APP_DELETE_CONSENTS_PATH, {
         consentIds: %w[consent1 consent2],
         appId: 'app1',
@@ -153,7 +153,7 @@ describe Descope::Api::V1::Management::ThirdPartyApplication do
   end
 
   it 'is expected to delete tenant consents' do
-    expect(@instance).to receive(:post).with(
+    expect(@instance).to receive(:mgmt_post).with(
       THIRD_PARTY_APP_DELETE_TENANT_CONSENTS_PATH, {
         consentIds: %w[consent1 consent2],
         appId: 'app1',

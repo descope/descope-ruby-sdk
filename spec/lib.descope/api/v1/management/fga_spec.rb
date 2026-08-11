@@ -16,7 +16,7 @@ describe Descope::Api::V1::Management::FGA do
 
     it 'is expected to save the FGA schema' do
       schema = 'model AuthZ 1.0\ntype user\ntype doc\n  relation owner: user'
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         FGA_SAVE_SCHEMA_PATH,
         { dsl: schema }
       )
@@ -32,7 +32,7 @@ describe Descope::Api::V1::Management::FGA do
     end
 
     it 'is expected to load the FGA schema' do
-      expect(@instance).to receive(:get).with(FGA_LOAD_SCHEMA_PATH)
+      expect(@instance).to receive(:mgmt_get).with(FGA_LOAD_SCHEMA_PATH)
       expect do
         @instance.fga_load_schema
       end.not_to raise_error
@@ -46,7 +46,7 @@ describe Descope::Api::V1::Management::FGA do
 
     it 'is expected to create the given relations' do
       tuples = [{ resource: 'doc1', relation: 'owner', target: 'user1' }]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         FGA_CREATE_RELATIONS_PATH,
         { tuples: tuples }
       )
@@ -63,7 +63,7 @@ describe Descope::Api::V1::Management::FGA do
 
     it 'is expected to delete the given relations' do
       tuples = [{ resource: 'doc1', relation: 'owner', target: 'user1' }]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         FGA_DELETE_RELATIONS_PATH,
         { tuples: tuples }
       )
@@ -80,7 +80,7 @@ describe Descope::Api::V1::Management::FGA do
 
     it 'is expected to check the given relations' do
       tuples = [{ resource: 'doc1', relation: 'owner', target: 'user1' }]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         FGA_CHECK_PATH,
         { tuples: tuples }
       )
@@ -96,7 +96,7 @@ describe Descope::Api::V1::Management::FGA do
     end
 
     it 'is expected to load the mappable schema for the given tenant' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         FGA_LOAD_MAPPABLE_SCHEMA_PATH,
         { tenantId: 'tenant-1' }
       )
@@ -106,7 +106,7 @@ describe Descope::Api::V1::Management::FGA do
     end
 
     it 'is expected to include resourcesLimit when options are given' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         FGA_LOAD_MAPPABLE_SCHEMA_PATH,
         { tenantId: 'tenant-1', resourcesLimit: 10 }
       )
@@ -123,7 +123,7 @@ describe Descope::Api::V1::Management::FGA do
 
     it 'is expected to search for mappable resources for the given tenant' do
       resources_queries = [{ resourceType: 'doc' }]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         FGA_SEARCH_MAPPABLE_RESOURCES_PATH,
         { tenantId: 'tenant-1', resourcesQueries: resources_queries }
       )
@@ -140,7 +140,7 @@ describe Descope::Api::V1::Management::FGA do
 
     it 'is expected to load the details of the given resource identifiers' do
       resource_identifiers = [{ resourceId: 'doc1', resourceType: 'doc' }]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         FGA_RESOURCES_LOAD_PATH,
         { resourceIdentifiers: resource_identifiers }
       )
@@ -157,7 +157,7 @@ describe Descope::Api::V1::Management::FGA do
 
     it 'is expected to save the details of the given resources' do
       resources_details = [{ resourceId: 'doc1', resourceType: 'doc', displayName: 'Document 1' }]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         FGA_RESOURCES_SAVE_PATH,
         { resourcesDetails: resources_details }
       )

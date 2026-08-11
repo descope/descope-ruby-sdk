@@ -34,7 +34,7 @@ describe Descope::Api::V1::Management::Authz do
           }
         ]
       }
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_SCHEMA_SAVE,
         {
           schema: schema,
@@ -53,7 +53,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to delete the schema for the project which will also delete all relations' do
-      expect(@instance).to receive(:post).with(AUTHZ_SCHEMA_DELETE)
+      expect(@instance).to receive(:mgmt_post).with(AUTHZ_SCHEMA_DELETE)
       expect do
         @instance.authz_delete_schema
       end.not_to raise_error
@@ -66,7 +66,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to load the schema for the project' do
-      expect(@instance).to receive(:post).with(AUTHZ_SCHEMA_LOAD)
+      expect(@instance).to receive(:mgmt_post).with(AUTHZ_SCHEMA_LOAD)
       expect do
         @instance.authz_load_schema
       end.not_to raise_error
@@ -79,7 +79,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to create or update the given namespace' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_NS_SAVE,
         {
           namespace: 'test-namespace',
@@ -99,7 +99,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to delete the given namespace' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_NS_DELETE,
         {
           name: 'test-namespace',
@@ -118,7 +118,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to create or update the given relation definition' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RD_SAVE,
         {
           relationDefinition: 'test-relation-definition',
@@ -144,7 +144,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to delete the given relation definition' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RD_DELETE,
         {
           name: 'test-relation-definition',
@@ -168,7 +168,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to create the given relation' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_CREATE,
         {
           relations: 'test-relations'
@@ -186,7 +186,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to delete the given relation' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_DELETE,
         { relations: [{ resource: 'some-note', relationDefinition: 'owner', namespace: 'note', target: 'some-user' }] }
       )
@@ -204,7 +204,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to delete the given relations for resources' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_DELETE_RESOURCES,
         {
           resources: 'test-resources'
@@ -222,7 +222,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to return true if the given resource has relations' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_HAS_RELATIONS,
         {
           relationQueries: ['some-query']
@@ -240,7 +240,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to return the list of targets who can access the given resource with the given RD' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_WHO,
         {
           resource: 'test-resource',
@@ -261,7 +261,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to return the list of relations for the given resources' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_RESOURCE,
         {
           resources: ['test-resources']
@@ -279,7 +279,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to return the list of relations for the given targets' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_TARGETS,
         {
           targets: ['test-targets']
@@ -306,7 +306,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     before do
-      allow(@instance).to receive(:post).with(
+      allow(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_TARGET_ALL,
         {
           target: 'test-target'
@@ -319,7 +319,7 @@ describe Descope::Api::V1::Management::Authz do
     end
 
     it 'is expected to return the list of relations for the given target' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         AUTHZ_RE_TARGET_ALL,
         {
           target: 'test-target'

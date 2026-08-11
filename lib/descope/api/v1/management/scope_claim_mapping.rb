@@ -10,7 +10,7 @@ module Descope
 
           def get_scope_claim_mapping # rubocop:disable Naming/AccessorMethodName
             # Get the project-wide OIDC scope-to-claim mappings.
-            post(SCOPE_CLAIM_MAPPING_GET_PATH)
+            mgmt_post(SCOPE_CLAIM_MAPPING_GET_PATH)
           end
 
           def set_scope_claim_mapping(mappings: nil)
@@ -20,12 +20,12 @@ module Descope
             #       "scope": "name of the OIDC scope",
             #       "claims": ["list of claims mapped to the scope"]
             #   }
-            post(SCOPE_CLAIM_MAPPING_SET_PATH, { mappings: })
+            mgmt_post(SCOPE_CLAIM_MAPPING_SET_PATH, { mappings: })
           end
 
           def delete_scope_claim_mapping
             # Delete the project-wide OIDC scope-to-claim mappings.
-            post(SCOPE_CLAIM_MAPPING_DELETE_PATH)
+            mgmt_post(SCOPE_CLAIM_MAPPING_DELETE_PATH)
           end
         end
       end

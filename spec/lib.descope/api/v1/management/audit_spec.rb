@@ -31,7 +31,7 @@ describe Descope::Api::V1::Management::Audit do
     end
 
     before do
-      allow(@instance).to receive(:post).twice.with(
+      allow(@instance).to receive(:mgmt_post).twice.with(
         AUDIT_SEARCH,
         {
           noTenants: true,
@@ -144,7 +144,7 @@ describe Descope::Api::V1::Management::Audit do
     end
 
     it 'is expected to create an audit event' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         '/v1/mgmt/audit/event',
         {
           action: 'get',

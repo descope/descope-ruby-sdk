@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Group do
     end
 
     it 'is expected to load all groups for a given tenant id' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         GROUP_LOAD_ALL_PATH,
         {
           tenantId: 'tenant-id'
@@ -33,7 +33,7 @@ describe Descope::Api::V1::Management::Group do
     end
 
     it 'is expected to load all groups for the given user and login ids' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         GROUP_LOAD_ALL_FOR_MEMBER_PATH,
         {
           tenantId: 'tenant-id',
@@ -57,7 +57,7 @@ describe Descope::Api::V1::Management::Group do
     end
 
     it 'is expected to load all members of the given group id' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         GROUP_LOAD_ALL_GROUP_MEMBERS_PATH,
         {
           tenantId: 'tenant-id',

@@ -10,12 +10,12 @@ module Descope
 
           def get_sso_settings(tenant_id)
             # Get SSO settings for the provided tenant id.
-            get(SSO_SETTINGS_PATH, { tenantId: tenant_id })
+            mgmt_get(SSO_SETTINGS_PATH, { tenantId: tenant_id })
           end
 
           def delete_sso_settings(tenant_id)
             # Delete SSO settings for the provided tenant id.
-            delete(SSO_SETTINGS_PATH, { tenantId: tenant_id })
+            mgmt_delete(SSO_SETTINGS_PATH, { tenantId: tenant_id })
           end
 
           def configure_sso_oidc(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
@@ -28,7 +28,7 @@ module Descope
               redirectUrl: redirect_url,
               domain:
             }
-            post(SSO_OIDC_PATH, request_params)
+            mgmt_post(SSO_OIDC_PATH, request_params)
           end
 
           def configure_sso_saml(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
@@ -41,12 +41,12 @@ module Descope
               redirectUrl: redirect_url,
               domain:
             }
-            post(SSO_SETTINGS_PATH, request_params)
+            mgmt_post(SSO_SETTINGS_PATH, request_params)
           end
 
           def configure_sso_saml_metadata(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
             # Configure tenant SSO SAML Metadata, using a valid management key.
-            post(SSO_METADATA_PATH, compose_metadata_body(tenant_id, settings, redirect_url, domain))
+            mgmt_post(SSO_METADATA_PATH, compose_metadata_body(tenant_id, settings, redirect_url, domain))
           end
 
           private
