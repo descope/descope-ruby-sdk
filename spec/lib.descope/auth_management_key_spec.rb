@@ -35,8 +35,12 @@ describe 'auth management key' do
   end
 
   around do |example|
-    %w[DESCOPE_MANAGEMENT_KEY DESCOPE_AUTH_MANAGEMENT_KEY].each { |var| ENV.delete(var) }
+    keys = %w[DESCOPE_MANAGEMENT_KEY DESCOPE_AUTH_MANAGEMENT_KEY]
+    saved = keys.to_h { |var| [var, ENV[var]] }
+    keys.each { |var| ENV.delete(var) }
     example.run
+  ensure
+    saved.each { |var, value| ENV[var] = value }
   end
 
   context 'on authentication requests' do
@@ -63,6 +67,21 @@ describe 'auth management key' do
       header = authorization_for(client) { sign_up(client) }
       expect(header).to eq("Bearer #{project_id}:#{auth_management_key}")
       expect(header).to_not include(management_key)
+    end
+
+    # DummyClass swallows extra_headers, so only a real client exercises this argument.
+    it 'tolerates a nil extra_headers from the caller' do
+      client = build_client(auth_management_key: auth_management_key)
+      header = authorization_for(client) { client.post(SIGN_IN_PASSWORD_PATH, {}, nil, refresh_token) }
+      expect(header).to eq("Bearer #{project_id}:#{refresh_token}:#{auth_management_key}")
+    end
+
+    it 'signs in with an enchanted link' do
+      client = build_client(auth_management_key: auth_management_key)
+      header = authorization_for(client) do
+        client.enchanted_link_sign_in(login_id: 'someone@example.com', uri: 'https://example.com')
+      end
+      expect(header).to eq("Bearer #{project_id}:#{auth_management_key}")
     end
 
     it 'does not substitute a key for an empty refresh token' do

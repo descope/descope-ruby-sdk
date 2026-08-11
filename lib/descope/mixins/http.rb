@@ -26,7 +26,7 @@ module Descope
 
           # The Authorization header travels with the request rather than being merged into the
           # shared @headers, so concurrent requests cannot send each other's credentials.
-          headers = authorization_header(pswd).merge(extra_headers)
+          headers = authorization_header(pswd).merge(extra_headers || {})
 
           @logger.debug "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
           request_with_retry(method, uri, body, headers)

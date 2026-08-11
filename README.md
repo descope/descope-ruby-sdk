@@ -56,6 +56,20 @@ descope_client = Descope::Client.new(
 one provided for [management API usage](#setup-1). The auth management key is never sent on
 management requests, and the management key is never sent on authentication requests.
 
+### Request timeout
+
+Every request is bounded by a 60 second timeout, matching the other Descope server SDKs. Raise it
+for calls that legitimately take longer, such as `export_project` on a large project:
+
+```ruby
+descope_client = Descope::Client.new(
+  {
+    project_id: '<project_id>',
+    timeout_seconds: 180
+  }
+)
+```
+
 ### Important Logging note
 You may pass `log_level: 'debug'` to the client config or use `DESCOPE_LOG_LEVEL` env var.
 Be aware that everything after the project ID in the `Authorization` header is masked, but the JWT
