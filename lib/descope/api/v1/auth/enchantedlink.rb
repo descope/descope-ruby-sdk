@@ -10,20 +10,44 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def enchanted_link_sign_in(method: nil, login_id: nil, uri: nil, login_options: nil, refresh_token: nil)
-            # Sign-in existing user by sending an enchanted link via email or phone.
+          def enchanted_link_sign_in(login_id: nil, uri: nil, login_options: nil, refresh_token: nil)
+            # Sign-in existing user by sending an enchanted link via email.
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignInEnchantedLinkEmail/
             validate_login_id(login_id)
             validate_refresh_token_provided(login_options, refresh_token)
             body = enchanted_link_compose_signin_body(login_id, uri, login_options)
-            uri = enchanted_link_compose_signin_url(method)
+            uri = enchanted_link_compose_signin_url
             post(uri, body, nil, refresh_token)
           end
 
-          def enchanted_link_sign_up(method: nil, login_id: nil, uri: nil, user: {})
-            # Sign-up new end user by sending an enchanted link via email or phone
+          def enchanted_link_sign_in_with_phone(login_id: nil, uri: nil, login_options: nil, refresh_token: nil)
+            # Sign-in existing user by sending an enchanted link via SMS.
+            validate_login_id(login_id)
+            validate_refresh_token_provided(login_options, refresh_token)
+            body = enchanted_link_compose_signin_body(login_id, uri, login_options)
+            uri = enchanted_link_compose_signin_url(Descope::Mixins::Common::DeliveryMethod::SMS)
+            post(uri, body, nil, refresh_token)
+          end
+
+          def enchanted_link_sign_up(login_id: nil, uri: nil, user: {})
+            # Sign-up new end user by sending an enchanted link via email
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpEnchantedLink/
-            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
+
+            unless adjust_and_verify_delivery_method(Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id, user)
+              raise Descope::ArgumentException.new(
+                'Invalid delivery method',
+                code: 400
+              )
+            end
+
+            body = enchanted_link_compose_signup_body(login_id, uri, user)
+            uri = enchanted_link_compose_signup_url
+            post(uri, body)
+          end
+
+          def enchanted_link_sign_up_with_phone(login_id: nil, uri: nil, user: {})
+            # Sign-up new end user by sending an enchanted link via SMS
+            method = Descope::Mixins::Common::DeliveryMethod::SMS
 
             unless adjust_and_verify_delivery_method(method, login_id, user)
               raise Descope::ArgumentException.new(
@@ -37,10 +61,16 @@ module Descope
             post(uri, body)
           end
 
-          def enchanted_link_sign_up_or_in(method: nil, login_id: nil, uri: nil, login_options: nil)
+          def enchanted_link_sign_up_or_in(login_id: nil, uri: nil, login_options: nil)
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpOrInEnchantedLinkEmail/
             body = enchanted_link_compose_signin_body(login_id, uri, login_options)
-            uri = enchanted_link_compose_sign_up_or_in_url(method)
+            uri = enchanted_link_compose_sign_up_or_in_url
+            post(uri, body)
+          end
+
+          def enchanted_link_sign_up_or_in_with_phone(login_id: nil, uri: nil, login_options: nil)
+            body = enchanted_link_compose_signin_body(login_id, uri, login_options)
+            uri = enchanted_link_compose_sign_up_or_in_url(Descope::Mixins::Common::DeliveryMethod::SMS)
             post(uri, body)
           end
 

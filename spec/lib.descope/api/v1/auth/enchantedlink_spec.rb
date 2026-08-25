@@ -61,6 +61,10 @@ describe Descope::Api::V1::EnchantedLink do
       end.to raise_error(Descope::AuthException, 'Missing refresh token for stepup/mfa')
     end
 
+    it 'is expected to respond to sign in with phone' do
+      expect(@instance).to respond_to(:enchanted_link_sign_in_with_phone)
+    end
+
     it 'is expected to sign in with enchanted link phone' do
       request_params = {
         loginId: 'test',
@@ -80,8 +84,7 @@ describe Descope::Api::V1::EnchantedLink do
       ).and_return({ 'maskedPhone' => '+1******890' })
 
       expect do
-        @instance.enchanted_link_sign_in(
-          method: DeliveryMethod::SMS,
+        @instance.enchanted_link_sign_in_with_phone(
           login_id: 'test',
           uri: 'https://some-uri/sms',
           login_options: {
@@ -123,6 +126,10 @@ describe Descope::Api::V1::EnchantedLink do
       end.not_to raise_error
     end
 
+    it 'is expected to respond to sign up with phone' do
+      expect(@instance).to respond_to(:enchanted_link_sign_up_with_phone)
+    end
+
     it 'is expected to sign up with enchanted link via phone' do
       request_params = {
         loginId: '+1234567890',
@@ -137,9 +144,8 @@ describe Descope::Api::V1::EnchantedLink do
       ).and_return({ 'maskedPhone' => '+1******890' })
 
       expect do
-        @instance.enchanted_link_sign_up(
+        @instance.enchanted_link_sign_up_with_phone(
           login_id: '+1234567890',
-          method: DeliveryMethod::SMS,
           uri: 'https://some-uri/sms',
           user: { login_id: 'user1', phone: '+1234567890' }
         )
@@ -183,6 +189,10 @@ describe Descope::Api::V1::EnchantedLink do
       end.not_to raise_error
     end
 
+    it 'is expected to respond to sign up or in with phone' do
+      expect(@instance).to respond_to(:enchanted_link_sign_up_or_in_with_phone)
+    end
+
     it 'is expected to sign up or in with enchanted link phone' do
       request_params = {
         loginId: 'test',
@@ -201,8 +211,7 @@ describe Descope::Api::V1::EnchantedLink do
       ).and_return({ 'maskedPhone' => '+1******890' })
 
       expect do
-        @instance.enchanted_link_sign_up_or_in(
-          method: DeliveryMethod::SMS,
+        @instance.enchanted_link_sign_up_or_in_with_phone(
           login_id: 'test',
           uri: 'https://some-uri/sms',
           login_options: {
