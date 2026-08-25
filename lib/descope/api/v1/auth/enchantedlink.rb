@@ -10,36 +10,37 @@ module Descope
           include Descope::Mixins::Common::EndpointsV1
           include Descope::Mixins::Common::EndpointsV2
 
-          def enchanted_link_sign_in(login_id: nil, uri: nil, login_options: nil, refresh_token: nil)
-            # Sign-in existing user by sending an enchanted link via email.
+          def enchanted_link_sign_in(method: nil, login_id: nil, uri: nil, login_options: nil, refresh_token: nil)
+            # Sign-in existing user by sending an enchanted link via email or phone.
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignInEnchantedLinkEmail/
             validate_login_id(login_id)
             validate_refresh_token_provided(login_options, refresh_token)
             body = enchanted_link_compose_signin_body(login_id, uri, login_options)
-            uri = enchanted_link_compose_signin_url
+            uri = enchanted_link_compose_signin_url(method)
             post(uri, body, nil, refresh_token)
           end
 
-          def enchanted_link_sign_up(login_id: nil, uri: nil, user: {})
-            # Sign-up new end user by sending an enchanted link via email
+          def enchanted_link_sign_up(method: nil, login_id: nil, uri: nil, user: {})
+            # Sign-up new end user by sending an enchanted link via email or phone
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpEnchantedLink/
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
 
-            unless adjust_and_verify_delivery_method(Descope::Mixins::Common::DeliveryMethod::EMAIL, login_id, user)
+            unless adjust_and_verify_delivery_method(method, login_id, user)
               raise Descope::ArgumentException.new(
                 'Invalid delivery method',
                 code: 400
               )
             end
 
-            body = enchanted_link_compose_signup_body(login_id, uri, user)
-            uri = enchanted_link_compose_signup_url
+            body = enchanted_link_compose_signup_body(login_id, uri, user, method)
+            uri = enchanted_link_compose_signup_url(method)
             post(uri, body)
           end
 
-          def enchanted_link_sign_up_or_in(login_id: nil, uri: nil, login_options: nil)
+          def enchanted_link_sign_up_or_in(method: nil, login_id: nil, uri: nil, login_options: nil)
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpOrInEnchantedLinkEmail/
             body = enchanted_link_compose_signin_body(login_id, uri, login_options)
-            uri = enchanted_link_compose_sign_up_or_in_url
+            uri = enchanted_link_compose_sign_up_or_in_url(method)
             post(uri, body)
           end
 
@@ -97,19 +98,23 @@ module Descope
             body
           end
 
-          def enchanted_link_compose_signin_url
-            compose_url(SIGN_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          def enchanted_link_compose_signin_url(method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
+            compose_url(SIGN_IN_AUTH_ENCHANTEDLINK_PATH, method)
           end
 
-          def enchanted_link_compose_signup_url
-            compose_url(SIGN_UP_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          def enchanted_link_compose_signup_url(method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
+            compose_url(SIGN_UP_AUTH_ENCHANTEDLINK_PATH, method)
           end
 
-          def enchanted_link_compose_sign_up_or_in_url
-            compose_url(SIGN_UP_OR_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          def enchanted_link_compose_sign_up_or_in_url(method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
+            compose_url(SIGN_UP_OR_IN_AUTH_ENCHANTEDLINK_PATH, method)
           end
 
-          def enchanted_link_compose_signup_body(login_id, uri, user)
+          def enchanted_link_compose_signup_body(login_id, uri, user, method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
             body = {
               loginId: login_id,
               redirectUrl: uri
@@ -118,7 +123,7 @@ module Descope
             unless user.nil? || user.empty?
               body[:user] = enchantedlink_user_compose_update_body(**user) unless user.empty?
 
-              method_str, val = get_login_id_by_method(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, user:)
+              method_str, val = get_login_id_by_method(method:, user:)
               body[method_str.to_sym] = val
             end
 

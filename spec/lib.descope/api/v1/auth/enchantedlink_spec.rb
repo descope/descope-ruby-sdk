@@ -60,6 +60,40 @@ describe Descope::Api::V1::EnchantedLink do
         @instance.send(:validate_refresh_token_provided, { mfa: true, stepup: true }, '')
       end.to raise_error(Descope::AuthException, 'Missing refresh token for stepup/mfa')
     end
+
+    it 'is expected to sign in with enchanted link phone' do
+      request_params = {
+        loginId: 'test',
+        redirectUrl: 'https://some-uri/sms',
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        }
+      }
+      expect(@instance).to receive(:post).with(
+        enchanted_link_compose_signin_url(DeliveryMethod::SMS),
+        request_params,
+        nil,
+        'refresh_token'
+      ).and_return({ 'maskedPhone' => '+1******890' })
+
+      expect do
+        @instance.enchanted_link_sign_in(
+          method: DeliveryMethod::SMS,
+          login_id: 'test',
+          uri: 'https://some-uri/sms',
+          login_options: {
+            stepup: false,
+            custom_claims: { 'abc': '123' },
+            mfa: false,
+            sso_app_id: 'sso-id'
+          },
+          refresh_token: 'refresh_token'
+        )
+      end.not_to raise_error
+    end
   end
 
   context '.sign_up' do
@@ -85,6 +119,29 @@ describe Descope::Api::V1::EnchantedLink do
           login_id: 'test',
           uri: 'https://some-uri/email',
           user: { login_id: 'user1', email: 'dummy@dummy.com' }
+        )
+      end.not_to raise_error
+    end
+
+    it 'is expected to sign up with enchanted link via phone' do
+      request_params = {
+        loginId: '+1234567890',
+        redirectUrl: 'https://some-uri/sms',
+        user: { loginId: 'user1', phone: '+1234567890' },
+        phone: '+1234567890'
+      }
+
+      expect(@instance).to receive(:post).with(
+        enchanted_link_compose_signup_url(DeliveryMethod::SMS),
+        request_params
+      ).and_return({ 'maskedPhone' => '+1******890' })
+
+      expect do
+        @instance.enchanted_link_sign_up(
+          login_id: '+1234567890',
+          method: DeliveryMethod::SMS,
+          uri: 'https://some-uri/sms',
+          user: { login_id: 'user1', phone: '+1234567890' }
         )
       end.not_to raise_error
     end
@@ -116,6 +173,38 @@ describe Descope::Api::V1::EnchantedLink do
         @instance.enchanted_link_sign_up_or_in(
           login_id: 'test',
           uri: 'https://some-uri/email',
+          login_options: {
+            stepup: false,
+            custom_claims: { 'abc': '123' },
+            mfa: false,
+            sso_app_id: 'sso-id'
+          }
+        )
+      end.not_to raise_error
+    end
+
+    it 'is expected to sign up or in with enchanted link phone' do
+      request_params = {
+        loginId: 'test',
+        redirectUrl: 'https://some-uri/sms',
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        }
+      }
+
+      expect(@instance).to receive(:post).with(
+        enchanted_link_compose_sign_up_or_in_url(DeliveryMethod::SMS),
+        request_params
+      ).and_return({ 'maskedPhone' => '+1******890' })
+
+      expect do
+        @instance.enchanted_link_sign_up_or_in(
+          method: DeliveryMethod::SMS,
+          login_id: 'test',
+          uri: 'https://some-uri/sms',
           login_options: {
             stepup: false,
             custom_claims: { 'abc': '123' },
