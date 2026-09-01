@@ -644,7 +644,9 @@ descope_client.logout_user('<login-id>')
 descope_client.logout_user_by_id('<user-id>')
 
 # Search all users, optionally according to tenant and/or role filter
-# results can be paginated using the limit and page parameters
+# results can be paginated using the limit and page parameters,
+# as well as filtered by time with from_created_time, to_created_time,
+# from_modified_time, and to_modified_time (Unix epoch milliseconds)
 users_resp = descope_client.search_all_users(tenant_ids = ['my-tenant-id'])
 users = users_resp['users']
 users.each do |user|
