@@ -37,4 +37,21 @@ describe Descope::Client do
     end
     it_should_behave_like 'v1 API client'
   end
+
+  describe 'timeout configuration' do
+    it 'prefers the timeout option over timeout_seconds' do
+      client = Descope::Client.new(project_id:, management_key:, timeout: 5, timeout_seconds: 17)
+      expect(client.timeout).to eq(5)
+    end
+
+    it 'uses the timeout_seconds option as the HTTP timeout' do
+      client = Descope::Client.new(project_id:, management_key:, timeout_seconds: 17)
+      expect(client.timeout).to eq(17)
+    end
+
+    it 'defaults to DEFAULT_TIMEOUT_SECONDS when timeout_seconds is not provided' do
+      client = Descope::Client.new(project_id:, management_key:)
+      expect(client.timeout).to eq(Descope::Mixins::Common::DEFAULT_TIMEOUT_SECONDS)
+    end
+  end
 end

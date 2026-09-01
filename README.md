@@ -49,6 +49,20 @@ descope_client = Descope::Client.new(
 )
 ```
 
+### Request Timeout
+
+By default, every HTTP request the SDK makes to Descope uses a 60 second timeout. You can
+override this by passing `timeout` to the client config:
+
+```ruby
+descope_client = Descope::Client.new(
+  project_id: '<project_id>',
+  timeout: 10  # applies to all requests; defaults to 60
+)
+```
+
+`timeout_seconds` also works as an alias to this setting.
+
 ## Authentication Methods
 These sections show how to use the SDK to perform various authentication/authorization functions:
 
@@ -721,7 +735,7 @@ You can manage SSO settings and map SSO group roles and user attributes.
 
 ```ruby
 # You can get SSO SAML settings for a tenant
-sso_settings_res = descope_client.sso_get_settings('tenant-id')  
+sso_settings_res = descope_client.sso_get_settings('tenant-id')
 
 # You can configure SSO SAML settings manually by setting the required fields directly
 descope_client.configure_sso_saml_metadata(
@@ -735,7 +749,7 @@ descope_client.configure_sso_saml_metadata(
               username: 'test',
               name: 'test'
       },
-      callbackDomain: 'test'   
+      callbackDomain: 'test'
     },
     redirect_url: 'https://your.domain.com', # Global redirection after successful authentication
     domain: 'tenant-users.com' # Users authentication with this domain will be logged in to this tenant
@@ -803,7 +817,7 @@ roles = roles_resp['roles']
     roles.each do |role|
       # Do something
     end
-# 
+#
 ```
 
 # Search roles
@@ -1106,7 +1120,7 @@ descope_client.authz_save_schema(schema: schema, upgrade: true)
 # Create a relation between a resource and user
 descope_client.authz_create_relations(
         [
-                { 
+                {
                         resource: 'some-doc',
                         relationDefinition: 'owner',
                         namespace: 'doc',

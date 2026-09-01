@@ -207,6 +207,35 @@ describe Descope::Mixins::HTTP do
     end
   end
 
+  describe 'timeout handling' do
+    let(:mock_response) do
+      double('response').tap do |response|
+        allow(response).to receive(:code).and_return(200)
+        allow(response).to receive(:body).and_return('{"success": true}')
+        allow(response).to receive(:cookies).and_return({})
+        allow(response).to receive(:headers).and_return({})
+      end
+    end
+
+    it 'passes the configured timeout through to #call' do
+      @instance.timeout = 42
+      allow(@instance).to receive(:call).and_return(mock_response)
+
+      @instance.request(:get, '/test', {}, {})
+
+      expect(@instance).to have_received(:call).with(:get, anything, 42, anything)
+    end
+
+    it 'forwards the timeout to RestClient::Request.execute' do
+      @instance.timeout = 42
+      allow(RestClient::Request).to receive(:execute).and_return(mock_response)
+
+      @instance.request(:get, '/test', {}, {})
+
+      expect(RestClient::Request).to have_received(:execute).with(hash_including(timeout: 42))
+    end
+  end
+
   describe 'integration with request method' do
     it 'passes headers parameter to safe_parse_json' do
       # Mock RestClient response with custom domain cookies
