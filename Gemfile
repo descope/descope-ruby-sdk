@@ -5,7 +5,7 @@ gemspec
 
 group :development do
   gem 'rubocop', '1.88.2', require: false
-  gem 'rubocop-rails', '2.35.5', require: false
+  gem 'rubocop-rails', '2.37.0', require: false
 end
 
 group :test do
