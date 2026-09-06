@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Engine do
     end
 
     it 'is expected to create a new engine' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ENGINE_CREATE_PATH,
         {
           name: 'test-engine'
@@ -33,7 +33,7 @@ describe Descope::Api::V1::Management::Engine do
     end
 
     it 'is expected to update an existing engine' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ENGINE_UPDATE_PATH,
         {
           id: 'test-id',
@@ -52,7 +52,7 @@ describe Descope::Api::V1::Management::Engine do
     end
 
     it 'is expected to delete an existing engine' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ENGINE_DELETE_PATH,
         {
           id: 'test-id'
@@ -70,7 +70,7 @@ describe Descope::Api::V1::Management::Engine do
     end
 
     it 'is expected to load an engine by id' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         ENGINE_LOAD_PATH,
         {
           id: 'test-id'
@@ -88,7 +88,7 @@ describe Descope::Api::V1::Management::Engine do
     end
 
     it 'is expected to load all engines' do
-      expect(@instance).to receive(:get).with(ENGINE_LOAD_ALL_PATH)
+      expect(@instance).to receive(:mgmt_get).with(ENGINE_LOAD_ALL_PATH)
       expect do
         @instance.load_all_engines
       end.not_to raise_error
@@ -101,7 +101,7 @@ describe Descope::Api::V1::Management::Engine do
     end
 
     it 'is expected to rotate the secret for an engine' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ENGINE_ROTATE_SECRET_PATH,
         {
           id: 'test-id'

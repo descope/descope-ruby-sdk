@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::ScopeClaimMapping do
     end
 
     it 'is expected to get the project-wide OIDC scope-to-claim mappings' do
-      expect(@instance).to receive(:post).with(SCOPE_CLAIM_MAPPING_GET_PATH)
+      expect(@instance).to receive(:mgmt_post).with(SCOPE_CLAIM_MAPPING_GET_PATH)
       expect do
         @instance.get_scope_claim_mapping
       end.not_to raise_error
@@ -34,7 +34,7 @@ describe Descope::Api::V1::Management::ScopeClaimMapping do
           claims: %w[claim1 claim2]
         }
       ]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         SCOPE_CLAIM_MAPPING_SET_PATH,
         { mappings: mappings }
       )
@@ -50,7 +50,7 @@ describe Descope::Api::V1::Management::ScopeClaimMapping do
     end
 
     it 'is expected to delete the project-wide OIDC scope-to-claim mappings' do
-      expect(@instance).to receive(:post).with(SCOPE_CLAIM_MAPPING_DELETE_PATH)
+      expect(@instance).to receive(:mgmt_post).with(SCOPE_CLAIM_MAPPING_DELETE_PATH)
       expect do
         @instance.delete_scope_claim_mapping
       end.not_to raise_error

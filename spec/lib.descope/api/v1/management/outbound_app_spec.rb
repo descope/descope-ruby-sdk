@@ -57,7 +57,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'fetches token with required parameters only' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         '/v1/mgmt/outbound/app/user/token',
         {
           appId: 'app-123',
@@ -70,7 +70,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'fetches token with scopes' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         '/v1/mgmt/outbound/app/user/token',
         {
           appId: 'app-123',
@@ -88,7 +88,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'fetches token with options' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         '/v1/mgmt/outbound/app/user/token',
         {
           appId: 'app-123',
@@ -110,7 +110,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'fetches token with tenant_id' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         '/v1/mgmt/outbound/app/user/token',
         {
           appId: 'app-123',
@@ -128,7 +128,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'fetches token with all parameters' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         '/v1/mgmt/outbound/app/user/token',
         {
           appId: 'app-123',
@@ -172,7 +172,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'deletes tokens by app_id only' do
-      expect(@instance).to receive(:delete).with(
+      expect(@instance).to receive(:mgmt_delete).with(
         '/v1/mgmt/outbound/user/tokens',
         { appId: 'app-123' }
       )
@@ -183,7 +183,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'deletes tokens by user_id only' do
-      expect(@instance).to receive(:delete).with(
+      expect(@instance).to receive(:mgmt_delete).with(
         '/v1/mgmt/outbound/user/tokens',
         { userId: 'user-123' }
       )
@@ -194,7 +194,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'deletes tokens by both app_id and user_id' do
-      expect(@instance).to receive(:delete).with(
+      expect(@instance).to receive(:mgmt_delete).with(
         '/v1/mgmt/outbound/user/tokens',
         { appId: 'app-123', userId: 'user-123' }
       )
@@ -223,7 +223,7 @@ describe Descope::Api::V1::Management::OutboundApp do
     end
 
     it 'deletes token by id' do
-      expect(@instance).to receive(:delete).with(
+      expect(@instance).to receive(:mgmt_delete).with(
         '/v1/mgmt/outbound/token',
         { id: 'token-123' }
       )

@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::SSOSettings do
     end
 
     it 'is expected to get SSO settings' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         SSO_SETTINGS_PATH, { tenantId: '123' }
       )
       expect { @instance.get_sso_settings('123') }.not_to raise_error
@@ -28,7 +28,7 @@ describe Descope::Api::V1::Management::SSOSettings do
     end
 
     it 'is expected to delete SSO settings' do
-      expect(@instance).to receive(:delete).with(
+      expect(@instance).to receive(:mgmt_delete).with(
         SSO_SETTINGS_PATH, { tenantId: '123' }
       )
       expect { @instance.delete_sso_settings('123') }.not_to raise_error
@@ -40,7 +40,7 @@ describe Descope::Api::V1::Management::SSOSettings do
       end
 
       it 'is expected to configure SSO settings' do
-        expect(@instance).to receive(:post).with(
+        expect(@instance).to receive(:mgmt_post).with(
           SSO_OIDC_PATH, {
             tenantId: '123',
             settings: {
@@ -86,7 +86,7 @@ describe Descope::Api::V1::Management::SSOSettings do
     end
 
     it 'is expected to configure SSO settings' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         SSO_SETTINGS_PATH, {
           tenantId: '123',
           settings: {
@@ -131,7 +131,7 @@ describe Descope::Api::V1::Management::SSOSettings do
     end
 
     it 'is expected to configure SAML metadata' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         SSO_METADATA_PATH, {
           tenantId: '123',
           settings: {

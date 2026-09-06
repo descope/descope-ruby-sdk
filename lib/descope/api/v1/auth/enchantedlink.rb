@@ -17,7 +17,7 @@ module Descope
             validate_refresh_token_provided(login_options, refresh_token)
             body = enchanted_link_compose_signin_body(login_id, uri, login_options)
             uri = enchanted_link_compose_signin_url
-            post(uri, body, nil, refresh_token)
+            post(uri, body, {}, refresh_token)
           end
 
           def enchanted_link_sign_up(login_id: nil, uri: nil, user: {})

@@ -53,7 +53,7 @@ module Descope
             request_params[:geos] = geos unless geos.nil?
             request_params[:tenants] = tenants unless tenants.nil?
 
-            post(ANALYTICS_SEARCH_PATH, request_params)
+            mgmt_post(ANALYTICS_SEARCH_PATH, request_params)
           end
         end
       end

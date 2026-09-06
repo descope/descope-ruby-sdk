@@ -22,7 +22,7 @@ describe Descope::Api::V1::Management::JWTTemplate do
         conformanceIssuer: true,
         authSchema: 'default'
       }
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         JWT_TEMPLATE_CREATE_PATH,
         { template: template }
       )
@@ -43,7 +43,7 @@ describe Descope::Api::V1::Management::JWTTemplate do
         name: 'name-of-template',
         template: 'the template body'
       }
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         JWT_TEMPLATE_UPDATE_PATH,
         { template: template }
       )
@@ -59,7 +59,7 @@ describe Descope::Api::V1::Management::JWTTemplate do
     end
 
     it 'is expected to delete the given JWT template' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         JWT_TEMPLATE_DELETE_PATH,
         { id: 'template-id' }
       )
@@ -75,7 +75,7 @@ describe Descope::Api::V1::Management::JWTTemplate do
     end
 
     it 'is expected to list all JWT templates' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         JWT_TEMPLATE_LIST_PATH,
         {}
       )
@@ -91,7 +91,7 @@ describe Descope::Api::V1::Management::JWTTemplate do
     end
 
     it 'is expected to load the given JWT template' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         JWT_TEMPLATE_LOAD_PATH,
         { id: 'template-id' }
       )

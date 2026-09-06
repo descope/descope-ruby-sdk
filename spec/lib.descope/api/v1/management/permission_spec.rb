@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Permission do
     end
 
     it 'is expected to create a new permission' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         PERMISSION_CREATE_PATH, {
           name: 'test',
           description: 'test'
@@ -36,7 +36,7 @@ describe Descope::Api::V1::Management::Permission do
     end
 
     it 'is expected to update a permission' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         PERMISSION_UPDATE_PATH, {
           name: 'test',
           newName: 'production',
@@ -59,7 +59,7 @@ describe Descope::Api::V1::Management::Permission do
     end
 
     it 'is expected to delete a permission' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         PERMISSION_DELETE_PATH, { name: 'test' }
       )
       expect do
@@ -74,7 +74,7 @@ describe Descope::Api::V1::Management::Permission do
     end
 
     it 'is expected to delete a permission' do
-      expect(@instance).to receive(:get).with(PERMISSION_LOAD_ALL_PATH)
+      expect(@instance).to receive(:mgmt_get).with(PERMISSION_LOAD_ALL_PATH)
       expect { @instance.load_all_permissions }.not_to raise_error
     end
   end

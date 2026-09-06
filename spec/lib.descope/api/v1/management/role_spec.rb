@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Role do
     end
 
     it 'is expected to create a new role' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ROLE_CREATE_PATH, {
           name: 'test',
           description: 'test',
@@ -40,7 +40,7 @@ describe Descope::Api::V1::Management::Role do
     end
 
     it 'is expected to update a role' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ROLE_UPDATE_PATH, {
           name: 'test',
           newName: 'production',
@@ -67,7 +67,7 @@ describe Descope::Api::V1::Management::Role do
     end
 
     it 'is expected to delete a role' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ROLE_DELETE_PATH, { name: 'test', tenantId: 'test' }
       )
       expect do
@@ -82,7 +82,7 @@ describe Descope::Api::V1::Management::Role do
     end
 
     it 'is expected to delete a role' do
-      expect(@instance).to receive(:get).with(ROLE_LOAD_ALL_PATH)
+      expect(@instance).to receive(:mgmt_get).with(ROLE_LOAD_ALL_PATH)
       expect { @instance.load_all_roles }.not_to raise_error
     end
   end
@@ -93,7 +93,7 @@ describe Descope::Api::V1::Management::Role do
     end
 
     it 'is expected to search roles' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ROLE_SEARCH_PATH, {
           roleNames: %w[tester test2],
           tenantIds: %w[t1 t2],

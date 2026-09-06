@@ -38,7 +38,7 @@ module Descope
               force_pkce:,
               default_audience:
             )
-            post(THIRD_PARTY_APP_CREATE_PATH, body)
+            mgmt_post(THIRD_PARTY_APP_CREATE_PATH, body)
           end
 
           def update_application(
@@ -71,7 +71,7 @@ module Descope
               force_pkce:,
               default_audience:
             )
-            post(THIRD_PARTY_APP_UPDATE_PATH, body)
+            mgmt_post(THIRD_PARTY_APP_UPDATE_PATH, body)
           end
 
           def patch_application(
@@ -103,32 +103,32 @@ module Descope
               force_pkce:,
               default_audience:
             )
-            post(THIRD_PARTY_APP_PATCH_PATH, body)
+            mgmt_post(THIRD_PARTY_APP_PATCH_PATH, body)
           end
 
           def delete_application(id)
             # Delete an existing third party application. IMPORTANT: This operation is irreversible. Use carefully.
-            post(THIRD_PARTY_APP_DELETE_PATH, { id: })
+            mgmt_post(THIRD_PARTY_APP_DELETE_PATH, { id: })
           end
 
           def load_application(id)
             # Load an existing third party application.
-            get(THIRD_PARTY_APP_LOAD_PATH, { id: })
+            mgmt_get(THIRD_PARTY_APP_LOAD_PATH, { id: })
           end
 
           def load_all_applications
             # Load all third party applications.
-            get(THIRD_PARTY_APP_LOAD_ALL_PATH, {})
+            mgmt_get(THIRD_PARTY_APP_LOAD_ALL_PATH, {})
           end
 
           def get_application_secret(id)
             # Get the cleartext secret of an existing third party application.
-            get(THIRD_PARTY_APP_SECRET_PATH, { id: })
+            mgmt_get(THIRD_PARTY_APP_SECRET_PATH, { id: })
           end
 
           def rotate_application_secret(id)
             # Rotate the secret of an existing third party application, returning the new cleartext secret.
-            post(THIRD_PARTY_APP_ROTATE_PATH, { id: })
+            mgmt_post(THIRD_PARTY_APP_ROTATE_PATH, { id: })
           end
 
           def delete_consents(app_id: nil, consent_ids: nil, user_ids: nil, tenant_id: nil)
@@ -138,7 +138,7 @@ module Descope
             body[:appId] = app_id if app_id
             body[:userIds] = user_ids if user_ids
             body[:tenantId] = tenant_id if tenant_id
-            post(THIRD_PARTY_APP_DELETE_CONSENTS_PATH, body)
+            mgmt_post(THIRD_PARTY_APP_DELETE_CONSENTS_PATH, body)
           end
 
           def delete_tenant_consents(app_id: nil, consent_ids: nil, tenant_id: nil)
@@ -147,7 +147,7 @@ module Descope
             body[:consentIds] = consent_ids if consent_ids
             body[:appId] = app_id if app_id
             body[:tenantId] = tenant_id if tenant_id
-            post(THIRD_PARTY_APP_DELETE_TENANT_CONSENTS_PATH, body)
+            mgmt_post(THIRD_PARTY_APP_DELETE_TENANT_CONSENTS_PATH, body)
           end
 
           private

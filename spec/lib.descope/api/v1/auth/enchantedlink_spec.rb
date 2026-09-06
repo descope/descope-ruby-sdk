@@ -30,7 +30,7 @@ describe Descope::Api::V1::EnchantedLink do
       expect(@instance).to receive(:post).with(
         enchanted_link_compose_signin_url,
         request_params,
-        nil,
+        {},
         'refresh_token'
       )
 

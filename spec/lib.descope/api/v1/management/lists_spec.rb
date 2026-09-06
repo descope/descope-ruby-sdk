@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to create a new list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_CREATE_PATH,
         {
           name: 'test-list',
@@ -35,7 +35,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to create a new list without optional fields' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_CREATE_PATH,
         { name: 'test-list', type: 'ip' }
       )
@@ -51,7 +51,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to update an existing list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_UPDATE_PATH,
         {
           id: 'test-id',
@@ -79,7 +79,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to delete an existing list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_DELETE_PATH,
         { id: 'test-id' }
       )
@@ -95,7 +95,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to load a list by id' do
-      expect(@instance).to receive(:get).with("#{LIST_LOAD_PATH}/test-id")
+      expect(@instance).to receive(:mgmt_get).with("#{LIST_LOAD_PATH}/test-id")
       expect do
         @instance.load_list(id: 'test-id')
       end.not_to raise_error
@@ -108,7 +108,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to load a list by name' do
-      expect(@instance).to receive(:get).with("#{LIST_LOAD_BY_NAME_PATH}/test-list")
+      expect(@instance).to receive(:mgmt_get).with("#{LIST_LOAD_BY_NAME_PATH}/test-list")
       expect do
         @instance.load_list_by_name(name: 'test-list')
       end.not_to raise_error
@@ -121,7 +121,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to load all lists' do
-      expect(@instance).to receive(:get).with(LIST_LOAD_ALL_PATH)
+      expect(@instance).to receive(:mgmt_get).with(LIST_LOAD_ALL_PATH)
       expect do
         @instance.load_all_lists
       end.not_to raise_error
@@ -135,7 +135,7 @@ describe Descope::Api::V1::Management::Lists do
 
     it 'is expected to import the given lists' do
       lists = [{ name: 'test-list', type: 'ip' }]
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_IMPORT_PATH,
         { lists: }
       )
@@ -151,7 +151,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to add the given IPs to the list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_ADD_IPS_PATH,
         { id: 'test-id', ips: ['1.2.3.4'] }
       )
@@ -167,7 +167,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to remove the given IPs from the list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_REMOVE_IPS_PATH,
         { id: 'test-id', ips: ['1.2.3.4'] }
       )
@@ -183,7 +183,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to check whether the given IP exists in the list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_CHECK_IP_PATH,
         { id: 'test-id', ip: '1.2.3.4' }
       )
@@ -199,7 +199,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to add the given texts to the list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_ADD_TEXTS_PATH,
         { id: 'test-id', texts: ['some-text'] }
       )
@@ -215,7 +215,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to remove the given texts from the list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_REMOVE_TEXTS_PATH,
         { id: 'test-id', texts: ['some-text'] }
       )
@@ -231,7 +231,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to check whether the given text exists in the list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_CHECK_TEXT_PATH,
         { id: 'test-id', text: 'some-text' }
       )
@@ -247,7 +247,7 @@ describe Descope::Api::V1::Management::Lists do
     end
 
     it 'is expected to clear all entries from the list' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         LIST_CLEAR_PATH,
         { id: 'test-id' }
       )

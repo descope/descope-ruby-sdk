@@ -18,13 +18,18 @@ module Descope
       MIN_REQUEST_RETRY_DELAY = 250
       BASE_DELAY = 100
 
-      %i[get post post_file post_form put patch delete delete_with_body].each do |method|
+      HTTP_METHODS = %i[get post put patch delete].freeze
+
+      HTTP_METHODS.each do |method|
         define_method(method) do |uri, body = {}, extra_headers = {}, pswd = nil|
           body = body.delete_if { |_, v| v.nil? }
-          authorization_header(pswd) # This will set the pswd if provided, else default to the @default_pswd
+
+          # The Authorization header travels with the request rather than being merged into the
+          # shared @headers, so concurrent requests cannot send each other's credentials.
+          headers = authorization_header(pswd).merge(extra_headers || {})
 
           @logger.debug "request => method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}}"
-          request_with_retry(method, uri, body, extra_headers)
+          request_with_retry(method, uri, body, headers)
         end
       end
 
@@ -118,6 +123,15 @@ module Descope
         @headers.merge!(h.to_hash)
       end
 
+      # Everything after the project ID in the bearer is either a token or a management key, so
+      # none of it belongs in a log line.
+      def mask_authorization(headers)
+        authorization = headers['Authorization']
+        return headers if authorization.nil?
+
+        headers.merge('Authorization' => authorization.sub(/\A(Bearer [^:]*):.*\z/, '\1:***'))
+      end
+
       def request_with_retry(method, uri, body = {}, extra_headers = {}, pswd = nil)
         Retryable.retryable(retry_options) do
           request(method, uri, body, extra_headers)
@@ -125,23 +139,16 @@ module Descope
       end
 
       def request(method, uri, body = {}, extra_headers = {})
-        # @headers is getting the authorization header merged in initializer.rb
-        headers_debug = @headers.dup
-        if headers_debug['Authorization']
-          headers_debug['Authorization'] = headers_debug['Authorization'].gsub(/(.{10})\z/, '***********')
-        end
+        request_headers = @headers.merge(extra_headers)
 
         @logger.debug "base url: #{@base_uri}"
-        @logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, extra_headers: #{extra_headers}, headers: #{headers_debug}"
+        @logger.debug "request method: #{method}, uri: #{uri}, body: #{body}, " \
+                      "headers: #{mask_authorization(request_headers)}"
         result = case method
-                 when :get
-                   get_headers = @headers.merge({ params: body }).merge(extra_headers)
-                   call(:get, encode_uri(uri), timeout, get_headers)
-                 when :delete
-                   delete_headers = @headers.merge({ params: body })
-                   call(:delete, encode_uri(uri), timeout, delete_headers)
+                 when :get, :delete
+                   call(method, encode_uri(uri), timeout, request_headers.merge({ params: body }))
                  else
-                   call(method, encode_uri(uri), timeout, @headers, body.to_json)
+                   call(method, encode_uri(uri), timeout, request_headers, body.to_json)
                  end
 
         raise Descope::Unsupported.new('No response from server', code: 400) unless result.respond_to?(:code)

@@ -10,7 +10,7 @@ module Descope
 
           def rename_project(name)
             # Rename a project.
-            post(PROJECT_UPDATE_NAME, { name: })
+            mgmt_post(PROJECT_UPDATE_NAME, { name: })
           end
 
           def export_project
@@ -20,7 +20,7 @@ module Descope
             #    - Users, tenants and access keys are not cloned.
             #    - Secrets, keys and tokens are not stripped from the exported data.
             #   @returns a HASH containing the exported JSON files payload.
-            post(PROJECT_EXPORT_PATH)
+            mgmt_post(PROJECT_EXPORT_PATH)
           end
 
           def import_project(files: nil, excludes: nil)
@@ -28,12 +28,12 @@ module Descope
             # The argument of files should be the output of the export project endpoint
             body = { files: }
             body[:excludes] = excludes unless excludes.nil?
-            post(PROJECT_IMPORT_PATH, body)
+            mgmt_post(PROJECT_IMPORT_PATH, body)
           end
 
           def delete_project
             # Delete the current project. IMPORTANT: This action is irreversible. Use carefully.
-            post(PROJECT_DELETE_PATH)
+            mgmt_post(PROJECT_DELETE_PATH)
           end
 
           def clone_project(name: nil, tag: nil)
@@ -44,7 +44,7 @@ module Descope
               name:,
               tag:
             }
-            post(PROJECT_CLONE, request_params)
+            mgmt_post(PROJECT_CLONE, request_params)
           end
         end
       end
