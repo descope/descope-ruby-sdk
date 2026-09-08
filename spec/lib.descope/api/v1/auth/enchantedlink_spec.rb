@@ -60,6 +60,48 @@ describe Descope::Api::V1::EnchantedLink do
         @instance.send(:validate_refresh_token_provided, { mfa: true, stepup: true }, '')
       end.to raise_error(Descope::AuthException, 'Missing refresh token for stepup/mfa')
     end
+
+    it 'is expected to respond to sign in with phone' do
+      expect(@instance).to respond_to(:enchanted_link_sign_in_with_phone)
+    end
+
+    it 'is expected to sign in with enchanted link via sms' do
+      request_params = {
+        loginId: '+1234567890',
+        redirectUrl: 'https://some-uri/sms',
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        },
+        providerId: 'provider-id',
+        templateId: 'template-id'
+      }
+
+      expect(@instance).to receive(:post).with(
+        '/v1/auth/enchantedlink/signin/sms',
+        request_params,
+        {},
+        'refresh_token'
+      ).and_return({ 'linkId' => '1', 'pendingRef' => 'ref', 'maskedPhone' => '+1******890' })
+
+      res = @instance.enchanted_link_sign_in_with_phone(
+        login_id: '+1234567890',
+        uri: 'https://some-uri/sms',
+        login_options: {
+          stepup: false,
+          custom_claims: { 'abc': '123' },
+          mfa: false,
+          sso_app_id: 'sso-id'
+        },
+        provider_id: 'provider-id',
+        template_id: 'template-id',
+        refresh_token: 'refresh_token'
+      )
+
+      expect(res['maskedPhone']).to eq('+1******890')
+    end
   end
 
   context '.sign_up' do
@@ -87,6 +129,36 @@ describe Descope::Api::V1::EnchantedLink do
           user: { login_id: 'user1', email: 'dummy@dummy.com' }
         )
       end.not_to raise_error
+    end
+
+    it 'is expected to respond to sign up with phone' do
+      expect(@instance).to respond_to(:enchanted_link_sign_up_with_phone)
+    end
+
+    it 'is expected to sign up with enchanted link via sms' do
+      request_params = {
+        loginId: '+1234567890',
+        redirectUrl: 'https://some-uri/sms',
+        user: { loginId: 'user1', phone: '+1234567890' },
+        phone: '+1234567890',
+        providerId: 'provider-id',
+        templateId: 'template-id'
+      }
+
+      expect(@instance).to receive(:post).with(
+        '/v1/auth/enchantedlink/signup/sms',
+        request_params
+      ).and_return({ 'linkId' => '1', 'pendingRef' => 'ref', 'maskedPhone' => '+1******890' })
+
+      res = @instance.enchanted_link_sign_up_with_phone(
+        login_id: '+1234567890',
+        uri: 'https://some-uri/sms',
+        user: { login_id: 'user1', phone: '+1234567890' },
+        provider_id: 'provider-id',
+        template_id: 'template-id'
+      )
+
+      expect(res['maskedPhone']).to eq('+1******890')
     end
   end
 
@@ -124,6 +196,96 @@ describe Descope::Api::V1::EnchantedLink do
           }
         )
       end.not_to raise_error
+    end
+
+    it 'is expected to respond to sign up or in with phone' do
+      expect(@instance).to respond_to(:enchanted_link_sign_up_or_in_with_phone)
+    end
+
+    it 'is expected to sign up or in with enchanted link via sms' do
+      request_params = {
+        loginId: '+1234567890',
+        redirectUrl: 'https://some-uri/sms',
+        loginOptions: {
+          stepup: false,
+          customClaims: { 'abc': '123' },
+          mfa: false,
+          ssoAppId: 'sso-id'
+        },
+        providerId: 'provider-id',
+        templateId: 'template-id'
+      }
+
+      expect(@instance).to receive(:post).with(
+        '/v1/auth/enchantedlink/signup-in/sms',
+        request_params
+      ).and_return({ 'linkId' => '1', 'pendingRef' => 'ref', 'maskedPhone' => '+1******890' })
+
+      res = @instance.enchanted_link_sign_up_or_in_with_phone(
+        login_id: '+1234567890',
+        uri: 'https://some-uri/sms',
+        login_options: {
+          stepup: false,
+          custom_claims: { 'abc': '123' },
+          mfa: false,
+          sso_app_id: 'sso-id'
+        },
+        provider_id: 'provider-id',
+        template_id: 'template-id'
+      )
+
+      expect(res['maskedPhone']).to eq('+1******890')
+    end
+  end
+
+  context '.update_user_phone' do
+    it 'is expected to respond to update user phone' do
+      expect(@instance).to respond_to(:enchanted_link_update_user_phone)
+    end
+
+    it 'is expected to update user phone with enchanted link via sms' do
+      request_params = {
+        loginId: 'test',
+        phone: '+1234567890',
+        addToLoginIDs: true,
+        onMergeUseExisting: true,
+        redirectUrl: 'https://some-uri/sms',
+        providerId: 'provider-id',
+        templateId: 'template-id',
+        templateOptions: { 'abc': '123' }
+      }
+
+      expect(@instance).to receive(:post).with(
+        '/v1/auth/enchantedlink/update/phone/sms',
+        request_params,
+        {},
+        'refresh_token'
+      ).and_return({ 'linkId' => '1', 'pendingRef' => 'ref', 'maskedPhone' => '+1******890' })
+
+      res = @instance.enchanted_link_update_user_phone(
+        login_id: 'test',
+        phone: '+1234567890',
+        uri: 'https://some-uri/sms',
+        add_to_login_ids: true,
+        on_merge_use_existing: true,
+        provider_id: 'provider-id',
+        template_id: 'template-id',
+        template_options: { 'abc': '123' },
+        refresh_token: 'refresh_token'
+      )
+
+      expect(res['maskedPhone']).to eq('+1******890')
+    end
+
+    it 'is expected to raise an error on an invalid phone number' do
+      expect do
+        @instance.enchanted_link_update_user_phone(
+          login_id: 'test',
+          phone: 'not-a-phone',
+          uri: 'https://some-uri/sms',
+          refresh_token: 'refresh_token'
+        )
+      end.to raise_error(Descope::AuthException)
     end
   end
 

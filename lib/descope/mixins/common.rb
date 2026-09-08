@@ -81,6 +81,7 @@ module Descope
         VERIFY_ENCHANTEDLINK_AUTH_PATH = '/v1/auth/enchantedlink/verify'
         GET_SESSION_ENCHANTEDLINK_AUTH_PATH = '/v1/auth/enchantedlink/pending-session'
         UPDATE_USER_EMAIL_ENCHANTEDLINK_PATH = '/v1/auth/enchantedlink/update/email'
+        UPDATE_USER_PHONE_ENCHANTEDLINK_PATH = '/v1/auth/enchantedlink/update/phone'
 
         # oauth
         OAUTH_START_PATH = '/v1/auth/oauth/authorize'
