@@ -222,7 +222,7 @@ res = descope_client.enchanted_link_sign_up_or_in_with_phone(
     uri: 'https://myapp.com/verify-enchanted-link', # Set redirect URI here or via console
     template_id: 'my-text-template-id' # Optional, selects a specific text template
 )
-link_identifier = res['linkId'] # Show the user which link they should press in their SMS
+link_identifier = res['linkId'] # Matches the identifier at the start of the SMS, so the user can confirm it
 pending_ref = res['pendingRef'] # Used to poll for a valid session
 masked_phone = res['maskedPhone'] # The phone number that the message was sent to in a masked format
 ```
