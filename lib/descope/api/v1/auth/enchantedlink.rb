@@ -20,6 +20,16 @@ module Descope
             post(uri, body, {}, refresh_token)
           end
 
+          def enchanted_link_sign_in_with_phone(login_id: nil, uri: nil, login_options: nil, provider_id: nil, template_id: nil, refresh_token: nil)
+            validate_login_id(login_id)
+            validate_refresh_token_provided(login_options, refresh_token)
+            body = enchanted_link_compose_signin_body(login_id, uri, login_options)
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
+            uri = enchanted_link_compose_signin_url(Descope::Mixins::Common::DeliveryMethod::SMS)
+            post(uri, body, {}, refresh_token)
+          end
+
           def enchanted_link_sign_up(login_id: nil, uri: nil, user: {})
             # Sign-up new end user by sending an enchanted link via email
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpEnchantedLink/
@@ -36,10 +46,35 @@ module Descope
             post(uri, body)
           end
 
+          def enchanted_link_sign_up_with_phone(login_id: nil, uri: nil, user: {}, provider_id: nil, template_id: nil)
+            method = Descope::Mixins::Common::DeliveryMethod::SMS
+
+            unless adjust_and_verify_delivery_method(method, login_id, user)
+              raise Descope::ArgumentException.new(
+                'Invalid delivery method',
+                code: 400
+              )
+            end
+
+            body = enchanted_link_compose_signup_body(login_id, uri, user, method)
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
+            uri = enchanted_link_compose_signup_url(method)
+            post(uri, body)
+          end
+
           def enchanted_link_sign_up_or_in(login_id: nil, uri: nil, login_options: nil)
             # @see https://docs.descope.com/api/openapi/enchantedlink/operation/SignUpOrInEnchantedLinkEmail/
             body = enchanted_link_compose_signin_body(login_id, uri, login_options)
             uri = enchanted_link_compose_sign_up_or_in_url
+            post(uri, body)
+          end
+
+          def enchanted_link_sign_up_or_in_with_phone(login_id: nil, uri: nil, login_options: nil, provider_id: nil, template_id: nil)
+            body = enchanted_link_compose_signin_body(login_id, uri, login_options)
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
+            uri = enchanted_link_compose_sign_up_or_in_url(Descope::Mixins::Common::DeliveryMethod::SMS)
             post(uri, body)
           end
 
@@ -56,6 +91,22 @@ module Descope
             body[:templateId] = template_id if template_id
             body[:templateOptions] = template_options if template_options
             uri = UPDATE_USER_EMAIL_ENCHANTEDLINK_PATH
+            post(uri, body, {}, refresh_token)
+          end
+
+          def enchanted_link_update_user_phone(login_id: nil, phone: nil, uri: nil, add_to_login_ids: nil, on_merge_use_existing: nil, provider_id: nil, template_id: nil, template_options: nil, refresh_token: nil)
+            validate_login_id(login_id)
+            validate_token_not_empty(refresh_token)
+            validate_phone(Descope::Mixins::Common::DeliveryMethod::SMS, phone)
+
+            body = enchanted_link_compose_update_user_phone_body(
+              login_id, phone, add_to_login_ids, on_merge_use_existing
+            )
+            body[:redirectUrl] = uri
+            body[:providerId] = provider_id if provider_id
+            body[:templateId] = template_id if template_id
+            body[:templateOptions] = template_options if template_options
+            uri = compose_url(UPDATE_USER_PHONE_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::SMS)
             post(uri, body, {}, refresh_token)
           end
 
@@ -97,19 +148,23 @@ module Descope
             body
           end
 
-          def enchanted_link_compose_signin_url
-            compose_url(SIGN_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          def enchanted_link_compose_signin_url(method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
+            compose_url(SIGN_IN_AUTH_ENCHANTEDLINK_PATH, method)
           end
 
-          def enchanted_link_compose_signup_url
-            compose_url(SIGN_UP_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          def enchanted_link_compose_signup_url(method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
+            compose_url(SIGN_UP_AUTH_ENCHANTEDLINK_PATH, method)
           end
 
-          def enchanted_link_compose_sign_up_or_in_url
-            compose_url(SIGN_UP_OR_IN_AUTH_ENCHANTEDLINK_PATH, Descope::Mixins::Common::DeliveryMethod::EMAIL)
+          def enchanted_link_compose_sign_up_or_in_url(method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
+            compose_url(SIGN_UP_OR_IN_AUTH_ENCHANTEDLINK_PATH, method)
           end
 
-          def enchanted_link_compose_signup_body(login_id, uri, user)
+          def enchanted_link_compose_signup_body(login_id, uri, user, method = nil)
+            method = Descope::Mixins::Common::DeliveryMethod::EMAIL if method.nil?
             body = {
               loginId: login_id,
               redirectUrl: uri
@@ -118,7 +173,7 @@ module Descope
             unless user.nil? || user.empty?
               body[:user] = enchantedlink_user_compose_update_body(**user) unless user.empty?
 
-              method_str, val = get_login_id_by_method(method: Descope::Mixins::Common::DeliveryMethod::EMAIL, user:)
+              method_str, val = get_login_id_by_method(method:, user:)
               body[method_str.to_sym] = val
             end
 
@@ -132,6 +187,18 @@ module Descope
             }
 
             body[:addToLoginIds] = add_to_login_ids if add_to_login_ids
+            body[:onMergeUseExisting] = on_merge_use_existing if on_merge_use_existing
+
+            body
+          end
+
+          def enchanted_link_compose_update_user_phone_body(login_id, phone, add_to_login_ids, on_merge_use_existing)
+            body = {
+              loginId: login_id,
+              phone:
+            }
+
+            body[:addToLoginIDs] = add_to_login_ids if add_to_login_ids
             body[:onMergeUseExisting] = on_merge_use_existing if on_merge_use_existing
 
             body

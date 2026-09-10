@@ -212,6 +212,33 @@ pending_ref = res['pendingRef'] # Used to poll for a valid session
 masked_email = res['maskedEmail'] # The email that the message was sent to in a masked format
 ```
 
+The same three calls are available over SMS, as `enchanted_link_sign_up_with_phone`,
+`enchanted_link_sign_in_with_phone` and `enchanted_link_sign_up_or_in_with_phone`. The `login_id` is
+a phone number, and the response carries `maskedPhone` instead of `maskedEmail`.
+
+```ruby
+res = descope_client.enchanted_link_sign_up_or_in_with_phone(
+    login_id: '+11111111111',
+    uri: 'https://myapp.com/verify-enchanted-link', # Set redirect URI here or via console
+    template_id: 'my-text-template-id' # Optional, selects a specific text template
+)
+link_identifier = res['linkId'] # Matches the identifier at the start of the SMS, so the user can confirm it
+pending_ref = res['pendingRef'] # Used to poll for a valid session
+masked_phone = res['maskedPhone'] # The phone number that the message was sent to in a masked format
+```
+
+An existing user's phone number can be updated with an enchanted link sent over SMS, using the
+refresh token of their active session:
+
+```ruby
+res = descope_client.enchanted_link_update_user_phone(
+    login_id: 'someone@example.com',
+    phone: '+11111111111',
+    uri: 'https://myapp.com/verify-enchanted-link',
+    refresh_token: refresh_token
+)
+```
+
 After sending the link, you must poll to receive a valid session using the `pending_ref` from
 the previous step. A valid session will be returned only after the user clicks the right link.
 
