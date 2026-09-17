@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.2.0](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.1.0...descope/v1.2.0) (2026-09-17)
+
+
+### Features
+
+* **auth:** support an auth management key for disabled auth methods ([#230](https://github.com/descope/descope-ruby-sdk/issues/230)) ([b746320](https://github.com/descope/descope-ruby-sdk/commit/b746320b1e69b53d0a75767e774f3ae1afbbced9))
+* **enchantedlink:** add SMS support alongside the existing email routes ([#234](https://github.com/descope/descope-ruby-sdk/issues/234)) ([cc122b1](https://github.com/descope/descope-ruby-sdk/commit/cc122b13a87cb2a056f42321e586327cf03ef3fd))
+* **management:** add missing management modules for go-sdk parity ([#209](https://github.com/descope/descope-ruby-sdk/issues/209)) ([17c34e0](https://github.com/descope/descope-ruby-sdk/commit/17c34e0059a50cab5a9839de9c476cbe3112cfe1))
+
 ## [1.1.0](https://github.com/descope/descope-ruby-sdk/compare/descope-v1.0.7...descope/v1.1.0) (2025-12-13)
 
 
