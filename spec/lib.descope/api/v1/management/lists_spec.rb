@@ -241,6 +241,32 @@ describe Descope::Api::V1::Management::Lists do
     end
   end
 
+  context '.list_check_texts' do
+    it 'should respond to .list_check_texts' do
+      expect(@instance).to respond_to :list_check_texts
+    end
+
+    it 'is expected to check whether any of the given texts exist in the list by default' do
+      expect(@instance).to receive(:mgmt_post).with(
+        LIST_CHECK_TEXT_PATH,
+        { id: 'test-id', texts: %w[text-1 text-2], matchAll: false }
+      )
+      expect do
+        @instance.list_check_texts(id: 'test-id', texts: %w[text-1 text-2])
+      end.not_to raise_error
+    end
+
+    it 'is expected to check whether all of the given texts exist in the list when match_all is set' do
+      expect(@instance).to receive(:mgmt_post).with(
+        LIST_CHECK_TEXT_PATH,
+        { id: 'test-id', texts: %w[text-1 text-2], matchAll: true }
+      )
+      expect do
+        @instance.list_check_texts(id: 'test-id', texts: %w[text-1 text-2], match_all: true)
+      end.not_to raise_error
+    end
+  end
+
   context '.clear_list' do
     it 'should respond to .clear_list' do
       expect(@instance).to respond_to :clear_list
