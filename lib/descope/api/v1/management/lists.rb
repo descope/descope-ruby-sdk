@@ -79,6 +79,12 @@ module Descope
             mgmt_post(LIST_CHECK_TEXT_PATH, { id:, text: })
           end
 
+          def list_check_texts(id: nil, texts: nil, match_all: false)
+            # Check whether the given texts exist in the list with the given id (up to 100 texts).
+            # By default it is enough for any of the texts to exist; set match_all to require all of them.
+            mgmt_post(LIST_CHECK_TEXT_PATH, { id:, texts:, matchAll: match_all })
+          end
+
           def clear_list(id: nil)
             # Clear all entries from the list with the given id.
             mgmt_post(LIST_CLEAR_PATH, { id: })

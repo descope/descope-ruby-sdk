@@ -1430,6 +1430,9 @@ descope_client.list_check_ip(id: list["id"], ip: "1.2.3.4")
 descope_client.list_add_texts(id: list["id"], texts: ["blocked"])
 descope_client.list_remove_texts(id: list["id"], texts: ["blocked"])
 descope_client.list_check_text(id: list["id"], text: "blocked")
+# Check up to 100 texts in one call: exists if any of them is in the list, or only if all are with match_all: true
+descope_client.list_check_texts(id: list["id"], texts: ["blocked", "other"])
+descope_client.list_check_texts(id: list["id"], texts: ["blocked", "other"], match_all: true)
 
 descope_client.clear_list(id: list["id"])
 descope_client.delete_list(id: list["id"])
