@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Project do
     end
 
     it 'is expected to rename the current project' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         PROJECT_UPDATE_NAME, { name: 'test' }
       )
       expect { @instance.rename_project('test') }.not_to raise_error
@@ -28,7 +28,7 @@ describe Descope::Api::V1::Management::Project do
     end
 
     it 'is expected to export the current project' do
-      expect(@instance).to receive(:post).with(PROJECT_EXPORT_PATH)
+      expect(@instance).to receive(:mgmt_post).with(PROJECT_EXPORT_PATH)
       expect do
         @instance.export_project
       end.not_to raise_error
@@ -41,7 +41,7 @@ describe Descope::Api::V1::Management::Project do
     end
 
     it 'is expected to import a project' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         PROJECT_IMPORT_PATH, { files: 'files' }
       )
       expect do
@@ -56,7 +56,7 @@ describe Descope::Api::V1::Management::Project do
     end
 
     it 'is expected to clone the current project' do
-      expect(@instance).to receive(:post).with(PROJECT_CLONE, { name: 'test', tag: 'test' })
+      expect(@instance).to receive(:mgmt_post).with(PROJECT_CLONE, { name: 'test', tag: 'test' })
       expect { @instance.clone_project(name: 'test', tag: 'test') }.not_to raise_error
     end
   end

@@ -27,7 +27,7 @@ module Descope
             request_params = {
               users: users_params
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           # Create a new test user.
@@ -102,7 +102,7 @@ module Descope
               hashed_password:,
               sso_app_ids:
             )
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           # Delete a user, using a valid management key.
@@ -113,12 +113,12 @@ module Descope
             request_params = {
               loginId: login_id
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           def delete_all_test_users
             path = Common::USER_DELETE_ALL_TEST_USERS_PATH
-            delete(path)
+            mgmt_delete(path)
           end
 
           # Load a user's data, using a valid management key.
@@ -132,7 +132,7 @@ module Descope
               loginId: login_id
             }
             path = Common::USER_LOAD_PATH
-            get(path, request_params)
+            mgmt_get(path, request_params)
           end
 
           # Load a user's data, using a valid management key by user id.
@@ -146,7 +146,7 @@ module Descope
             request_params = {
               userId: user_id
             }
-            get(path, request_params)
+            mgmt_get(path, request_params)
           end
 
           # Log a user out of all sessions, using a valid management key.
@@ -157,7 +157,7 @@ module Descope
             request_params = {
               loginId: login_id
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           def logout_user_by_id(user_id)
@@ -166,7 +166,7 @@ module Descope
             request_params = {
               userId: user_id
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           # Search for users, using a valid management key.
@@ -216,7 +216,7 @@ module Descope
             body[:roleNames] = role_names unless role_names.empty?
             body[:tenantRoleIds] = map_to_values_object(tenant_role_ids) unless tenant_role_ids.nil? || tenant_role_ids.empty?
             body[:tenantRoleNames] = map_to_values_object(tenant_role_names) unless tenant_role_names.nil? || tenant_role_names.empty?
-            post(Common::USERS_SEARCH_PATH, body)
+            mgmt_post(Common::USERS_SEARCH_PATH, body)
           end
 
           def map_to_values_object(input_map)
@@ -234,7 +234,7 @@ module Descope
               loginId: login_id,
               provider: provider
             }
-            get(path, request_params)
+            mgmt_get(path, request_params)
           end
 
           # Updates an existing user's status, using a valid management key.
@@ -246,7 +246,7 @@ module Descope
               loginId: login_id,
               status: 'enabled'
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           def deactivate(login_id)
@@ -256,7 +256,7 @@ module Descope
               loginId: login_id,
               status: 'disabled'
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           # Updates an existing user's login ID, using a valid management key.
@@ -268,7 +268,7 @@ module Descope
               loginId: login_id,
               newLoginId: new_login_id
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           # Updates an existing user's email, using a valid management key.
@@ -281,7 +281,7 @@ module Descope
               email:,
               verified:
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           # Updates an existing user's phone number, using a valid management key.
@@ -293,7 +293,7 @@ module Descope
               phone:,
               verified:
             }
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           # Updates an existing user's display name, using a valid management key.
@@ -310,7 +310,7 @@ module Descope
             body[:givenName] = given_name unless given_name.nil?
             body[:middleName] = middle_name unless middle_name.nil?
             body[:familyName] = family_name unless family_name.nil?
-            post(Common::USER_UPDATE_NAME_PATH, body)
+            mgmt_post(Common::USER_UPDATE_NAME_PATH, body)
           end
 
           # Update an existing user's profile picture, using a valid management key.
@@ -320,7 +320,7 @@ module Descope
               loginId: login_id,
               picture: picture
             }
-            post(Common::USER_UPDATE_PICTURE_PATH, body)
+            mgmt_post(Common::USER_UPDATE_PICTURE_PATH, body)
           end
 
           # Update an existing user's custom attributes, using a valid management key.
@@ -332,7 +332,7 @@ module Descope
               attributeKey: attribute_key,
               attributeValue: attribute_value
             }
-            post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
+            mgmt_post(Common::USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, body)
           end
 
           def patch_user(
@@ -377,7 +377,7 @@ module Descope
               hashed_password:,
               sso_app_ids:
             )
-            patch(path, request_params)
+            mgmt_patch(path, request_params)
           end
 
           def update_jwt(jwt: nil, custom_claims: nil)
@@ -385,7 +385,7 @@ module Descope
               jwt:,
               customClaims: custom_claims,
             }
-            post(Common::UPDATE_JWT_PATH, body)
+            mgmt_post(Common::UPDATE_JWT_PATH, body)
           end
 
           #
@@ -395,7 +395,7 @@ module Descope
               roleNames: role_names,
               tenantId: tenant_id
             }
-            post(Common::USER_ADD_ROLE_PATH, body)
+            mgmt_post(Common::USER_ADD_ROLE_PATH, body)
           end
 
           def user_remove_roles(login_id: nil, tenant_id:nil, role_names: [])
@@ -404,7 +404,7 @@ module Descope
               roleNames: role_names,
               tenantId: tenant_id
             }
-            post(Common::USER_REMOVE_ROLE_PATH, body)
+            mgmt_post(Common::USER_REMOVE_ROLE_PATH, body)
           end
 
           def user_add_tenant(login_id: nil, tenant_id: nil)
@@ -412,7 +412,7 @@ module Descope
               loginId: login_id,
               tenantId: tenant_id
             }
-            post(Common::USER_ADD_TENANT_PATH, body)
+            mgmt_post(Common::USER_ADD_TENANT_PATH, body)
           end
 
           def user_remove_tenant(login_id: nil, tenant_id: nil)
@@ -420,7 +420,7 @@ module Descope
               loginId: login_id,
               tenantId: tenant_id
             }
-            post(Common::USER_REMOVE_TENANT_PATH, body)
+            mgmt_post(Common::USER_REMOVE_TENANT_PATH, body)
           end
 
           def add_tenant_role(login_id: nil, tenant_id: nil, role_names: [])
@@ -429,7 +429,7 @@ module Descope
               tenantId: tenant_id,
               roleNames: role_names
             }
-            post(Common::USER_ADD_TENANT_PATH, body)
+            mgmt_post(Common::USER_ADD_TENANT_PATH, body)
           end
 
           def user_remove_tenant_roles(login_id: nil, tenant_id: nil, role_names: [])
@@ -438,7 +438,7 @@ module Descope
               tenantId: tenant_id,
               roleNames: role_names
             }
-            post(Common::USER_REMOVE_TENANT_PATH, body)
+            mgmt_post(Common::USER_REMOVE_TENANT_PATH, body)
           end
 
           def set_temporary_password(login_id: nil, password: nil)
@@ -446,7 +446,7 @@ module Descope
               loginId: login_id,
               password:
             }
-            post(Common::USER_SET_TEMPORARY_PASSWORD_PATH, body)
+            mgmt_post(Common::USER_SET_TEMPORARY_PASSWORD_PATH, body)
           end
 
           def set_active_password(login_id: nil, password: nil)
@@ -454,7 +454,7 @@ module Descope
               loginId: login_id,
               password:
             }
-            post(Common::USER_SET_ACTIVE_PASSWORD_PATH, body)
+            mgmt_post(Common::USER_SET_ACTIVE_PASSWORD_PATH, body)
           end
 
 		  # Deprecated (use set_temporary_password(..) instead)
@@ -463,7 +463,7 @@ module Descope
               loginId: login_id,
               password:
             }
-            post(Common::USER_SET_PASSWORD_PATH, body)
+            mgmt_post(Common::USER_SET_PASSWORD_PATH, body)
           end
 
           def expire_password(login_id)
@@ -471,7 +471,7 @@ module Descope
             body = {
               loginId: login_id
             }
-            post(Common::USER_EXPIRE_PASSWORD_PATH, body)
+            mgmt_post(Common::USER_EXPIRE_PASSWORD_PATH, body)
           end
 
           def generate_otp_for_test_user(method: nil, login_id: nil)
@@ -479,7 +479,7 @@ module Descope
               loginId: login_id,
               deliveryMethod: get_method_string(method)
             }
-            post(Common::USER_GENERATE_OTP_FOR_TEST_PATH, body)
+            mgmt_post(Common::USER_GENERATE_OTP_FOR_TEST_PATH, body)
           end
 
           def generate_magic_link_for_test_user(method: nil, login_id: nil, uri: nil)
@@ -488,7 +488,7 @@ module Descope
               deliveryMethod: get_method_string(method),
               URI: uri
             }
-            post(Common::USER_GENERATE_MAGIC_LINK_FOR_TEST_PATH, body)
+            mgmt_post(Common::USER_GENERATE_MAGIC_LINK_FOR_TEST_PATH, body)
           end
 
           def generate_enchanted_link_for_test_user(login_id: nil, uri: nil)
@@ -496,7 +496,7 @@ module Descope
               loginId: login_id,
               URI: uri
             }
-            post(Common::USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, body)
+            mgmt_post(Common::USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, body)
           end
 
           def generate_embedded_link(login_id: nil, custom_claims: nil)
@@ -513,7 +513,7 @@ module Descope
               loginId: login_id,
               customClaims: custom_claims.to_h
             }
-            post(USER_GENERATE_EMBEDDED_LINK_PATH, request_params)
+            mgmt_post(USER_GENERATE_EMBEDDED_LINK_PATH, request_params)
           end
 
           # Search for all test users.
@@ -582,7 +582,7 @@ module Descope
             body[:tenantRoleIds] = map_to_values_object(tenant_role_ids) unless tenant_role_ids.nil? || tenant_role_ids.empty?
             body[:tenantRoleNames] = map_to_values_object(tenant_role_names) unless tenant_role_names.nil? || tenant_role_names.empty?
 
-            post(Common::TEST_USERS_SEARCH_PATH, body)
+            mgmt_post(Common::TEST_USERS_SEARCH_PATH, body)
           end
 
 
@@ -647,7 +647,7 @@ module Descope
             )
             return request_params if skip_create
 
-            post(path, request_params)
+            mgmt_post(path, request_params)
           end
 
           def user_compose_create_body(

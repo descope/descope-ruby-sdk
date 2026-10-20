@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::AccessKey do
     end
 
     it 'is expected to create access key' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ACCESS_KEY_CREATE_PATH, {
           name: 'test',
           expireTime: 0,
@@ -46,7 +46,7 @@ describe Descope::Api::V1::Management::AccessKey do
     end
 
     it 'is expected to load an access key' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         ACCESS_KEY_LOAD_PATH, { id: '123' }
       )
       expect { @instance.load_access_key('123') }.not_to raise_error
@@ -59,7 +59,7 @@ describe Descope::Api::V1::Management::AccessKey do
     end
 
     it 'is expected to search all access keys' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ACCESS_KEYS_SEARCH_PATH, { tenantIds: %w[123 456] }
       )
       expect { @instance.search_all_access_keys(%w[123 456]) }.not_to raise_error
@@ -72,7 +72,7 @@ describe Descope::Api::V1::Management::AccessKey do
     end
 
     it 'is expected to update an access keys' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ACCESS_KEY_UPDATE_PATH, { id: '123', name: 'test1' }
       )
       expect { @instance.update_access_key(id: '123', name: 'test1') }.not_to raise_error
@@ -85,7 +85,7 @@ describe Descope::Api::V1::Management::AccessKey do
     end
 
     it 'is expected to deactivate an access keys' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ACCESS_KEY_DEACTIVATE_PATH, { id: '123' }
       )
       expect { @instance.deactivate_access_key('123') }.not_to raise_error
@@ -98,7 +98,7 @@ describe Descope::Api::V1::Management::AccessKey do
     end
 
     it 'is expected to activate an access keys' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ACCESS_KEY_ACTIVATE_PATH, { id: '123' }
       )
       expect { @instance.activate_access_key('123') }.not_to raise_error
@@ -111,7 +111,7 @@ describe Descope::Api::V1::Management::AccessKey do
     end
 
     it 'is expected to delete an access keys' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         ACCESS_KEY_DELETE_PATH, { id: '123' }
       )
       expect { @instance.delete_access_key('123') }.not_to raise_error

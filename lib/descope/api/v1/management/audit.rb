@@ -52,7 +52,7 @@ module Descope
             request_params[:text] = text unless text.nil?
             request_params[:from] = from_ts.to_i * 1000 unless from_ts.nil?
             request_params[:to] = to_ts.to_i * 1000 unless to_ts.nil?
-            res = post(AUDIT_SEARCH, request_params)
+            res = mgmt_post(AUDIT_SEARCH, request_params)
             raise Descope::AuthException, "could not get audits: #{res}" if res['audits'].nil?
 
             { 'audits' => res['audits'].map { |audit| convert_audit_record(audit) } }
@@ -79,7 +79,7 @@ module Descope
             }
             request_params[:userId] = user_id unless user_id.nil?
 
-            post(AUDIT_CREATE_EVENT, request_params)
+            mgmt_post(AUDIT_CREATE_EVENT, request_params)
           end
 
           private

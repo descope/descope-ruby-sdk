@@ -47,7 +47,7 @@ module Descope
               }
             end
 
-            post(OUTBOUND_APP_FETCH_USER_TOKEN_PATH, body)
+            mgmt_post(OUTBOUND_APP_FETCH_USER_TOKEN_PATH, body)
           end
 
           # Delete outbound application tokens by appId or userId.
@@ -70,7 +70,7 @@ module Descope
             query_params[:appId] = app_id unless app_id.nil? || app_id.empty?
             query_params[:userId] = user_id unless user_id.nil? || user_id.empty?
 
-            delete(OUTBOUND_APP_DELETE_USER_TOKENS_PATH, query_params)
+            mgmt_delete(OUTBOUND_APP_DELETE_USER_TOKENS_PATH, query_params)
           end
 
           # Delete outbound application token by its ID.
@@ -83,7 +83,7 @@ module Descope
             validate_token_id(token_id)
 
             query_params = { id: token_id }
-            delete(OUTBOUND_APP_DELETE_TOKEN_BY_ID_PATH, query_params)
+            mgmt_delete(OUTBOUND_APP_DELETE_TOKEN_BY_ID_PATH, query_params)
           end
 
           private

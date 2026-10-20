@@ -58,7 +58,7 @@ describe Descope::Api::V1::Management::User do
     }
 
     it 'is expected to create a user with user data' do
-      expect(@instance).to receive(:post).with(USER_CREATE_PATH, params)
+      expect(@instance).to receive(:mgmt_post).with(USER_CREATE_PATH, params)
 
       expect do
         @instance.create_user(**args)
@@ -67,7 +67,7 @@ describe Descope::Api::V1::Management::User do
 
     it 'is expected to create a test user with user data' do
       params[:test] = true
-      expect(@instance).to receive(:post).with(TEST_USER_CREATE_PATH, params)
+      expect(@instance).to receive(:mgmt_post).with(TEST_USER_CREATE_PATH, params)
 
       expect do
         args[:test] = true
@@ -101,7 +101,7 @@ describe Descope::Api::V1::Management::User do
           }
         ]
       }
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_CREATE_BATCH_PATH, users_params
       )
 
@@ -117,7 +117,7 @@ describe Descope::Api::V1::Management::User do
     end
 
     it "is expected to post #{USER_CREATE_PATH} with invite true" do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_CREATE_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
@@ -143,7 +143,7 @@ describe Descope::Api::V1::Management::User do
     end
 
     it 'is expected to respond to a user update method' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
@@ -171,7 +171,7 @@ describe Descope::Api::V1::Management::User do
     end
 
     it 'is expected to respond to a user delete method' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_DELETE_PATH, { loginId: 'name@mail.com' }
       )
 
@@ -183,7 +183,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.delete_all_user' do
     it 'is expected to respond to a user delete method' do
-      expect(@instance).to receive(:delete).with(USER_DELETE_ALL_TEST_USERS_PATH)
+      expect(@instance).to receive(:mgmt_delete).with(USER_DELETE_ALL_TEST_USERS_PATH)
 
       expect do
         @instance.delete_all_test_users
@@ -197,7 +197,7 @@ describe Descope::Api::V1::Management::User do
     end
 
     it "is expected to get #{USER_LOAD_PATH} with login_id" do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         USER_LOAD_PATH, { loginId: 'someone' }
       )
       expect { @instance.load_user('someone') }.not_to raise_error
@@ -206,7 +206,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.load_by_user_id' do
     it "is expected to get #{USER_LOAD_PATH} with user_id" do
-      allow(@instance).to receive(:get).with(
+      allow(@instance).to receive(:mgmt_get).with(
         USER_LOAD_PATH, { userId: 'ABCD' }
       )
       expect { @instance.load_by_user_id('ABCD') }.not_to raise_error
@@ -215,7 +215,7 @@ describe Descope::Api::V1::Management::User do
 
   context '.logout_user' do
     it 'is expected to respond to a logout user method' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_LOGOUT_PATH, { loginId: 'name@mail.com' }
       )
 
@@ -225,7 +225,7 @@ describe Descope::Api::V1::Management::User do
     end
 
     it 'is expected to respond to a logout user by id method' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_LOGOUT_PATH, { userId: 'U2ZpARjKAJJmq0fzU2lXNNCGnF4j' }
       )
 
@@ -241,7 +241,7 @@ describe Descope::Api::V1::Management::User do
 
       tenant_role_ids = { 'tenant1' => ['roleA', 'roleB'] }
       tenant_role_names = { 'tenant1' => ['roleName1', 'roleName2'] }
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USERS_SEARCH_PATH, {
           loginId: 'someone@example.com',
           tenantIds: [],
@@ -284,7 +284,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a get_provider_token method' do
       expect(@instance).to respond_to(:get_provider_token)
 
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         USER_GET_PROVIDER_TOKEN, {
           loginId: 'someone@example.com',
           provider: 'google-oauth2'
@@ -304,7 +304,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a activate method' do
       expect(@instance).to respond_to(:activate)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_STATUS_PATH, {
           loginId: 'someone@example.com',
           status: 'enabled'
@@ -321,7 +321,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a activate method' do
       expect(@instance).to respond_to(:activate)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_STATUS_PATH, {
           loginId: 'someone@example.com',
           status: 'disabled'
@@ -338,7 +338,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a update_email method' do
       expect(@instance).to respond_to(:update_email)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_EMAIL_PATH, {
           loginId: 'someone@example.com',
           email: 'tester@test.com',
@@ -360,7 +360,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a update_phone method' do
       expect(@instance).to respond_to(:update_phone)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_PHONE_PATH, {
           loginId: 'someone@example.com',
           phone: '1234567890',
@@ -382,7 +382,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a update_display_name method' do
       expect(@instance).to respond_to(:update_display_name)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_NAME_PATH, {
           loginId: 'someone@example.com',
           name: 'some guy',
@@ -408,7 +408,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a update_picture method' do
       expect(@instance).to respond_to(:update_picture)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_PICTURE_PATH, {
           loginId: 'someone@example.com',
           picture: 'https://www.example.com/picture.png'
@@ -428,7 +428,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a update_custom_attribute method' do
       expect(@instance).to respond_to(:update_custom_attribute)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_UPDATE_CUSTOM_ATTRIBUTE_PATH, {
           loginId: 'someone@example.com',
           attributeKey: 'OU',
@@ -450,7 +450,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a add_roles method' do
       expect(@instance).to respond_to(:user_add_roles)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_ADD_ROLE_PATH, {
           loginId: 'someone@example.com',
           roleNames: %w[role1 role2],
@@ -472,7 +472,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a user_remove_roles method' do
       expect(@instance).to respond_to(:user_remove_roles)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_REMOVE_ROLE_PATH, {
           loginId: 'someone@example.com',
           roleNames: %w[role1 role2],
@@ -494,7 +494,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a add_tenant method' do
       expect(@instance).to respond_to(:user_add_tenant)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_ADD_TENANT_PATH, {
           loginId: 'someone@example.com',
           tenantId: 'tenant1'
@@ -514,7 +514,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a remove_tenant method' do
       expect(@instance).to respond_to(:user_remove_tenant)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_REMOVE_TENANT_PATH, {
           loginId: 'someone@example.com',
           tenantId: 'tenant1'
@@ -534,7 +534,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a add_tenant_role method' do
       expect(@instance).to respond_to(:add_tenant_role)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_ADD_TENANT_PATH, {
           loginId: 'someone@example.com',
           tenantId: 'tenant1',
@@ -556,7 +556,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a remove_tenant_role method' do
       expect(@instance).to respond_to(:user_remove_tenant_roles)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_REMOVE_TENANT_PATH, {
           loginId: 'someone@example.com',
           tenantId: 'tenant1',
@@ -578,7 +578,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a set_temporary_password method' do
       expect(@instance).to respond_to(:set_temporary_password)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_SET_TEMPORARY_PASSWORD_PATH, {
           loginId: 'someone@example.com',
           password: 's3cr3t'
@@ -598,7 +598,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a set_active_password method' do
       expect(@instance).to respond_to(:set_active_password)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_SET_ACTIVE_PASSWORD_PATH, {
           loginId: 'someone@example.com',
           password: 's3cr3t'
@@ -618,7 +618,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a set_password method' do
       expect(@instance).to respond_to(:set_password)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_SET_PASSWORD_PATH, {
           loginId: 'someone@example.com',
           password: 's3cr3t'
@@ -638,7 +638,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a expire_password method' do
       expect(@instance).to respond_to(:expire_password)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_EXPIRE_PASSWORD_PATH, { loginId: 'someone@example.com' }
       )
 
@@ -650,7 +650,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a generate_otp_for_test method' do
       expect(@instance).to respond_to(:generate_otp_for_test_user)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_GENERATE_OTP_FOR_TEST_PATH, {
           loginId: 'someone@example.com',
           deliveryMethod: 'email'
@@ -670,7 +670,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a generate_enchanted_link_for_test method' do
       expect(@instance).to respond_to(:generate_enchanted_link_for_test_user)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_GENERATE_ENCHANTED_LINK_FOR_TEST_PATH, {
           loginId: 'someone@example.com',
           URI: 'https://www.example.com'
@@ -690,7 +690,7 @@ describe Descope::Api::V1::Management::User do
     it 'is expected to respond to a update_jwt method' do
       expect(@instance).to respond_to(:update_jwt)
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         UPDATE_JWT_PATH, {
           jwt: 'eyJ3abcde12345',
           customClaims: { 'claim1' => 'value1', 'claim2' => 'value2' }
@@ -717,7 +717,7 @@ describe Descope::Api::V1::Management::User do
         customClaims: { 'abc': '123' }
       }
 
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         USER_GENERATE_EMBEDDED_LINK_PATH,
         request_params
       )
@@ -737,7 +737,7 @@ describe Descope::Api::V1::Management::User do
     end
 
     it 'is expected to respond to a user patch method' do
-      expect(@instance).to receive(:patch).with(
+      expect(@instance).to receive(:mgmt_patch).with(
         USER_PATCH_PATH, {
           loginId: 'name@mail.com',
           email: 'name@mail.com',
@@ -765,7 +765,7 @@ describe Descope::Api::V1::Management::User do
 
       tenant_role_ids = { 'tenant1' => ['roleA', 'roleB'] }
       tenant_role_names = { 'tenant1' => ['roleName1', 'roleName2'] }
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         TEST_USERS_SEARCH_PATH, {
           tenantIds: %w[t1 t2],
           roleNames: %w[r1 r2],

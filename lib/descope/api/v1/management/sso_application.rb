@@ -18,7 +18,7 @@ module Descope
             body[:enabled] = enabled if enabled
             body[:logo] = logo if logo
             body[:loginPageUrl] = login_page_url if login_page_url
-            post(SSO_APPLICATION_OIDC_CREATE_PATH, body)
+            mgmt_post(SSO_APPLICATION_OIDC_CREATE_PATH, body)
           end
 
           # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -78,14 +78,14 @@ module Descope
               force_authentication:,
               logout_redirect_url:
             )
-            post(SSO_APPLICATION_SAML_CREATE_PATH, body)
+            mgmt_post(SSO_APPLICATION_SAML_CREATE_PATH, body)
           end
 
           def update_sso_oidc_app(id: nil, name: nil, description: nil, enabled: nil, logo: nil, login_page_url: nil, force_authentication: nil)
             # Update an existing OIDC sso application with the given parameters. IMPORTANT: All parameters are used as overrides
             # to the existing sso application. Empty fields will override populated fields. Use carefully.
             body = compose_create_update_oidc_body(name, login_page_url, id, description, enabled, logo, force_authentication)
-            post(SSO_APPLICATION_OIDC_UPDATE_PATH, body)
+            mgmt_post(SSO_APPLICATION_OIDC_UPDATE_PATH, body)
           end
 
           def update_saml_application(
@@ -143,17 +143,17 @@ module Descope
               force_authentication:,
               logout_redirect_url:
             )
-            post(SSO_APPLICATION_SAML_UPDATE_PATH, body)
+            mgmt_post(SSO_APPLICATION_SAML_UPDATE_PATH, body)
           end
 
           def delete_sso_app(id)
             # Delete an existing sso application. IMPORTANT: This operation is irreversible. Use carefully.
-            delete(SSO_APPLICATION_DELETE_PATH, { id: })
+            mgmt_delete(SSO_APPLICATION_DELETE_PATH, { id: })
           end
 
           def load_sso_app(id)
             # Load an existing sso application.
-            get(SSO_APPLICATION_LOAD_PATH, { id: })
+            mgmt_get(SSO_APPLICATION_LOAD_PATH, { id: })
           end
 
           def load_all_sso_apps
@@ -167,7 +167,7 @@ module Descope
             #           ]
             #       }
             #   Containing the loaded sso applications information.
-            get(SSO_APPLICATION_LOAD_ALL_PATH, {})
+            mgmt_get(SSO_APPLICATION_LOAD_ALL_PATH, {})
           end
 
           private

@@ -17,7 +17,7 @@ module Descope
               name:,
               description:
             }
-            post(PERMISSION_CREATE_PATH, request_params)
+            mgmt_post(PERMISSION_CREATE_PATH, request_params)
           end
 
           def update_permission(name: nil, new_name: nil, description: nil)
@@ -29,17 +29,17 @@ module Descope
               newName: new_name,
               description:
             }
-            post(PERMISSION_UPDATE_PATH, request_params)
+            mgmt_post(PERMISSION_UPDATE_PATH, request_params)
           end
 
           def delete_permission(name = nil)
             # Delete an existing permission. IMPORTANT: This action is irreversible. Use carefully.
-            post(PERMISSION_DELETE_PATH, { name: })
+            mgmt_post(PERMISSION_DELETE_PATH, { name: })
           end
 
           def load_all_permissions
             # Load all permissions.
-            get(PERMISSION_LOAD_ALL_PATH)
+            mgmt_get(PERMISSION_LOAD_ALL_PATH)
           end
         end
       end

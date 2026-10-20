@@ -17,7 +17,8 @@ module Descope
 
             self_provisioning_domains ||= []
             custom_attributes ||= {}
-            post(TENANT_CREATE_PATH, compose_tenant_create_update_body(name, id, self_provisioning_domains, custom_attributes))
+            mgmt_post(TENANT_CREATE_PATH,
+                      compose_tenant_create_update_body(name, id, self_provisioning_domains, custom_attributes))
           end
 
           def update_tenant(name: nil, id: nil, self_provisioning_domains: nil, custom_attributes: nil)
@@ -26,22 +27,23 @@ module Descope
             # @see https://docs.descope.com/api/openapi/tenantmanagement/operation/UpdateTenant/
             self_provisioning_domains ||= []
             custom_attributes ||= {}
-            post(TENANT_UPDATE_PATH, compose_tenant_create_update_body(name, id, self_provisioning_domains, custom_attributes))
+            mgmt_post(TENANT_UPDATE_PATH,
+                      compose_tenant_create_update_body(name, id, self_provisioning_domains, custom_attributes))
           end
 
           def delete_tenant(id = nil)
             # Delete an existing tenant. IMPORTANT: This action is irreversible. Use carefully.
-            post(TENANT_DELETE_PATH, { id: })
+            mgmt_post(TENANT_DELETE_PATH, { id: })
           end
 
           def load_tenant(id = nil)
             # Load tenant by id.
-            get(TENANT_LOAD_PATH, { id: })
+            mgmt_get(TENANT_LOAD_PATH, { id: })
           end
 
           def load_all_tenants
             # Load all tenants.
-            get(TENANT_LOAD_ALL_PATH)
+            mgmt_get(TENANT_LOAD_ALL_PATH)
           end
 
           def search_all_tenants(ids: nil, names: nil, self_provisioning_domains: nil, custom_attributes: nil)
@@ -52,7 +54,7 @@ module Descope
               selfProvisioningDomains: self_provisioning_domains,
               customAttributes: custom_attributes
             }
-            post(TENANT_SEARCH_ALL_PATH, request_params)
+            mgmt_post(TENANT_SEARCH_ALL_PATH, request_params)
           end
 
           private

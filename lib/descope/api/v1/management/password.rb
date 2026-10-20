@@ -10,7 +10,7 @@ module Descope
 
           def get_password_settings(tenant_id)
             # Get password settings for the provided tenant id.
-            get(PASSWORD_SETTINGS_PATH, { tenantId: tenant_id })
+            mgmt_get(PASSWORD_SETTINGS_PATH, { tenantId: tenant_id })
           end
 
           def update_password_settings(settings)
@@ -20,7 +20,7 @@ module Descope
 
             # Update password settings for the provided tenant id.
             body = compose_settings_body(settings)
-            post(PASSWORD_SETTINGS_PATH, body)
+            mgmt_post(PASSWORD_SETTINGS_PATH, body)
           end
 
           private

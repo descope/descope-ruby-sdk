@@ -24,7 +24,7 @@ describe Descope::Api::V1::Management::SCIM do
                            start_index,
                            count,
                            excluded_attributes)
-      expect(@instance).to receive(:get).with(url)
+      expect(@instance).to receive(:mgmt_get).with(url)
       expect do
         @instance.scim_search_groups(filter:, start_index:, count:, excluded_attributes:)
       end.not_to raise_error
@@ -48,7 +48,7 @@ describe Descope::Api::V1::Management::SCIM do
                             members,
                             external_id,
                             excluded_attributes)
-      expect(@instance).to receive(:post).with(Descope::Api::V1::Management::Common::SCIM_GROUPS_PATH, body)
+      expect(@instance).to receive(:mgmt_post).with(Descope::Api::V1::Management::Common::SCIM_GROUPS_PATH, body)
       expect do
         @instance.scim_create_group(group_id:,
                                     display_name:,
@@ -73,7 +73,7 @@ describe Descope::Api::V1::Management::SCIM do
         :compose_scim_create_group_url,
         group_id, display_name, external_id, excluded_attributes
       )
-      expect(@instance).to receive(:get).with(url)
+      expect(@instance).to receive(:mgmt_get).with(url)
       expect do
         @instance.scim_load_group(group_id:, display_name:, external_id:, excluded_attributes:)
       end.not_to raise_error
@@ -96,7 +96,7 @@ describe Descope::Api::V1::Management::SCIM do
         group_id, display_name, members, external_id, excluded_attributes
       )
       url = "#{SCIM_GROUPS_PATH}/#{group_id}"
-      expect(@instance).to receive(:patch).with(url, body)
+      expect(@instance).to receive(:mgmt_patch).with(url, body)
       expect do
         @instance.scim_update_group(group_id:, display_name:, members:, external_id:, excluded_attributes:)
       end.not_to raise_error
@@ -111,7 +111,7 @@ describe Descope::Api::V1::Management::SCIM do
     it 'is expected to delete scim group' do
       group_id = 'G123'
       url = "#{SCIM_GROUPS_PATH}/#{group_id}"
-      expect(@instance).to receive(:delete).with(url)
+      expect(@instance).to receive(:mgmt_delete).with(url)
       expect { @instance.scim_delete_group(group_id) }.not_to raise_error
     end
   end
@@ -142,7 +142,7 @@ describe Descope::Api::V1::Management::SCIM do
 
       url = @instance.send(:compose_scim_patch_group_url, group_id, user_id, operations)
 
-      expect(@instance).to receive(:patch).with(url)
+      expect(@instance).to receive(:mgmt_patch).with(url)
       expect do
         @instance.scim_patch_group(group_id:, user_id:, operations:)
       end.not_to raise_error
@@ -156,7 +156,7 @@ describe Descope::Api::V1::Management::SCIM do
 
     it 'is expected to load scim resource types' do
       url = "#{SCIM_RESOURCE_TYPES_PATH}"
-      expect(@instance).to receive(:get).with(url)
+      expect(@instance).to receive(:mgmt_get).with(url)
       expect { @instance.scim_load_resource_types }.not_to raise_error
     end
   end
@@ -168,7 +168,7 @@ describe Descope::Api::V1::Management::SCIM do
 
     it 'is expected to load scim service provider config' do
       url = "#{SCIM_SERVICE_PROVIDER_CONFIG_PATH}"
-      expect(@instance).to receive(:get).with(url)
+      expect(@instance).to receive(:mgmt_get).with(url)
       expect { @instance.scim_load_service_provider_config }.not_to raise_error
     end
   end
@@ -186,7 +186,7 @@ describe Descope::Api::V1::Management::SCIM do
                            filter,
                            start_index,
                            count)
-      expect(@instance).to receive(:get).with(url)
+      expect(@instance).to receive(:mgmt_get).with(url)
       expect do
         @instance.scim_search_users(filter:, start_index:, count:)
       end.not_to raise_error
@@ -219,7 +219,7 @@ describe Descope::Api::V1::Management::SCIM do
                             active,
                             name,
                             user_name)
-      expect(@instance).to receive(:post).with(SCIM_USERS_PATH, body)
+      expect(@instance).to receive(:mgmt_post).with(SCIM_USERS_PATH, body)
       expect do
         @instance.scim_create_user(
           user_id:,
@@ -242,7 +242,7 @@ describe Descope::Api::V1::Management::SCIM do
     it 'is expected to load scim user' do
       user_id = 'U123'
       url = "#{SCIM_USERS_PATH}/#{user_id}"
-      expect(@instance).to receive(:get).with(url)
+      expect(@instance).to receive(:mgmt_get).with(url)
       expect do
         @instance.scim_load_user(user_id)
       end.not_to raise_error
@@ -257,7 +257,7 @@ describe Descope::Api::V1::Management::SCIM do
     it 'is expected to load scim user' do
       user_id = 'U123'
       url = "#{SCIM_USERS_PATH}/#{user_id}"
-      expect(@instance).to receive(:patch).with(url)
+      expect(@instance).to receive(:mgmt_patch).with(url)
       expect do
         @instance.scim_update_user(user_id)
       end.not_to raise_error
@@ -272,7 +272,7 @@ describe Descope::Api::V1::Management::SCIM do
     it 'is expected to delete scim user' do
       user_id = 'U123'
       url = "#{SCIM_USERS_PATH}/#{user_id}"
-      expect(@instance).to receive(:delete).with(url)
+      expect(@instance).to receive(:mgmt_delete).with(url)
       expect { @instance.scim_delete_user(user_id) }.not_to raise_error
     end
   end
@@ -303,7 +303,7 @@ describe Descope::Api::V1::Management::SCIM do
 
       body = @instance.send(:compose_scim_patch_user_body, user_id, group_id, operations)
 
-      expect(@instance).to receive(:patch).with(SCIM_USERS_PATH, body)
+      expect(@instance).to receive(:mgmt_patch).with(SCIM_USERS_PATH, body)
       expect do
         @instance.scim_patch_user(user_id:, group_id:, operations:)
       end.not_to raise_error

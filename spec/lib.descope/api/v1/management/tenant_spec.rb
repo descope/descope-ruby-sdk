@@ -15,7 +15,7 @@ describe Descope::Api::V1::Management::Tenant do
     end
 
     it 'is expected to create a new tenant' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         TENANT_CREATE_PATH, {
           name: 'test',
           id: 'test',
@@ -46,7 +46,7 @@ describe Descope::Api::V1::Management::Tenant do
     end
 
     it 'is expected to update a tenant' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         TENANT_UPDATE_PATH, {
           name: 'test',
           id: 'test',
@@ -77,7 +77,7 @@ describe Descope::Api::V1::Management::Tenant do
     end
 
     it 'is expected to delete a tenant' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         TENANT_DELETE_PATH, { id: 'test' }
       )
       expect { @instance.delete_tenant('test') }.not_to raise_error
@@ -90,7 +90,7 @@ describe Descope::Api::V1::Management::Tenant do
     end
 
     it 'is expected to load a tenant' do
-      expect(@instance).to receive(:get).with(
+      expect(@instance).to receive(:mgmt_get).with(
         TENANT_LOAD_PATH, { id: 'test' }
       )
       expect { @instance.load_tenant('test') }.not_to raise_error
@@ -103,7 +103,7 @@ describe Descope::Api::V1::Management::Tenant do
     end
 
     it 'is expected to load all tenants' do
-      expect(@instance).to receive(:get).with(TENANT_LOAD_ALL_PATH)
+      expect(@instance).to receive(:mgmt_get).with(TENANT_LOAD_ALL_PATH)
       expect { @instance.load_all_tenants }.not_to raise_error
     end
   end
@@ -114,7 +114,7 @@ describe Descope::Api::V1::Management::Tenant do
     end
 
     it 'is expected to search all tenants' do
-      expect(@instance).to receive(:post).with(
+      expect(@instance).to receive(:mgmt_post).with(
         TENANT_SEARCH_ALL_PATH, {
           ids: %w[test1 test2],
           names: %w[test1 test2],

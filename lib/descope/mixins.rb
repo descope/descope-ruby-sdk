@@ -4,6 +4,7 @@ require 'logger'
 require 'jwt'
 require 'descope/mixins/headers'
 require 'descope/mixins/http'
+require 'descope/mixins/requests'
 require 'descope/mixins/initializer'
 require 'descope/mixins/validation'
 require 'descope/mixins/logging'
@@ -15,7 +16,7 @@ module Descope
   module Mixins
     include Descope::Mixins::Common
     include Descope::Mixins::Headers
-    include Descope::Mixins::HTTP
+    include Descope::Mixins::Requests
     include Descope::Mixins::Initializer
     include Descope::Mixins::Logging
   end

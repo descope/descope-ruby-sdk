@@ -31,9 +31,49 @@ descope_client = Descope::Client.new(
 )
 ```
 
+### Auth Management Key
+
+Authentication methods whose public access has been disabled can still be used by providing an
+auth management key. When set, it is sent along with every authentication request.
+
+Create one in the [Descope Console](https://app.descope.com/settings/company/managementkeys) with
+either the `Authentication` or `Full Access` scope on the project or company.
+
+```ruby
+# Initialized after setting the DESCOPE_PROJECT_ID and DESCOPE_AUTH_MANAGEMENT_KEY env vars
+descope_client = Descope::Client.new({})
+
+# ** Or directly **
+descope_client = Descope::Client.new(
+  {
+    project_id: '<project_id>',
+    auth_management_key: ENV['AUTH_MGMT_KEY']
+  }
+)
+```
+
+**Note**: the auth management key can, and probably should, be a different management key than the
+one provided for [management API usage](#setup-1). The auth management key is never sent on
+management requests, and the management key is never sent on authentication requests.
+
+### Request timeout
+
+Every request is bounded by a 60 second timeout, matching the other Descope server SDKs. Raise it
+for calls that legitimately take longer, such as `export_project` on a large project:
+
+```ruby
+descope_client = Descope::Client.new(
+  {
+    project_id: '<project_id>',
+    timeout_seconds: 180
+  }
+)
+```
+
 ### Important Logging note
 You may pass `log_level: 'debug'` to the client config or use `DESCOPE_LOG_LEVEL` env var.
-Be aware that only the management key is truncated, and the JWT responses are printed on debug
+Be aware that everything after the project ID in the `Authorization` header is masked, but the JWT
+responses are printed on debug
 
 Do not run with log level debug on Production!
 
@@ -170,6 +210,33 @@ res = descope_client.enchanted_link_sign_up_or_in(
 link_identifier = res['linkId'] # Show the user which link they should press in their email
 pending_ref = res['pendingRef'] # Used to poll for a valid session
 masked_email = res['maskedEmail'] # The email that the message was sent to in a masked format
+```
+
+The same three calls are available over SMS, as `enchanted_link_sign_up_with_phone`,
+`enchanted_link_sign_in_with_phone` and `enchanted_link_sign_up_or_in_with_phone`. The `login_id` is
+a phone number, and the response carries `maskedPhone` instead of `maskedEmail`.
+
+```ruby
+res = descope_client.enchanted_link_sign_up_or_in_with_phone(
+    login_id: '+11111111111',
+    uri: 'https://myapp.com/verify-enchanted-link', # Set redirect URI here or via console
+    template_id: 'my-text-template-id' # Optional, selects a specific text template
+)
+link_identifier = res['linkId'] # Matches the identifier at the start of the SMS, so the user can confirm it
+pending_ref = res['pendingRef'] # Used to poll for a valid session
+masked_phone = res['maskedPhone'] # The phone number that the message was sent to in a masked format
+```
+
+An existing user's phone number can be updated with an enchanted link sent over SMS, using the
+refresh token of their active session:
+
+```ruby
+res = descope_client.enchanted_link_update_user_phone(
+    login_id: 'someone@example.com',
+    phone: '+11111111111',
+    uri: 'https://myapp.com/verify-enchanted-link',
+    refresh_token: refresh_token
+)
 ```
 
 After sending the link, you must poll to receive a valid session using the `pending_ref` from
@@ -504,6 +571,8 @@ in nature. Please use responsibly.
 
 To use the management API you'll need a `Management Key` along with your `Project ID`.
 Create one in the [Descope Console](https://app.descope.com/settings/company/managementkeys).
+This key is used only for management functions - to reach authentication methods whose public
+access has been disabled, use the [Auth Management Key](#auth-management-key) instead.
 
 ```ruby
 require 'descope'
@@ -1269,6 +1338,160 @@ resp["apps"].each do |app|
 end
 ```
 
+### Manage Third Party Applications
+
+You can create, update, patch, delete or load third party (OIDC) applications, and manage their secrets and consents:
+
+```ruby
+# Create a third party application (response includes the generated id and secret)
+resp = descope_client.create_application(
+  name: "My third party app",
+  login_page_url: "https://dummy.com/login"
+)
+id = resp["id"]
+
+# Update (overrides all fields) or patch (only given fields)
+descope_client.update_application(id: id, name: "Updated name", login_page_url: "https://dummy.com/login")
+descope_client.patch_application(id: id, name: "Patched name")
+
+# Load one / all applications
+descope_client.load_application(id)
+descope_client.load_all_applications
+
+# Manage the application secret
+descope_client.get_application_secret(id)
+descope_client.rotate_application_secret(id)
+
+# Delete consents for the application
+descope_client.delete_consents(app_id: id, user_ids: ["U123"])
+
+# Application deletion cannot be undone. Use carefully.
+descope_client.delete_application(id)
+```
+
+### Manage Management Keys
+
+Create and manage management keys for a project:
+
+```ruby
+# Response includes the key metadata and the one-time cleartext value
+resp = descope_client.create_management_key(
+  name: "CI key",
+  description: "used by CI",
+  expires_in: 0, # 0 = no expiration (seconds)
+  permitted_ips: ["1.2.3.4/32"]
+)
+
+descope_client.update_management_key(id: "key-id", name: "renamed CI key")
+descope_client.get_management_key(id: "key-id")
+descope_client.search_management_keys(status: "active")
+descope_client.delete_management_key(id: "key-id")
+```
+
+### Manage Engines
+
+```ruby
+resp = descope_client.create_engine(name: "my-engine") # secret returned only here and on rotate
+descope_client.update_engine(id: resp["id"], name: "renamed-engine")
+descope_client.load_engine(id: resp["id"])
+descope_client.load_all_engines
+descope_client.rotate_engine_secret(id: resp["id"])
+descope_client.delete_engine(id: resp["id"])
+```
+
+### Manage Descopers
+
+```ruby
+descope_client.create_descoper([{ loginId: "admin@descope.com", roleNames: ["Descoper"] }])
+descope_client.update_descoper(id: "U123", attributes: { name: "Admin" })
+descope_client.get_descoper(id: "U123")
+descope_client.search_descopers
+descope_client.delete_descoper(id: "U123")
+```
+
+### Manage Lists
+
+Manage allow/deny lists of IPs and text values:
+
+```ruby
+list = descope_client.create_list(name: "blocklist", type: "ip")
+descope_client.update_list(id: list["id"], name: "blocklist", type: "ip")
+descope_client.load_list(list["id"])
+descope_client.load_list_by_name("blocklist")
+descope_client.load_all_lists
+descope_client.import_lists(lists: [{ name: "blocklist", type: "ip", data: ["1.2.3.4"] }])
+
+# IP entries
+descope_client.list_add_ips(id: list["id"], ips: ["1.2.3.4"])
+descope_client.list_remove_ips(id: list["id"], ips: ["1.2.3.4"])
+descope_client.list_check_ip(id: list["id"], ip: "1.2.3.4")
+
+# Text entries
+descope_client.list_add_texts(id: list["id"], texts: ["blocked"])
+descope_client.list_remove_texts(id: list["id"], texts: ["blocked"])
+descope_client.list_check_text(id: list["id"], text: "blocked")
+# Check up to 100 texts in one call: exists if any of them is in the list, or only if all are with match_all: true
+descope_client.list_check_texts(id: list["id"], texts: ["blocked", "other"])
+descope_client.list_check_texts(id: list["id"], texts: ["blocked", "other"], match_all: true)
+
+descope_client.clear_list(id: list["id"])
+descope_client.delete_list(id: list["id"])
+```
+
+### Manage JWT Templates
+
+```ruby
+descope_client.create_jwt_template(template: { name: "my-template", authSchema: "default" })
+descope_client.update_jwt_template(template: { id: "T123", name: "my-template" })
+descope_client.list_jwt_templates
+descope_client.load_jwt_template(id: "T123")
+descope_client.delete_jwt_template(id: "T123")
+```
+
+### Manage Scope Claim Mapping
+
+Manage the project-wide OIDC scope-to-claim mapping:
+
+```ruby
+descope_client.set_scope_claim_mapping(mappings: [{ scope: "email", claims: ["email"] }])
+descope_client.get_scope_claim_mapping
+descope_client.delete_scope_claim_mapping
+```
+
+### Query SSO Groups
+
+Query the SSO groups synced to a project's tenant:
+
+```ruby
+descope_client.load_all_groups(tenant_id: "T123")
+descope_client.load_all_groups_for_members(tenant_id: "T123", user_ids: ["U123"], login_ids: ["a@b.com"])
+descope_client.load_all_group_members(tenant_id: "T123", group_id: "G123")
+```
+
+### Manage FGA (Fine-Grained Authorization)
+
+Manage a fine-grained authorization schema and relations:
+
+```ruby
+# Save/load the schema (schema is a DSL string)
+descope_client.fga_save_schema(schema: "model\n  schema 1.1\ntype user")
+descope_client.fga_load_schema
+
+# Create, delete and check relations
+tuples = [{ resource: "doc1", resourceType: "document", relation: "owner", target: "u1", targetType: "user" }]
+descope_client.fga_create_relations(tuples: tuples)
+descope_client.fga_check(tuples: tuples)
+descope_client.fga_delete_relations(tuples: tuples)
+```
+
+### Analytics
+
+Search project analytics:
+
+```ruby
+descope_client.analytics_search(from_ts: 1700000000000, to_ts: 1700086400000, group_by_action: true)
+```
+
 
 ## API Rate Limits
 
@@ -1304,6 +1527,15 @@ You can find various usage examples in the [examples folder](https://github.com/
 
 ```bash
 bundle install
+```
+
+### Environment variables
+
+```bash
+export DESCOPE_PROJECT_ID=<ProjectID>
+export DESCOPE_MANAGEMENT_KEY=<ManagementKey>
+# Optional, only needed for authentication methods with disabled public access
+export DESCOPE_AUTH_MANAGEMENT_KEY=<AuthManagementKey>
 ```
 
 ### Run tests

@@ -17,7 +17,7 @@ module Descope
               permissionNames: permission_names,
               tenantId: tenant_id
             }
-            post(ROLE_CREATE_PATH, request_params)
+            mgmt_post(ROLE_CREATE_PATH, request_params)
           end
 
           def update_role(name: nil, new_name: nil, description: nil, permission_names: nil, tenant_id: nil)
@@ -31,7 +31,7 @@ module Descope
               permissionNames: permission_names,
               tenantId: tenant_id
             }
-            post(ROLE_UPDATE_PATH, request_params)
+            mgmt_post(ROLE_UPDATE_PATH, request_params)
           end
 
           def delete_role(name: nil, tenant_id: nil)
@@ -40,12 +40,12 @@ module Descope
 
             request_params = { name: }
             request_params[:tenantId] = tenant_id if tenant_id
-            post(ROLE_DELETE_PATH, request_params)
+            mgmt_post(ROLE_DELETE_PATH, request_params)
           end
 
           def load_all_roles
             # Load all roles.
-            get(ROLE_LOAD_ALL_PATH)
+            mgmt_get(ROLE_LOAD_ALL_PATH)
           end
 
           def search_roles(role_names: nil, tenant_ids: nil, role_name_like: nil, permission_names: nil)
@@ -55,7 +55,7 @@ module Descope
             request_params[:tenantIds] = tenant_ids if tenant_ids
             request_params[:roleNameLike] = role_name_like if role_name_like
             request_params[:permissionNames] = permission_names if permission_names
-            post(ROLE_SEARCH_PATH, request_params)
+            mgmt_post(ROLE_SEARCH_PATH, request_params)
           end
         end
       end
