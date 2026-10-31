@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'rubocop', '1.91.0', require: false
+  gem 'rubocop', '1.92.0', require: false
   gem 'rubocop-rails', '2.38.0', require: false
 end
 
