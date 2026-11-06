@@ -27,6 +27,9 @@ module Descope
 
 
         ALGORITHM_KEY = 'alg'
+        PUBLIC_KEYS_TTL = 600 # seconds since the last successful fetch
+        PUBLIC_KEYS_REFETCH_COOLDOWN = 30 # seconds between fetches triggered by an unknown kid
+        private_constant :PUBLIC_KEYS_TTL, :PUBLIC_KEYS_REFETCH_COOLDOWN
 
         def generate_jwt_response(response_body: nil, refresh_cookie: nil, audience: nil)
           if response_body.nil? || response_body.empty?
@@ -189,11 +192,7 @@ module Descope
 
           found_key = nil
           @mlock.synchronize do
-            if @public_keys.nil? || @public_keys == {} || @public_keys.to_s.empty? || @public_keys[kid].nil?
-              @logger.debug 'fetching public keys'
-              # fetch keys from /v2/keys and set them in @public_keys
-              fetch_public_keys
-            end
+            refresh_public_keys(kid)
 
             found_key = @public_keys[kid]
             @logger.debug "found_key: #{found_key}"
@@ -356,16 +355,40 @@ module Descope
             raise AuthException.new("Unable to fetch public keys. #{response}", code: 500)
           end
 
-          jwkeys_wrapper = response
-          jwkeys = jwkeys_wrapper['keys']
-          @public_keys = {}
-
-          jwkeys.each do |key|
+          public_keys = {}
+          response['keys'].each do |key|
             loaded_kid, pub_key, alg = validate_and_load_public_key(key)
-            @public_keys[loaded_kid] = [pub_key, alg]
+            public_keys[loaded_kid] = [pub_key, alg]
           rescue AuthException
             nil
           end
+          @public_keys = public_keys
+        end
+
+        # An unknown kid refetches the whole key set at most once per PUBLIC_KEYS_REFETCH_COOLDOWN since the last
+        # successful fetch, so a failed fetch is retried on the next lookup. A cached kid refetches once the set is
+        # older than PUBLIC_KEYS_TTL, skipping the fetch for PUBLIC_KEYS_REFETCH_COOLDOWN after a failed attempt.
+        # On failure the last good key set is kept. Caller holds @mlock.
+        def refresh_public_keys(kid)
+          now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          fetched = @public_keys_fetched_at
+          if @public_keys[kid].nil?
+            return if fetched && now - fetched < PUBLIC_KEYS_REFETCH_COOLDOWN
+          else
+            return if @public_key || (fetched && now - fetched < PUBLIC_KEYS_TTL)
+
+            attempted = @public_keys_fetch_attempted_at
+            return if attempted && now - attempted < PUBLIC_KEYS_REFETCH_COOLDOWN
+          end
+
+          @logger.debug 'fetching public keys'
+          @public_keys_fetch_attempted_at = now
+          fetch_public_keys
+          @public_keys_fetched_at = now
+        rescue StandardError => e
+          raise if @public_keys[kid].nil?
+
+          @logger.warn "Unable to refresh public keys, using cached keys: #{e.message}"
         end
 
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity

@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Descope::Api::V1::Auth do
-  before(:all) do
+  before do
     dummy_instance = DummyClass.new
     dummy_instance.extend(Descope::Api::V1::Auth)
     dummy_instance.extend(Descope::Api::V1::Session)
@@ -240,6 +240,117 @@ describe Descope::Api::V1::Auth do
       # Expect no errors
       expect(errors).to have_attributes(length: 0)
       expect(counter).to eq(1)
+    end
+  end
+
+  context 'public key cache' do
+    let(:rsa) { OpenSSL::PKey::RSA.generate(2048) }
+    let(:jwk) { JWT::JWK.new(rsa, kid: 'kid-1', use: 'sig', alg: ALGORITHM) }
+    let(:token) { JWT.encode({ data: 'data' }, rsa, ALGORITHM, kid: 'kid-1') }
+    let(:keys_response) { { 'keys' => [jwk.export.transform_keys(&:to_s)] } }
+    let(:now) { [0.0] }
+
+    def token_for(kid)
+      JWT.encode({ data: 'data' }, rsa, ALGORITHM, kid:)
+    end
+
+    before do
+      allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC) { now[0] }
+      @fetches = 0
+      @response = keys_response
+      allow(@instance).to receive(:token_validation_key) do
+        @fetches += 1
+        raise Descope::AuthException.new('boom', code: 500) if @response.nil?
+
+        @response
+      end
+    end
+
+    it 'fetches once for the same kid within the TTL' do
+      2.times { @instance.send(:validate_token, token) }
+      now[0] = 599
+      @instance.send(:validate_token, token)
+      expect(@fetches).to eq(1)
+    end
+
+    it 'replaces the key set after the TTL and rejects a key that is no longer published' do
+      @instance.send(:validate_token, token)
+      @response = { 'keys' => [] }
+      now[0] = 599
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      now[0] = 600
+      expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, /Public key not found/)
+      expect(@fetches).to eq(2)
+    end
+
+    it 'refetches for an unknown kid at most once per cooldown after a successful fetch' do
+      @instance.send(:validate_token, token)
+      now[0] = 100
+      3.times do
+        expect { @instance.send(:validate_token, token_for('other')) }
+          .to raise_error(Descope::AuthException, /Public key not found/)
+      end
+      expect(@fetches).to eq(2)
+      now[0] = 130
+      expect { @instance.send(:validate_token, token_for('other')) }.to raise_error(Descope::AuthException)
+      expect(@fetches).to eq(3)
+    end
+
+    it 'keeps cached keys usable when a refresh fails and limits retries to the cooldown' do
+      @instance.send(:validate_token, token)
+      @response = nil
+      now[0] = 600
+      3.times { expect { @instance.send(:validate_token, token) }.not_to raise_error }
+      expect(@fetches).to eq(2)
+      now[0] = 630
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      expect(@fetches).to eq(3)
+    end
+
+    it 'keeps cached keys when the refresh response is malformed' do
+      @instance.send(:validate_token, token)
+      @response = { 'error' => 'nope' }
+      now[0] = 600
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      expect(@instance.instance_variable_get(:@public_keys).keys).to eq(['kid-1'])
+    end
+
+    it 'surfaces the fetch error when the key is not cached and the fetch fails' do
+      @response = nil
+      expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, 'boom')
+    end
+
+    it 'retries the fetch for an unknown kid right after a failed fetch' do
+      @response = nil
+      expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, 'boom')
+      @response = keys_response
+      now[0] = 1
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      expect(@fetches).to eq(2)
+    end
+
+    it 'does not delay an unknown kid lookup after a failed refresh of a cached key' do
+      @instance.send(:validate_token, token)
+      @response = nil
+      now[0] = 600
+      @instance.send(:validate_token, token)
+      expect(@fetches).to eq(2)
+      now[0] = 601
+      expect { @instance.send(:validate_token, token_for('other')) }.to raise_error(Descope::AuthException, 'boom')
+      expect(@fetches).to eq(3)
+    end
+
+    it 'does not apply the TTL to a static public key but still fetches for an unknown kid, rate limited' do
+      @instance.instance_variable_set(:@public_key, jwk.export.transform_keys(&:to_s))
+      @instance.instance_variable_set(:@public_keys, { 'kid-1' => [jwk, ALGORITHM] })
+      now[0] = 10_000
+      @instance.send(:validate_token, token)
+      expect(@fetches).to eq(0)
+      2.times { expect { @instance.send(:validate_token, token_for('other')) }.to raise_error(Descope::AuthException) }
+      expect(@fetches).to eq(1)
+      now[0] = 10_030
+      expect { @instance.send(:validate_token, token_for('other')) }.to raise_error(Descope::AuthException)
+      expect(@fetches).to eq(2)
     end
   end
 
