@@ -275,12 +275,52 @@ describe Descope::Api::V1::Auth do
 
     it 'replaces the key set after the TTL and rejects a key that is no longer published' do
       @instance.send(:validate_token, token)
-      @response = { 'keys' => [] }
+      @response = { 'keys' => [JWT::JWK.new(rsa, kid: 'kid-2', use: 'sig', alg: ALGORITHM).export.transform_keys(&:to_s)] }
       now[0] = 599
       expect { @instance.send(:validate_token, token) }.not_to raise_error
       now[0] = 600
       expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, /Public key not found/)
       expect(@fetches).to eq(2)
+    end
+
+    it 'keeps the last key set and logs a warning when a successful response has no usable keys' do
+      @instance.send(:validate_token, token)
+      logger = @instance.instance_variable_get(:@logger)
+      allow(logger).to receive(:warn)
+      [{ 'keys' => [] }, { 'keys' => nil }, { 'keys' => [{ 'kid' => 'no-alg' }] }].each_with_index do |response, i|
+        @response = response
+        now[0] = 600 * (i + 1)
+        expect { @instance.send(:validate_token, token) }.not_to raise_error
+      end
+      expect(@instance.instance_variable_get(:@public_keys).keys).to eq(['kid-1'])
+      expect(logger).to have_received(:warn).with(/Unable to fetch public keys/).exactly(3).times
+    end
+
+    it 'shares the outcome of a failed fetch with callers that waited on it' do
+      started = Queue.new
+      release = Queue.new
+      allow(@instance).to receive(:token_validation_key) do
+        @fetches += 1
+        started << true
+        release.pop
+        raise Descope::AuthException.new('boom', code: 500)
+      end
+      errors = Concurrent::Array.new
+      lookup = lambda do
+        Thread.new do
+          @instance.send(:validate_token, token)
+        rescue Descope::AuthException => e
+          errors << e.message
+        end
+      end
+      first = lookup.call
+      started.pop
+      waiters = Array.new(3) { lookup.call }
+      Thread.pass until waiters.all? { |t| t.status == 'sleep' }
+      release.close
+      [first, *waiters].each(&:join)
+      expect(@fetches).to eq(1)
+      expect(errors).to eq(['boom'] * 4)
     end
 
     it 'refetches for an unknown kid at most once per cooldown after a successful fetch' do
@@ -395,17 +435,22 @@ describe Descope::Api::V1::Auth do
       expect(@fetches).to eq(2)
     end
 
-    it 'applies the TTL to keys fetched while a static public key is configured' do
+    it 'keeps a static public key alongside fetched keys and replaces only the fetched ones' do
       @instance.instance_variable_set(:@public_key, jwk.export.transform_keys(&:to_s))
       @instance.instance_variable_set(:@public_keys, { 'kid-1' => [jwk, ALGORITHM] })
       fetched_jwk = JWT::JWK.new(rsa, kid: 'kid-2', use: 'sig', alg: ALGORITHM)
       @response = { 'keys' => [fetched_jwk.export.transform_keys(&:to_s)] }
       expect { @instance.send(:validate_token, token_for('kid-2')) }.not_to raise_error
-      @response = { 'keys' => [] }
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      @response = { 'keys' => [JWT::JWK.new(rsa, kid: 'kid-3', use: 'sig', alg: ALGORITHM).export.transform_keys(&:to_s)] }
       now[0] = 600
+      expect { @instance.send(:validate_token, token_for('kid-3')) }.not_to raise_error
       expect { @instance.send(:validate_token, token_for('kid-2')) }
         .to raise_error(Descope::AuthException, /Public key not found/)
-      expect(@fetches).to eq(2)
+      @response = nil
+      now[0] = 10_000
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      expect { @instance.send(:validate_token, token_for('kid-3')) }.to raise_error(Descope::AuthException)
     end
 
     it 'fetches keys when the cache was cleared to nil' do

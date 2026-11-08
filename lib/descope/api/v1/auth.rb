@@ -192,8 +192,9 @@ module Descope
           raise AuthException.new('Token header is missing property: kid', code: 500) if kid.nil?
 
           found_key = nil
+          seen_fetches = @public_keys_fetches
           @mlock.synchronize do
-            refresh_public_keys(kid)
+            refresh_public_keys(kid, seen_fetches)
 
             found_key = @public_keys[kid]
             @logger.debug "found_key: #{found_key}"
@@ -363,7 +364,19 @@ module Descope
           rescue AuthException
             nil
           end
-          @public_keys = public_keys
+          raise AuthException.new("Unable to fetch public keys. #{response}", code: 500) if public_keys.empty?
+
+          @public_keys = public_keys.merge(static_public_keys)
+        end
+
+        # The user-provided public key, kept alongside fetched keys and never expired.
+        def static_public_keys
+          return {} if @public_key.nil?
+
+          @static_public_keys ||= begin
+            kid, pub_key, alg = validate_and_load_public_key(@public_key)
+            { kid => [pub_key, alg] }
+          end
         end
 
         # An unknown kid refetches the whole key set at most once per PUBLIC_KEYS_REFETCH_COOLDOWN since the last
@@ -371,32 +384,42 @@ module Descope
         # older than PUBLIC_KEYS_TTL, skipping the fetch for PUBLIC_KEYS_REFETCH_COOLDOWN after a failed attempt.
         # On failure the last good key set is kept, but it is not used once older than PUBLIC_KEYS_MAX_STALE: a
         # lookup then fails unless a fetch succeeds, and fetches are spaced PUBLIC_KEYS_REFETCH_COOLDOWN after a
-        # failed attempt. Caller holds @mlock.
-        def refresh_public_keys(kid)
+        # failed attempt. A caller that waited on @mlock while another caller fetched uses that fetch's outcome.
+        # The static public key is never fetched or expired. Caller holds @mlock.
+        def refresh_public_keys(kid, seen_fetches)
+          @public_keys ||= {}
+          return if static_public_keys.key?(kid)
+
           now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           fetched = @public_keys_fetched_at
+          stale = fetched && now - fetched >= PUBLIC_KEYS_MAX_STALE
+          attempt_public_keys_fetch(kid, now, fetched, stale) if seen_fetches == @public_keys_fetches
+          error = @public_keys_fetch_error
+          raise error if error && (@public_keys[kid].nil? || stale)
+        end
+
+        def attempt_public_keys_fetch(kid, now, fetched, stale)
           attempted = @public_keys_fetch_attempted_at
           retry_wait = attempted && now - attempted < PUBLIC_KEYS_REFETCH_COOLDOWN
-          @public_keys ||= {}
-          stale = fetched && now - fetched >= PUBLIC_KEYS_MAX_STALE
           if stale
             raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if retry_wait
           elsif @public_keys[kid].nil?
             return if fetched && now - fetched < PUBLIC_KEYS_REFETCH_COOLDOWN
-          else
-            return if fetched ? now - fetched < PUBLIC_KEYS_TTL : @public_key
-
-            return if retry_wait
+          elsif (fetched && now - fetched < PUBLIC_KEYS_TTL) || retry_wait
+            return
           end
 
           @logger.debug 'fetching public keys'
           @public_keys_fetch_attempted_at = now
-          fetch_public_keys
-          @public_keys_fetched_at = now
-        rescue StandardError => e
-          raise if @public_keys[kid].nil? || stale
-
-          @logger.warn "Unable to refresh public keys, using cached keys: #{e.message}"
+          begin
+            fetch_public_keys
+            @public_keys_fetched_at = now
+            @public_keys_fetch_error = nil
+          rescue StandardError => e
+            @logger.warn "Unable to fetch public keys: #{e.message}"
+            @public_keys_fetch_error = e
+          end
+          @public_keys_fetches = @public_keys_fetches.to_i + 1
         end
 
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity
