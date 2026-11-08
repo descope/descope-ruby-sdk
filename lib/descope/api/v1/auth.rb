@@ -29,7 +29,8 @@ module Descope
         ALGORITHM_KEY = 'alg'
         PUBLIC_KEYS_TTL = 600 # seconds since the last successful fetch
         PUBLIC_KEYS_REFETCH_COOLDOWN = 30 # seconds between fetches triggered by an unknown kid
-        private_constant :PUBLIC_KEYS_TTL, :PUBLIC_KEYS_REFETCH_COOLDOWN
+        PUBLIC_KEYS_MAX_STALE = 3600 # seconds since the last successful fetch after which cached keys are not used
+        private_constant :PUBLIC_KEYS_TTL, :PUBLIC_KEYS_REFETCH_COOLDOWN, :PUBLIC_KEYS_MAX_STALE
 
         def generate_jwt_response(response_body: nil, refresh_cookie: nil, audience: nil)
           if response_body.nil? || response_body.empty?
@@ -368,12 +369,14 @@ module Descope
         # An unknown kid refetches the whole key set at most once per PUBLIC_KEYS_REFETCH_COOLDOWN since the last
         # successful fetch, so a failed fetch is retried on the next lookup. A cached kid refetches once the set is
         # older than PUBLIC_KEYS_TTL, skipping the fetch for PUBLIC_KEYS_REFETCH_COOLDOWN after a failed attempt.
-        # On failure the last good key set is kept. Caller holds @mlock.
+        # On failure the last good key set is kept, but it is not used once older than PUBLIC_KEYS_MAX_STALE.
+        # Caller holds @mlock.
         def refresh_public_keys(kid)
           now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           fetched = @public_keys_fetched_at
           @public_keys ||= {}
-          if @public_keys[kid].nil?
+          stale = fetched && now - fetched >= PUBLIC_KEYS_MAX_STALE
+          if @public_keys[kid].nil? || stale
             return if fetched && now - fetched < PUBLIC_KEYS_REFETCH_COOLDOWN
           else
             return if fetched ? now - fetched < PUBLIC_KEYS_TTL : @public_key
@@ -387,7 +390,7 @@ module Descope
           fetch_public_keys
           @public_keys_fetched_at = now
         rescue StandardError => e
-          raise if @public_keys[kid].nil?
+          raise if @public_keys[kid].nil? || stale
 
           @logger.warn "Unable to refresh public keys, using cached keys: #{e.message}"
         end

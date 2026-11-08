@@ -307,6 +307,17 @@ describe Descope::Api::V1::Auth do
       expect(@fetches).to eq(3)
     end
 
+    it 'stops using cached keys an hour after the last successful fetch while refreshes keep failing' do
+      @instance.send(:validate_token, token)
+      @response = nil
+      now[0] = 3599
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      now[0] = 3600
+      2.times { expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, 'boom') }
+      @response = keys_response
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+    end
+
     it 'keeps cached keys when the refresh response is malformed' do
       @instance.send(:validate_token, token)
       @response = { 'error' => 'nope' }
