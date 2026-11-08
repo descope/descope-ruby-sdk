@@ -327,6 +327,28 @@ describe Descope::Api::V1::Auth do
       expect(@fetches).to eq(4)
     end
 
+    it 'spaces fetches 30 seconds after a failed attempt once cached keys are an hour old' do
+      @instance.send(:validate_token, token)
+      @response = nil
+      now[0] = 3600
+      expect { @instance.send(:validate_token, token_for('other')) }.to raise_error(Descope::AuthException, 'boom')
+      expect(@fetches).to eq(2)
+      [3601, 3629].each do |t|
+        now[0] = t
+        [token_for('other'), token].each do |tok|
+          expect { @instance.send(:validate_token, tok) }.to raise_error(Descope::AuthException, /Public key not found/)
+        end
+      end
+      expect(@fetches).to eq(2)
+      now[0] = 3630
+      expect { @instance.send(:validate_token, token_for('other')) }.to raise_error(Descope::AuthException, 'boom')
+      expect(@fetches).to eq(3)
+      @response = keys_response
+      now[0] = 3660
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      expect(@fetches).to eq(4)
+    end
+
     it 'keeps cached keys when the refresh response is malformed' do
       @instance.send(:validate_token, token)
       @response = { 'error' => 'nope' }
