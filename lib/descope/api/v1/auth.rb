@@ -369,20 +369,24 @@ module Descope
         # An unknown kid refetches the whole key set at most once per PUBLIC_KEYS_REFETCH_COOLDOWN since the last
         # successful fetch, so a failed fetch is retried on the next lookup. A cached kid refetches once the set is
         # older than PUBLIC_KEYS_TTL, skipping the fetch for PUBLIC_KEYS_REFETCH_COOLDOWN after a failed attempt.
-        # On failure the last good key set is kept, but it is not used once older than PUBLIC_KEYS_MAX_STALE.
-        # Caller holds @mlock.
+        # On failure the last good key set is kept, but it is not used once older than PUBLIC_KEYS_MAX_STALE: a
+        # lookup then fails unless a fetch succeeds. Caller holds @mlock.
         def refresh_public_keys(kid)
           now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           fetched = @public_keys_fetched_at
           @public_keys ||= {}
           stale = fetched && now - fetched >= PUBLIC_KEYS_MAX_STALE
-          if @public_keys[kid].nil? || stale
+          if @public_keys[kid].nil?
             return if fetched && now - fetched < PUBLIC_KEYS_REFETCH_COOLDOWN
           else
-            return if fetched ? now - fetched < PUBLIC_KEYS_TTL : @public_key
+            return if !stale && (fetched ? now - fetched < PUBLIC_KEYS_TTL : @public_key)
 
             attempted = @public_keys_fetch_attempted_at
-            return if attempted && now - attempted < PUBLIC_KEYS_REFETCH_COOLDOWN
+            if attempted && now - attempted < PUBLIC_KEYS_REFETCH_COOLDOWN
+              raise AuthException.new('Unable to validate public key. Public key not found.', code: 500) if stale
+
+              return
+            end
           end
 
           @logger.debug 'fetching public keys'

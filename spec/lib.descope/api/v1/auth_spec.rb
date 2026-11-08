@@ -313,9 +313,18 @@ describe Descope::Api::V1::Auth do
       now[0] = 3599
       expect { @instance.send(:validate_token, token) }.not_to raise_error
       now[0] = 3600
-      2.times { expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, 'boom') }
+      expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, /Public key not found/)
+      expect(@fetches).to eq(2)
+      now[0] = 3628
+      expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, /Public key not found/)
+      expect(@fetches).to eq(2)
+      now[0] = 3629
+      expect { @instance.send(:validate_token, token) }.to raise_error(Descope::AuthException, 'boom')
+      expect(@fetches).to eq(3)
       @response = keys_response
+      now[0] = 3660
       expect { @instance.send(:validate_token, token) }.not_to raise_error
+      expect(@fetches).to eq(4)
     end
 
     it 'keeps cached keys when the refresh response is malformed' do
