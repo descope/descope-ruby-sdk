@@ -372,10 +372,11 @@ module Descope
         def refresh_public_keys(kid)
           now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           fetched = @public_keys_fetched_at
+          @public_keys ||= {}
           if @public_keys[kid].nil?
             return if fetched && now - fetched < PUBLIC_KEYS_REFETCH_COOLDOWN
           else
-            return if @public_key || (fetched && now - fetched < PUBLIC_KEYS_TTL)
+            return if fetched ? now - fetched < PUBLIC_KEYS_TTL : @public_key
 
             attempted = @public_keys_fetch_attempted_at
             return if attempted && now - attempted < PUBLIC_KEYS_REFETCH_COOLDOWN

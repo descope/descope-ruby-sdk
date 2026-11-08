@@ -352,6 +352,25 @@ describe Descope::Api::V1::Auth do
       expect { @instance.send(:validate_token, token_for('other')) }.to raise_error(Descope::AuthException)
       expect(@fetches).to eq(2)
     end
+
+    it 'applies the TTL to keys fetched while a static public key is configured' do
+      @instance.instance_variable_set(:@public_key, jwk.export.transform_keys(&:to_s))
+      @instance.instance_variable_set(:@public_keys, { 'kid-1' => [jwk, ALGORITHM] })
+      fetched_jwk = JWT::JWK.new(rsa, kid: 'kid-2', use: 'sig', alg: ALGORITHM)
+      @response = { 'keys' => [fetched_jwk.export.transform_keys(&:to_s)] }
+      expect { @instance.send(:validate_token, token_for('kid-2')) }.not_to raise_error
+      @response = { 'keys' => [] }
+      now[0] = 600
+      expect { @instance.send(:validate_token, token_for('kid-2')) }
+        .to raise_error(Descope::AuthException, /Public key not found/)
+      expect(@fetches).to eq(2)
+    end
+
+    it 'fetches keys when the cache was cleared to nil' do
+      @instance.instance_variable_set(:@public_keys, nil)
+      expect { @instance.send(:validate_token, token) }.not_to raise_error
+      expect(@fetches).to eq(1)
+    end
   end
 
   context '.select_tenant' do
