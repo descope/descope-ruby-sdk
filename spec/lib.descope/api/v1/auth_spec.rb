@@ -453,6 +453,15 @@ describe Descope::Api::V1::Auth do
       expect { @instance.send(:validate_token, token_for('kid-3')) }.to raise_error(Descope::AuthException)
     end
 
+    it 'restores the static public key without a fetch when the cache was cleared' do
+      @instance.instance_variable_set(:@public_key, jwk.export.transform_keys(&:to_s))
+      [nil, {}].each do |cleared|
+        @instance.instance_variable_set(:@public_keys, cleared)
+        expect { @instance.send(:validate_token, token) }.not_to raise_error
+      end
+      expect(@fetches).to eq(0)
+    end
+
     it 'fetches keys when the cache was cleared to nil' do
       @instance.instance_variable_set(:@public_keys, nil)
       expect { @instance.send(:validate_token, token) }.not_to raise_error

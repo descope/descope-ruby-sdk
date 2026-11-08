@@ -388,7 +388,10 @@ module Descope
         # The static public key is never fetched or expired. Caller holds @mlock.
         def refresh_public_keys(kid, seen_fetches)
           @public_keys ||= {}
-          return if static_public_keys.key?(kid)
+          if static_public_keys.key?(kid)
+            @public_keys[kid] ||= static_public_keys[kid]
+            return
+          end
 
           now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           fetched = @public_keys_fetched_at
