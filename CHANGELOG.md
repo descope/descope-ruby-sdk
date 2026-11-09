@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.3.0](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.2.0...descope/v1.3.0) (2026-11-09)
+
+
+### Bug Fixes
+
+* **auth:** refresh cached signing keys and rate limit unknown kid refetch ([#250](https://github.com/descope/descope-ruby-sdk/issues/250)) ([72d586e](https://github.com/descope/descope-ruby-sdk/commit/72d586efd95fd899446ee48a4220a3a1fb7ce347))
+
 ## [1.2.0](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.1.0...descope/v1.2.0) (2026-10-19)
 
 
