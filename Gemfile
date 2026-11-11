@@ -12,7 +12,7 @@ group :test do
   gem 'factory_bot', '6.6.0', require: false
   gem 'faker', require: false
   gem 'parallel_tests', require: false
-  gem 'rack-test', '2.2.0', require: false
+  gem 'rack-test', '2.3.0', require: false
   gem 'rotp', '6.3.0', require: false
   gem 'rspec', '3.13.2', require: false
   gem 'selenium-webdriver', '4.51.0', require: false
