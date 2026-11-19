@@ -79,7 +79,7 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     retryable (3.0.5)
-    rotp (6.3.0)
+    rotp (6.4.0)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -149,7 +149,7 @@ DEPENDENCIES
   faker
   parallel_tests
   rack-test (= 2.3.0)
-  rotp (= 6.3.0)
+  rotp (= 6.4.0)
   rspec (= 3.13.2)
   rubocop (= 1.92.2)
   rubocop-rails (= 2.38.0)
