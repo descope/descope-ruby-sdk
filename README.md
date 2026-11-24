@@ -790,34 +790,42 @@ You can manage SSO settings and map SSO group roles and user attributes.
 
 ```ruby
 # You can get SSO SAML settings for a tenant
-sso_settings_res = descope_client.sso_get_settings('tenant-id')  
+sso_settings_res = descope_client.get_sso_settings('tenant-id')
+# The loaded SAML settings include the accepted audiences
+accepted_audiences = sso_settings_res['saml']['acceptedAudiences']
 
 # You can configure SSO SAML settings manually by setting the required fields directly
-descope_client.configure_sso_saml_metadata(
-    tenant_id: '123', # Which tenant this configuration is for
+descope_client.configure_sso_saml(
+    tenant_id: 'tenant-id', # Which tenant this configuration is for
     settings: {
-      name: 'test',
-      clientId: 'test',
-      scope: ['test'],
-      userAttrMapping: {
-              loginId: 'test',
-              username: 'test',
-              name: 'test'
-      },
-      callbackDomain: 'test'   
+      idp_url: 'https://idp.example.com/sso', # Required
+      idp_entity_id: 'https://idp.example.com/entity', # Required
+      idp_cert: '<IdP certificate>', # Required
+      attribute_mapping: { name: 'displayName', email: 'mail', group: 'groups' },
+      role_mappings: [{ groups: %w[admins], role_name: 'Tenant Admin' }],
+      default_sso_roles: ['Viewer'] # An empty list clears the default SSO roles
     },
     redirect_url: 'https://your.domain.com', # Global redirection after successful authentication
-    domain: 'tenant-users.com', # Users authentication with this domain will be logged in to this tenant
+    domains: ['tenant-users.com'], # Users authenticating with these domains log in to this tenant. Replaces the stored domains
     # Optional: audience values a SAML assertion may carry in place of the tenant's SP entity ID,
     # for IdPs that send a different audience. Exact match (surrounding whitespace ignored), an empty
     # string accepts an empty audience, up to 20 values of up to 1000 characters each.
     # Leave it out (nil) to keep the stored values, pass an array to replace them, or [] to clear them.
-    # configure_sso_saml accepts the same accepted_audiences argument.
     accepted_audiences: ['https://idp.example.com/audience']
 )
 
-# The loaded SAML settings include the accepted audiences
-accepted_audiences = sso_settings_res['saml']['acceptedAudiences']
+# Or configure them from the IdP metadata URL. The other settings keys and arguments work the same.
+descope_client.configure_sso_saml_metadata(
+    tenant_id: 'tenant-id',
+    settings: {
+      idp_metadata_url: 'https://idp.example.com/metadata', # Required
+      attribute_mapping: { name: 'displayName', email: 'mail', group: 'groups' },
+      role_mappings: [{ groups: %w[admins], role_name: 'Tenant Admin' }]
+    },
+    redirect_url: 'https://your.domain.com',
+    domains: ['tenant-users.com'],
+    accepted_audiences: ['https://idp.example.com/audience']
+)
 ```
 
 
