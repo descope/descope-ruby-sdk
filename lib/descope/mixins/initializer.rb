@@ -46,7 +46,6 @@ module Descope
         # should - be a different management key than @management_key.
         @auth_management_key = options[:auth_management_key] || ENV['DESCOPE_AUTH_MANAGEMENT_KEY']
         @timeout_seconds = options[:timeout_seconds] || Common::DEFAULT_TIMEOUT_SECONDS
-        @timeout = @timeout_seconds  # Set timeout for HTTP requests
         @jwt_validation_leeway = options[:jwt_validation_leeway] || Common::DEFAULT_JWT_VALIDATION_LEEWAY
 
         if @project_id.to_s.empty?
@@ -85,7 +84,8 @@ module Descope
           key: key,
           headers: @headers,
           logger: @logger,
-          timeout: @timeout_seconds
+          timeout: @timeout_seconds,
+          skip_verify: @skip_verify
         )
       end
 

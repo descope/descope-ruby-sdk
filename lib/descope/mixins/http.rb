@@ -113,7 +113,7 @@ module Descope
             # Extract value after the '=' sign
             cookie_value = name_value.split('=', 2)[1]
             # Return cookie value (JWT tokens should not be URL-decoded)
-            cookie_value.strip
+            cookie_value.strip.then { |v| v.empty? ? nil : v }
           else
             nil
           end
@@ -195,8 +195,8 @@ module Descope
           payload: body
         }
 
-        # Apply TLS verification setting if skip_verify is set
-        if defined?(@skip_verify) && @skip_verify
+        # Disable TLS verification only when explicitly configured (local development)
+        if @skip_verify
           request_options[:verify_ssl] = OpenSSL::SSL::VERIFY_NONE
         end
 

@@ -40,6 +40,27 @@ describe Descope::Mixins::HTTP do
       result = @instance.parse_cookie_value(cookie_header, 'DS')
       expect(result).to eq('spaced_token')
     end
+
+    it 'returns nil for an empty (cleared) cookie value' do
+      expect(@instance.parse_cookie_value('DSR=; Max-Age=0; Path=/', 'DSR')).to be_nil
+    end
+  end
+
+  describe 'skip_verify' do
+    def client(skip_verify)
+      Descope::HttpClient.new(base_uri: 'https://api.descope.com', project_id: 'P1', headers: {},
+                              logger: Logger.new(nil), skip_verify: skip_verify)
+    end
+
+    it 'disables TLS verification only when skip_verify is set' do
+      expect(RestClient::Request).to receive(:execute).with(hash_including(verify_ssl: OpenSSL::SSL::VERIFY_NONE))
+      client(true).call(:get, 'https://x', 1, {})
+    end
+
+    it 'keeps TLS verification by default' do
+      expect(RestClient::Request).to receive(:execute).with(hash_excluding(:verify_ssl))
+      client(false).call(:get, 'https://x', 1, {})
+    end
   end
 
   describe '#safe_parse_json with cookie handling' do

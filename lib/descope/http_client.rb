@@ -9,7 +9,7 @@ module Descope
   class HttpClient
     include Descope::Mixins::HTTP
 
-    def initialize(base_uri:, project_id:, headers:, logger:, key: nil, timeout: nil, retry_count: nil)
+    def initialize(base_uri:, project_id:, headers:, logger:, key: nil, timeout: nil, retry_count: nil, skip_verify: false)
       @base_uri = base_uri
       @project_id = project_id
       @key = key
@@ -17,6 +17,7 @@ module Descope
       @logger = logger
       @timeout = timeout
       @retry_count = retry_count
+      @skip_verify = skip_verify
     end
 
     # Bearer <project_id>[:<pswd>][:<key>] where pswd is a refresh token or access key presented by
