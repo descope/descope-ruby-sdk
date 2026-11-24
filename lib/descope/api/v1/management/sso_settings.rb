@@ -10,6 +10,8 @@ module Descope
 
           def get_sso_settings(tenant_id)
             # Get SSO settings for the provided tenant id.
+            # For SAML, the response's saml.acceptedAudiences lists the audience values a SAML assertion
+            # may carry in place of the tenant's SP entity ID.
             mgmt_get(SSO_SETTINGS_PATH, { tenantId: tenant_id })
           end
 
@@ -31,22 +33,31 @@ module Descope
             mgmt_post(SSO_OIDC_PATH, request_params)
           end
 
-          def configure_sso_saml(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
+          def configure_sso_saml(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil, accepted_audiences: nil)
             raise Descope::ArgumentException.new('SSO SAML settings must be a Hash', code: 400) unless settings.is_a?(Hash)
 
             # Configure tenant SSO SAML Settings, using a valid management key.
+            # accepted_audiences is an optional list of audience values a SAML assertion may carry in place of
+            # the tenant's SP entity ID, for IdPs that send a different audience. Values must match exactly
+            # (surrounding whitespace is ignored) and an empty string accepts an empty audience. Up to 20 values
+            # of up to 1000 characters each. Leave it nil to keep the stored values. Pass an array to replace
+            # them, or an empty array to clear them.
             request_params = {
               tenantId: tenant_id,
-              settings: compose_settings_body(settings),
+              settings: add_accepted_audiences(compose_settings_body(settings), accepted_audiences),
               redirectUrl: redirect_url,
               domain:
             }
             mgmt_post(SSO_SETTINGS_PATH, request_params)
           end
 
-          def configure_sso_saml_metadata(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil)
+          def configure_sso_saml_metadata(tenant_id: nil, settings: nil, redirect_url: nil, domain: nil,
+                                          accepted_audiences: nil)
             # Configure tenant SSO SAML Metadata, using a valid management key.
-            mgmt_post(SSO_METADATA_PATH, compose_metadata_body(tenant_id, settings, redirect_url, domain))
+            # accepted_audiences works the same as in configure_sso_saml: nil keeps the stored values, an array
+            # replaces them and an empty array clears them.
+            mgmt_post(SSO_METADATA_PATH,
+                      compose_metadata_body(tenant_id, settings, redirect_url, domain, accepted_audiences))
           end
 
           private
@@ -91,13 +102,23 @@ module Descope
             body
           end
 
-          def compose_metadata_body(tenant_id, settings, redirect_url, domain)
+          def compose_metadata_body(tenant_id, settings, redirect_url, domain, accepted_audiences = nil)
             {
               tenantId: tenant_id,
-              settings: compose_settings_body(settings),
+              settings: add_accepted_audiences(compose_settings_body(settings), accepted_audiences),
               redirectUrl: redirect_url,
               domain:
             }
+          end
+
+          # nil keeps the stored accepted audiences, so neither field is sent. An array (empty included)
+          # replaces them, so the list is sent together with the replace flag.
+          def add_accepted_audiences(settings_body, accepted_audiences)
+            return settings_body if accepted_audiences.nil?
+
+            settings_body[:acceptedAudiences] = accepted_audiences
+            settings_body[:replaceAcceptedAudiences] = true
+            settings_body
           end
 
           def role_mapping_to_hash(role_mapping)

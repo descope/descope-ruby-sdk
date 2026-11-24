@@ -807,8 +807,17 @@ descope_client.configure_sso_saml_metadata(
       callbackDomain: 'test'   
     },
     redirect_url: 'https://your.domain.com', # Global redirection after successful authentication
-    domain: 'tenant-users.com' # Users authentication with this domain will be logged in to this tenant
+    domain: 'tenant-users.com', # Users authentication with this domain will be logged in to this tenant
+    # Optional: audience values a SAML assertion may carry in place of the tenant's SP entity ID,
+    # for IdPs that send a different audience. Exact match (surrounding whitespace ignored), an empty
+    # string accepts an empty audience, up to 20 values of up to 1000 characters each.
+    # Leave it out (nil) to keep the stored values, pass an array to replace them, or [] to clear them.
+    # configure_sso_saml accepts the same accepted_audiences argument.
+    accepted_audiences: ['https://idp.example.com/audience']
 )
+
+# The loaded SAML settings include the accepted audiences
+accepted_audiences = sso_settings_res['saml']['acceptedAudiences']
 ```
 
 

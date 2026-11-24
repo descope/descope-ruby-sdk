@@ -123,6 +123,45 @@ describe Descope::Api::V1::Management::SSOSettings do
         )
       end.not_to raise_error
     end
+
+    it 'does not send accepted audiences when accepted_audiences is nil' do
+      expect(@instance).to receive(:mgmt_post).with(
+        SSO_SETTINGS_PATH, { tenantId: '123', settings: { name: 'test' }, redirectUrl: nil, domain: nil }
+      )
+      @instance.configure_sso_saml(tenant_id: '123', settings: { name: 'test' }, accepted_audiences: nil)
+    end
+
+    it 'replaces accepted audiences when accepted_audiences is a list' do
+      expect(@instance).to receive(:mgmt_post).with(
+        SSO_SETTINGS_PATH, {
+          tenantId: '123',
+          settings: {
+            name: 'test',
+            acceptedAudiences: ['https://idp.example.com/aud', ''],
+            replaceAcceptedAudiences: true
+          },
+          redirectUrl: nil,
+          domain: nil
+        }
+      )
+      @instance.configure_sso_saml(
+        tenant_id: '123',
+        settings: { name: 'test' },
+        accepted_audiences: ['https://idp.example.com/aud', '']
+      )
+    end
+
+    it 'clears accepted audiences when accepted_audiences is an empty array' do
+      expect(@instance).to receive(:mgmt_post).with(
+        SSO_SETTINGS_PATH, {
+          tenantId: '123',
+          settings: { name: 'test', acceptedAudiences: [], replaceAcceptedAudiences: true },
+          redirectUrl: nil,
+          domain: nil
+        }
+      )
+      @instance.configure_sso_saml(tenant_id: '123', settings: { name: 'test' }, accepted_audiences: [])
+    end
   end
 
   context '.configure_sso_saml_metadata' do
@@ -167,6 +206,45 @@ describe Descope::Api::V1::Management::SSOSettings do
           domain: 'test'
         )
       end.not_to raise_error
+    end
+
+    it 'does not send accepted audiences when accepted_audiences is nil' do
+      expect(@instance).to receive(:mgmt_post).with(
+        SSO_METADATA_PATH, { tenantId: '123', settings: { name: 'test' }, redirectUrl: nil, domain: nil }
+      )
+      @instance.configure_sso_saml_metadata(tenant_id: '123', settings: { name: 'test' }, accepted_audiences: nil)
+    end
+
+    it 'replaces accepted audiences when accepted_audiences is a list' do
+      expect(@instance).to receive(:mgmt_post).with(
+        SSO_METADATA_PATH, {
+          tenantId: '123',
+          settings: {
+            name: 'test',
+            acceptedAudiences: ['https://idp.example.com/aud', ''],
+            replaceAcceptedAudiences: true
+          },
+          redirectUrl: nil,
+          domain: nil
+        }
+      )
+      @instance.configure_sso_saml_metadata(
+        tenant_id: '123',
+        settings: { name: 'test' },
+        accepted_audiences: ['https://idp.example.com/aud', '']
+      )
+    end
+
+    it 'clears accepted audiences when accepted_audiences is an empty array' do
+      expect(@instance).to receive(:mgmt_post).with(
+        SSO_METADATA_PATH, {
+          tenantId: '123',
+          settings: { name: 'test', acceptedAudiences: [], replaceAcceptedAudiences: true },
+          redirectUrl: nil,
+          domain: nil
+        }
+      )
+      @instance.configure_sso_saml_metadata(tenant_id: '123', settings: { name: 'test' }, accepted_audiences: [])
     end
   end
 end
