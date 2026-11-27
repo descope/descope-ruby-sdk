@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.4.0](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.3.0...descope/v1.4.0) (2026-11-27)
+
+
+### Features
+
+* **sso:** fix SAML configure endpoints and support accepted audiences ([#264](https://github.com/descope/descope-ruby-sdk/issues/264)) ([3c7857d](https://github.com/descope/descope-ruby-sdk/commit/3c7857d32162212a0a4f75bfe7f6e0d5405187ea))
+
 ## [1.3.0](https://github.com/descope/descope-ruby-sdk/compare/descope/v1.2.0...descope/v1.3.0) (2026-11-09)
 
 
